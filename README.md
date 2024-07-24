@@ -2,13 +2,14 @@
 
 解析XPD数据后找不到XGen中Guides和hair之间的对应关系，中道崩殂
 
+![image](https://github.com/user-attachments/assets/b9a4c92e-a901-45f7-9d16-0c9293279671)
+
 ## Building
-
-### run
-
+```
 run build.bat
+```
 
-### notes
+## Notes
 1. 新建build文件夹
     ```
     mkdir build
