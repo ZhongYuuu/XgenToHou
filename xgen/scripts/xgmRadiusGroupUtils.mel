@@ -1,0 +1,82 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+// ===========================================================================
+// Copyright 2015 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+
+
+//
+//    Description:
+//        Creates a group of brush size UI, which includes:
+//            - A float type of slider group for the brush size/radius
+//            - A pin button as a toggle for using global radius
+//
+//    Input Arguments:
+//        parent         Parent layout of the radius group layout.
+//                       Required so that UI object names can be successfully resolved.
+//        brushCmd       The command to be evaluated in the procedure.
+//        tool           Name of the instance of the tool that the command is applied on
+//
+//    Return Value:
+//        None.
+//
+global proc xgmBrushRadiusGroupProperties( string $parent, 
+        string $brushCmd, 
+        string $tool )
+{
+    setParent $parent;
+
+    rowLayout -numberOfColumns 2 -adjustableColumn 1 -columnWidth 2 20 -columnAlign 1 "left" -columnAttach 1 "left" 0
+                -columnAlign 2 "right" -columnAttach 2 "right" 3 xgmBrushSettingsSizeLayout;
+        floatSliderGrp -field true -pre 3
+            -min 0
+            -max 1000
+            -fieldMaxValue 10000000
+            -label (uiRes("m_xgmRadiusGroupUtils.kXgmBrushSize"))
+            -annotation (uiRes("m_xgmRadiusGroupUtils.kXgmBrushSizeAnnotation"))
+            -cc ( $brushCmd + " -e -radius #1 " + $tool )
+            xgmBrushSizeFSG;
+
+        iconTextCheckBox -width 22 -style "iconOnly" -image "nodeGrapherUnpinnedLarge.png" -selectionImage "nodeGrapherPinnedLarge.png" 
+            -annotation (uiRes("m_xgmRadiusGroupUtils.kUseGlobalBrushSizeAnnotation"))
+            -onCommand  ( $brushCmd + " -e -useGlobalRadius false " + $tool )
+            -offCommand ( $brushCmd + " -e -useGlobalRadius true " + $tool )
+            xgmBrushPinITCB;
+
+    setParent ..;
+}
+
+//
+//    Description:
+//        initializes values of the group of brush size/radius UI 
+//
+//    Input Arguments:
+//        parent         Parent layout of the brush radius group layout.
+//                       Required so that UI object names can be successfully resolved.
+//        brushCmd       The command to be evaluated in the procedure.
+//        tool           Name of the instance of the tool that the command is applied on
+//
+//    Return Value:
+//        None.
+//
+global proc xgmBrushRadiusGroupValues( string $parent, 
+        string $brushCmd, 
+        string $tool )
+{
+    setParent $parent;
+
+    float $radius = eval( $brushCmd + " -q -radius " + $tool );
+    floatSliderGrp -e -value $radius xgmBrushSizeFSG;
+
+    int $useGlobalRadius = 1 - eval( $brushCmd + " -q -useGlobalRadius " + $tool );
+    iconTextCheckBox -e -value $useGlobalRadius xgmBrushPinITCB;
+}

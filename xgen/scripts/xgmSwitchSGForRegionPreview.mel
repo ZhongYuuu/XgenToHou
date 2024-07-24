@@ -1,0 +1,41 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+global proc xgmSwitchSGForRegionPreview()
+{
+      string $descs[] = `ls -type xgmSplineDescription`;
+      int $i;
+      for ($i=0; $i<size($descs); $i++)
+      {
+          if (`attributeExists "realShaderOverride" $descs[$i]`)
+          {
+              string $attr = $descs[$i] + ".realShaderOverride";
+              if (`connectionInfo -isSource $attr`)
+              {
+                  string $destShadingPlug[] = `connectionInfo -destinationFromSource $attr`;
+                  //print "dst plugs: ";
+                  //print $destShadingPlug;
+                  //print "\n";
+                  
+                  string $instGrpAttr = $descs[$i] + ".instObjGroups";
+                  string $dagSetAttrs[] = `connectionInfo -destinationFromSource $instGrpAttr`;
+                  if (size($dagSetAttrs) == 0)
+                      continue;
+                  
+                  string $shadingSets[] = `listSets -type 1 -object $descs[$i]`;
+                  //print $shadingSets;
+                  //print "\n======shadingSets========\n";
+                  select $descs[$i];
+                  string $shadingNode = `plugNode $destShadingPlug[0]`;
+                  sets -e -forceElement $shadingNode;
+                  
+                  disconnectAttr $attr $destShadingPlug[0];
+                  connectAttr -f $attr $dagSetAttrs[0];
+              }
+          }
+      }  
+}

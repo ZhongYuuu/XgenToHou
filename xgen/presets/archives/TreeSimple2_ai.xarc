@@ -1,0 +1,14 @@
+#ArchiveGroup 0 name="TreeSimple2_ai" description="No description." thumbnail="archives/TreeSimple2.png" materials="archives/materials/TreeSimple2_ai.ma" color=[1,0,0]
+0 "archives/abc/TreeSimple2_ai.abc" material=TreeSimple2_ai:paintfx_archives:treeSimple2ShaderSG objects=|paintfx_archives:treeSimple2MeshGroup|paintfx_archives:treeSimple2Main
+0 "archives/abc/TreeSimple2_ai.abc" material=TreeSimple2_ai:paintfx_archives:treeSimple2LeafShaderSG objects=|paintfx_archives:treeSimple2MeshGroup|paintfx_archives:treeSimple2Leaf
+3 "archives/ass/TreeSimple2_ai_Main.ass.gz" material=TreeSimple2_ai:paintfx_archives:treeSimple2ShaderSG objects=|paintfx_archives:treeSimple2MeshGroup|paintfx_archives:treeSimple2Leaf
+3 "archives/ass/TreeSimple2_ai_Leaf.ass.gz" material=TreeSimple2_ai:paintfx_archives:treeSimple2LeafShaderSG objects=|paintfx_archives:treeSimple2MeshGroup|paintfx_archives:treeSimple2Leaf
+1 "archives/abc/TreeSimple2_ai_med.abc" material=TreeSimple2_ai:paintfx_archives:treeSimple2ShaderSG objects=|paintfx_archives:treeSimple2MeshGroup|paintfx_archives:treeSimple2Main
+1 "archives/abc/TreeSimple2_ai_med.abc" material=TreeSimple2_ai:paintfx_archives:treeSimple2LeafShaderSG objects=|paintfx_archives:treeSimple2MeshGroup|paintfx_archives:treeSimple2Leaf
+4 "archives/ass/TreeSimple2_ai_Main_med.ass.gz" material=TreeSimple2_ai:paintfx_archives:treeSimple2ShaderSG objects=|paintfx_archives:treeSimple2MeshGroup|paintfx_archives:treeSimple2Leaf
+4 "archives/ass/TreeSimple2_ai_Leaf_med.ass.gz" material=TreeSimple2_ai:paintfx_archives:treeSimple2LeafShaderSG objects=|paintfx_archives:treeSimple2MeshGroup|paintfx_archives:treeSimple2Leaf
+2 "archives/abc/TreeSimple2_ai_lo.abc" material=TreeSimple2_ai:paintfx_archives:treeSimple2ShaderSG objects=|paintfx_archives:treeSimple2MeshGroup|paintfx_archives:treeSimple2Main
+2 "archives/abc/TreeSimple2_ai_lo.abc" material=TreeSimple2_ai:paintfx_archives:treeSimple2LeafShaderSG objects=|paintfx_archives:treeSimple2MeshGroup|paintfx_archives:treeSimple2Leaf
+5 "archives/ass/TreeSimple2_ai_Main_lo.ass.gz" material=TreeSimple2_ai:paintfx_archives:treeSimple2ShaderSG objects=|paintfx_archives:treeSimple2MeshGroup|paintfx_archives:treeSimple2Leaf
+5 "archives/ass/TreeSimple2_ai_Leaf_lo.ass.gz" material=TreeSimple2_ai:paintfx_archives:treeSimple2LeafShaderSG objects=|paintfx_archives:treeSimple2MeshGroup|paintfx_archives:treeSimple2Leaf
+

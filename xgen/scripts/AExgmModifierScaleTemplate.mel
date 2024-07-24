@@ -1,0 +1,29 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+
+global proc AExgmModifierScaleTemplate(string $nodeName)
+{
+    editorTemplate -beginScrollLayout;
+        // Common Attributes
+        AExgmModifierBaseTemplate $nodeName;
+
+        // Scale modifier attributes
+        editorTemplate -beginLayout (uiRes("m_AExgmModifierScaleTemplate.kScaleModifier")) -collapse 0;
+            xgmCreateAEUiForFloatAttr "mask" (uiRes("m_AExgmModifierScaleTemplate.kMask")) "xgmModifierScale";
+            xgmCreateAEUiForFloatAttr "scale" (uiRes("m_AExgmModifierScaleTemplate.kScale")) "xgmModifierScale";
+        editorTemplate -endLayout;
+
+        // Inherited depend node attributes
+        AEdependNodeTemplate $nodeName;
+
+        // Additional dynamic attributes
+        editorTemplate -addExtraControls;
+
+    editorTemplate -endScrollLayout;
+}
+

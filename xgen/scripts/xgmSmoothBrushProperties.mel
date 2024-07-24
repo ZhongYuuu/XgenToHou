@@ -1,0 +1,188 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+// ===========================================================================
+// Copyright 2015 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+
+
+//  Description:    defines behaviour and layout of xgmSmoothBrushContext
+//                    tool property sheet
+//
+
+global string $gXgmSmoothBrushLayout = "xgmSmoothBrush";
+global string $gXgmSmoothBrushCmd = "xgmSmoothBrushContext";
+global string $gXgmSmoothBrushToolName = "xgmSmoothBrushTool";
+
+global string $gXgmSmoothBrushSettingFrame = "xgmSmoothBrushSettingFrame";
+global string $gXgmSmoothBrushFalloffFrame = "xgmSmoothBrushFalloffFrame";
+global string $gXgmSmoothRootToTipFalloffFrame = "xgmSmoothRootToTipFalloffFrame";
+global string $gXgmSmoothBrushDisplaySettingFrame = "xgmSmoothBrushDisplaySettingFrame";
+global string $gXgmSmoothBrushSymmetrySettingFrame = "xgmSmoothBrushSymmetrySettingFrame";
+
+global string $gXgmSmoothBrushFalloffTypes;
+global string $gXgmSmoothBrushFalloffTypesL10N[];
+global int $gXgmSmoothSurfaceFalloffIndex;
+
+//
+//    Description:
+//        Initializes the smooth brush falloff types
+//
+//    Input Arguments:
+//        None.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmInitSmoothBrushFalloffTypes()
+{
+    global string $gXgmSmoothBrushFalloffTypes;
+    global string $gXgmSmoothBrushFalloffTypesL10N[];
+    global int $gXgmSmoothSurfaceFalloffIndex;
+
+    if( $gXgmSmoothBrushFalloffTypes == "" || size($gXgmSmoothBrushFalloffTypesL10N) == 0 ) {
+        $gXgmSmoothBrushFalloffTypes = "screen,volume,surface";
+        $gXgmSmoothBrushFalloffTypesL10N  = { (uiRes("m_xgmSmoothBrushProperties.kXgmSmoothBrushFalloffTypeScreen")),
+                                              (uiRes("m_xgmSmoothBrushProperties.kXgmSmoothBrushFalloffTypeVolume")),
+                                              (uiRes("m_xgmSmoothBrushProperties.kXgmSmoothBrushFalloffTypeSurface"))};
+        $gXgmSmoothSurfaceFalloffIndex = size($gXgmSmoothBrushFalloffTypesL10N) - 1 ;
+    }
+}
+
+
+//
+//    Description:
+//        Creates the UI of the custom brush settings for the smooth brush
+//
+//    Input Arguments:
+//        None.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmSmoothBrushSettingsCustom()
+{
+    global string $gXgmSmoothBrushCmd;
+
+    string $curctx = `currentCtx`;
+
+    radioButtonGrp -label (uiRes("m_xgmSmoothBrushProperties.kXgmSmoothBrushBrushMode"))
+                -numberOfRadioButtons 2
+                -label1 (uiRes("m_xgmSmoothBrushProperties.kXgmSmoothBrushBrushModeGlobal"))
+                -label2 (uiRes("m_xgmSmoothBrushProperties.kXgmSmoothBrushBrushModeLocal"))
+                -on1 ( $gXgmSmoothBrushCmd + " -e -globalSelection 1 " + $curctx )
+                -on2 ( $gXgmSmoothBrushCmd + " -e -globalSelection 0 " + $curctx )
+                xgmSmoothBrushBrushModeRBG;
+
+    floatSliderGrp -field true -pre 3
+                -min 0
+                -max 1
+                -fieldMaxValue 1
+                -label (uiRes("m_xgmSmoothBrushProperties.kXgmSmoothBrushOrientationFactor"))
+                -cc ( $gXgmSmoothBrushCmd + " -e -orientationFactor #1 " + $curctx )
+                xgmSmoothBrushOrientationFSG;
+
+    floatSliderGrp -field true -pre 3
+                -min 0
+                -max 1
+                -fieldMaxValue 1
+                -label (uiRes("m_xgmSmoothBrushProperties.kXgmSmoothBrushCurvatureFactor"))
+                -cc ( $gXgmSmoothBrushCmd + " -e -curvatureFactor #1 " + $curctx )
+                xgmSmoothBrushCurvatureFSG;
+
+    checkBoxGrp 
+                -label (uiRes("m_xgmSmoothBrushProperties.kPreserveLength"))
+                -numberOfCheckBoxes 1
+                -on1 ( $gXgmSmoothBrushCmd + " -e -preserveLength 1 " + $curctx)
+                -of1 ( $gXgmSmoothBrushCmd + " -e -preserveLength 0 " + $curctx)
+                xgmSmoothBrushPreserveLengthGRP;
+
+    rowLayout -numberOfColumns 1
+        -columnAttach 1 "left" 135
+        xgmBrushButtonsRow;
+        button -label (uiRes("m_xgmSmoothBrushProperties.kXgmBrushFlood"))
+            -command ($gXgmSmoothBrushCmd + " -e -flood " + $curctx )
+            -width 60
+            xgmBrushFloodButton;
+    setParent ..;
+}
+
+//
+//    Description:
+//        layout of smooth brush tool property sheet
+//
+//    Input Arguments:
+//        None.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmSmoothBrushProperties ()
+{
+    global string $gXgmSmoothBrushLayout;
+    global string $gXgmSmoothBrushCmd;
+    global string $gXgmSmoothBrushToolName;
+    global string $gXgmSmoothBrushSettingFrame;
+    global string $gXgmSmoothBrushFalloffFrame;
+    global string $gXgmSmoothRootToTipFalloffFrame;
+    global string $gXgmSmoothBrushDisplaySettingFrame;
+    global string $gXgmSmoothBrushSymmetrySettingFrame;
+    global string $gXgmSmoothBrushFalloffTypes;
+    global string $gXgmSmoothBrushFalloffTypesL10N[];
+
+    xgmInitSmoothBrushFalloffTypes();
+
+    string $parent = `toolPropertyWindow -q -location`;
+    setParent $parent;
+
+    setUITemplate -pushTemplate OptionsTemplate;
+
+    columnLayout $gXgmSmoothBrushLayout;
+
+    xgmBrushSettingsProperties( $gXgmSmoothBrushLayout, 
+                            $gXgmSmoothBrushSettingFrame, 
+                            $gXgmSmoothBrushCmd, 
+                            $gXgmSmoothBrushToolName, 
+                            "xgmSmoothBrushSettingsCustom" );
+
+    xgmBrushFalloffProperties( $gXgmSmoothBrushLayout, 
+                            $gXgmSmoothBrushFalloffFrame, 
+                            $gXgmSmoothBrushCmd, 
+                            $gXgmSmoothBrushToolName,
+                            "",
+                            $gXgmSmoothBrushFalloffTypes,
+                            $gXgmSmoothBrushFalloffTypesL10N ); 
+    string $temp[];
+    xgmRootToTipFalloffProperties( $gXgmSmoothBrushLayout, 
+                            $gXgmSmoothRootToTipFalloffFrame, 
+                            $gXgmSmoothBrushCmd, 
+                            $gXgmSmoothBrushToolName,
+                            $temp,
+                            "" ); 
+
+    // The "Root to Tip" falloff only applies to the curvature smooth. It has no impact on the length smooth and orientation smooth.
+    frameLayout -e -l (uiRes("m_xgmSmoothBrushProperties.kXgmRootToTipMagnitudeControl")) $gXgmSmoothRootToTipFalloffFrame;
+
+    xgmBrushDisplaySettingsProperties( $gXgmSmoothBrushLayout, 
+                            $gXgmSmoothBrushDisplaySettingFrame,
+                            $gXgmSmoothBrushCmd, 
+                            $gXgmSmoothBrushToolName,
+                            "" );
+
+    xgmBrushSymmetrySettingsProperties( $gXgmSmoothBrushLayout, 
+                            $gXgmSmoothBrushSymmetrySettingFrame,
+                            $gXgmSmoothBrushCmd, 
+                            $gXgmSmoothBrushToolName,
+                            "" );
+
+    setUITemplate -popTemplate;
+}
+

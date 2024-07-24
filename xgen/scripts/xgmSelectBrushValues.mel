@@ -1,0 +1,129 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+// ===========================================================================
+// Copyright 2015 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+
+//    Description:    initializes tool property sheet - brush settings values
+//
+//    Input Arguments:
+//        parent         Parent layout of the common brush settings layout.
+//                       Required so that UI object names can be successfully resolved
+//        brushCmd       Brush command to be used by the UI objects
+//        tool           Name of the instance of the tool that the command is applied on
+
+//    Return Value:
+//        None.
+//
+global proc xgmSelectBrushSettingsValues( string $parent, string $brushCmd, string $tool )
+{
+    global string $gXgmSelectBrushSelectTypes;
+    global string $gXgmSelectBrushCmd;
+
+    setParent $parent;
+
+    float $radius = eval( $brushCmd + " -q -radius " + $tool );
+    floatSliderGrp -e -value $radius xgmBrushSizeFSG;
+
+    int $useGlobalRadius = 1 - eval( $brushCmd + " -q -useGlobalRadius " + $tool ); 
+    iconTextCheckBox -e -value $useGlobalRadius xgmBrushPinITCB;
+
+    int $invert = eval( $brushCmd + " -q -invert " + $tool );
+    checkBoxGrp -e -value1 $invert xgmSelectBrushInvertCBG;
+
+    int $filterBackface = eval( $brushCmd + " -q -filterBackface " + $tool );
+    checkBoxGrp -e -value1 $filterBackface xgmBrushFilterBackfaceGRP;
+
+    float $filterBackfaceEndAngle = eval( $brushCmd + " -q -fea " + $tool );
+    floatSliderGrp -e -value $filterBackfaceEndAngle -enable $filterBackface xgmBrushFilterBackfaceEndAngleFSG;
+
+    string $falloffType = eval( $brushCmd + " -q -brushFalloffType " + $tool );
+    string $currentBrushFalloffTypes[];
+    tokenize($gXgmSelectBrushSelectTypes, ",", $currentBrushFalloffTypes);
+    int $index = 1;
+    for ($item in $currentBrushFalloffTypes) {
+        if($item == $falloffType) {
+            optionMenuGrp -e -select $index xgmBrushFalloffTypeOMG;
+            break;
+        }
+        $index++;
+    }
+
+    float $volumeSearchRadius = eval( $gXgmSelectBrushCmd + " -q -vsr " + $tool );
+    float $volumeCenterOffset = eval( $gXgmSelectBrushCmd + " -q -vco " + $tool );
+    float $offsetHotkeyInterval = eval( $gXgmSelectBrushCmd + " -q -ohi " + $tool );
+    int   $volume = 0;
+    if($falloffType == "volume") {
+        $volume = 1;
+    }
+    floatSliderGrp -e -en $volume -value $volumeSearchRadius xgmSelectBrushVolumeSearchRadiusFSG;
+    floatSliderGrp -e -en $volume -value $volumeCenterOffset xgmSelectBrushVolumeCenterOffsetFSG;
+    floatSliderGrp -e -en $volume -value $offsetHotkeyInterval xgmSelectBrushOffsetHotkeyIntervalFSG;
+}
+
+//
+//    Description:
+//        initializes tool property sheet - brush display settings custom values
+//
+//    Input Arguments:
+//        None.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmSelectBrushDisplaySettingsCustom()
+{
+    floatSliderGrp -e -visible 1 xgmDispBrushOverallColorIntensityFSG;
+    checkBoxGrp -e -visible 1 xgmDispSelectionHighlightingEnableCBG;
+    colorSliderGrp -e -visible 1 xgmDispSelectionHighlightingColorCSG;
+    checkBoxGrp -e -visible 1 xgmDispPreSelHighlightingEnableCBG;
+    colorSliderGrp -e -visible 1 xgmDispPreSelHighlightColorCSG;
+    separator -e -visible 1 xgmBrushDisplaySettingsSEP;
+}
+
+//
+//    Description:    initializes selectBrushContext tool property sheet values
+//
+//    Input Arguments:
+//        tool      this is the name of the instance of the tool
+//                    that the property sheet is modifying.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmSelectBrushValues(string $tool) 
+{
+    global string $gXgmSelectBrushLayout;
+    global string $gXgmSelectBrushCmd;
+    global string $gXgmSelectBrushSelectTypes;
+    global string $gXgmSelectBrushSettingFrame;
+    global string $gXgmSelectBrushDisplaySettingFrame;
+    global string $gXgmSelectBrushSymmetrySettingFrame;
+
+    string $parent = `toolPropertyWindow -q -location`;
+    setParent $parent;
+
+    frameLayout -e -en true $gXgmSelectBrushSettingFrame;
+    frameLayout -e -en true $gXgmSelectBrushDisplaySettingFrame;
+
+    xgmSelectBrushSettingsValues( $gXgmSelectBrushSettingFrame, $gXgmSelectBrushCmd, $tool);
+    xgmBrushDisplaySettingsValues( $gXgmSelectBrushDisplaySettingFrame, $gXgmSelectBrushCmd, $tool, "xgmSelectBrushDisplaySettingsCustom");
+    xgmBrushSymmetrySettingsValues( $gXgmSelectBrushSymmetrySettingFrame, $gXgmSelectBrushCmd, $tool, "");
+
+    string $help = "SelectBrushTool";
+    toolPropertySetCommon $tool "xgmSelectBrushTool.xpm" $help;
+
+    toolPropertySelect $gXgmSelectBrushLayout;
+
+    string $nameField = `toolPropertyWindow -query -field`;
+    text -edit -label (uiRes("m_xgmSelectBrushValues.kSelectBrushToolName")) $nameField;
+}

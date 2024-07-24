@@ -1,0 +1,154 @@
+//**************************************************************************/
+// Copyright 2015 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk
+// license agreement provided at the time of installation or download,
+// or which otherwise accompanies this software in either electronic
+// or hard copy form.
+//**************************************************************************/
+
+//
+// XGen wide spline Depth pass shader
+//
+
+// Uniforms
+//
+uniform mat4  gWorld                 : world;
+uniform mat4  gWorldInverse          : worldinverse;
+uniform mat4  gWorldViewProjection   : worldviewprojection;
+uniform vec3  gViewDirection         : viewdirection;
+uniform vec3  gWorldCameraPosition   : worldcameraposition;
+uniform float gDepthPriority         : depthpriority;
+uniform bool  gIsOrthographic        : isorthographic;
+
+// Varyings
+//
+attribute VS_INPUT
+{
+    vec3 Pos                : POSITION;
+    vec3 mayaBitangentIn    : BINORMAL;
+    vec2 uvCoord            : TEXCOORD0;
+    vec2 wCoord             : TEXCOORD1;
+    float xgenCVWidth       : TEXCOORD2;
+}
+
+attribute VS_TO_GS
+{
+    vec3 mayaTangentIn      : TANGENT;
+    vec3 mayaBitangentIn    : BINORMAL;
+    vec2 uvCoord            : TEXCOORD0;
+    vec2 wCoord             : TEXCOORD1;
+    float xgenCVWidth       : TEXCOORD2;
+}
+
+attribute GS_TO_PS
+{
+}
+
+attribute pixelOut 
+{
+    vec4 colorOut           : COLOR0;
+}
+
+// Vertex Shader
+//
+GLSLShader VS_Depth
+{
+
+vec3 ixgenFacingCameraVSToGSTw(vec3 Pm, vec3 Bw, mat4 worldInverse, vec3 viewDirection, vec3 worldCameraPosition, bool isOrthographic)
+{
+    // Get a view vector from camera to vertex
+    vec3 viewVector = Pm - mul(worldInverse, vec4(worldCameraPosition, 1.0f)).xyz;
+
+    // Orthographic camera is directional
+    if (isOrthographic)
+    {
+        vec3 viewOrigin = mul(worldInverse, vec4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
+        vec3 viewTarget = mul(worldInverse, vec4(viewDirection, 1.0f)).xyz;
+        viewVector = viewTarget - viewOrigin;
+    }
+
+    // Tangent is the cross product of view vector and bitangent
+    return normalize(cross(viewVector, Bw));
+}
+
+void main()
+{
+    vsOut.mayaTangentIn   = ixgenFacingCameraVSToGSTw(Pos, mayaBitangentIn, gWorldInverse, gViewDirection, gWorldCameraPosition, gIsOrthographic);
+    vsOut.mayaBitangentIn = normalize(mayaBitangentIn);
+    vsOut.uvCoord         = uvCoord;
+    vsOut.wCoord          = wCoord;
+    vsOut.xgenCVWidth     = xgenCVWidth;
+    gl_Position           = vec4(Pos, 1.0f);
+}
+
+}
+
+// Geometry Shader
+//
+GLSLShader GS_Depth
+{
+
+layout (lines) in;
+layout (triangle_strip, max_vertices = 4) out;
+
+void main()
+{
+    // Early Out
+    if( all(equal(gl_in[0].gl_Position.xyz, gl_in[1].gl_Position.xyz)) )
+    {
+        return;
+    }
+
+    vec3 pm;
+
+    pm = gl_in[0].gl_Position.xyz - gsIn[0].mayaTangentIn * gsIn[0].xgenCVWidth * 0.5f;
+    gl_Position = mul(gWorldViewProjection, vec4(pm, 1.0f));
+    gl_Position.z -= gl_Position.w * 2.0f * gDepthPriority;
+    EmitVertex();
+    
+    pm = gl_in[0].gl_Position.xyz + gsIn[0].mayaTangentIn * gsIn[0].xgenCVWidth * 0.5f;
+    gl_Position = mul(gWorldViewProjection, vec4(pm, 1.0f));
+    gl_Position.z -= gl_Position.w * 2.0f * gDepthPriority;
+    EmitVertex();
+    
+    pm = gl_in[1].gl_Position.xyz - gsIn[1].mayaTangentIn * gsIn[1].xgenCVWidth * 0.5f;
+    gl_Position = mul(gWorldViewProjection, vec4(pm, 1.0f));
+    gl_Position.z -= gl_Position.w * 2.0f * gDepthPriority;
+    EmitVertex();
+
+    pm = gl_in[1].gl_Position.xyz + gsIn[1].mayaTangentIn * gsIn[1].xgenCVWidth * 0.5f;
+    gl_Position = mul(gWorldViewProjection, vec4(pm, 1.0f));
+    gl_Position.z -= gl_Position.w * 2.0f * gDepthPriority;
+    EmitVertex();
+
+    EndPrimitive();
+}
+
+}
+
+// Pixel Shader
+//
+GLSLShader PS_Depth
+{
+
+void main()
+{
+    colorOut = vec4(0.0f, 0.0f, 0.0f, 0.0f);
+}
+
+}
+
+// Techniques
+//
+technique main
+{
+    pass pDepth
+    {
+        VertexShader   (in VS_INPUT,      out VS_TO_GS vsOut) = VS_Depth;
+        GeometryShader (in VS_TO_GS gsIn, out GS_TO_PS gsOut) = GS_Depth;
+        PixelShader    (in GS_TO_PS psIn, out pixelOut)       = PS_Depth;
+    }
+}
+
+

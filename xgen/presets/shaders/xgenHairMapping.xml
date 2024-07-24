@@ -1,0 +1,113 @@
+<!--
+Copyright 2015 Autodesk, Inc. All rights reserved.
+
+Use of this software is subject to the terms of the Autodesk
+license agreement provided at the time of installation or download,
+or which otherwise accompanies this software in either electronic
+or hard copy form.
+-->
+<fragment uiName="xgenHairMapping" name="xgenHairMapping" type="plumbing" class="ShadeFragment" version="1.0" feature_level="0" >
+    <description>
+        <![CDATA[
+XGen hair mapping. Choose and place the UVs from root to tip.]]>
+    </description>
+    <properties>
+        <float2 name="coverage" />
+        <float2 name="translateFrame" />
+        <float2 name="repeatUV" />
+        <float2 name="offset" />
+        <float2 name="wCoord" semantic="TEXCOORD1" flags="varyingInputParam" />
+    </properties>
+    <values>
+        <float2 name="coverage"       value="1.000000,1.000000" />
+        <float2 name="translateFrame" value="0.000000,0.000000" />
+        <float2 name="repeatUV"       value="1.000000,1.000000" />
+        <float2 name="offset"         value="0.000000,0.000000" />
+    </values>
+    <outputs>
+        <float2 name="outUV" />
+    </outputs>
+    <implementation>
+        <implementation render="OGSRenderer" language="Cg" lang_version="2.100000" >
+            <function_name val="xgenHairMapping" />
+            <source>
+                <![CDATA[
+float2 xgenHairMapping(float2 coverage, float2 translate, float2 repeat, float2 offset, float2 uv)
+{
+    const float2 OUTSIDE_VALUE = float2(-1.0E+07f, -1.0E+07f);
+
+    // Check if point is outside mapped region
+    if (uv.x <= -1.0E+07f && uv.y <= -1.0E+07f)
+        return OUTSIDE_VALUE;
+    
+    // Coverage translate transform
+    uv = (uv - translate) / coverage;
+    
+    // Check if point is outside mapped region
+    if (uv.x < 0.0f || uv.x > 1.0f || uv.y < 0.0f || uv.y > 1.0f)
+        return OUTSIDE_VALUE;
+
+    // Repeat and offset transform
+    uv = uv * repeat + offset;
+
+    return uv;
+} 
+                ]]>
+            </source>
+        </implementation>
+        <implementation render="OGSRenderer" language="GLSL" lang_version="3.000000" >
+            <function_name val="xgenHairMapping" />
+            <source>
+                <![CDATA[
+vec2 xgenHairMapping(vec2 coverage, vec2 translate, vec2 repeat, vec2 offset, vec2 uv)
+{
+    const vec2 OUTSIDE_VALUE = vec2(-1.0E+07f, -1.0E+07f);
+
+    // Check if point is outside mapped region
+    if (uv.x <= -1.0E+07f && uv.y <= -1.0E+07f)
+        return OUTSIDE_VALUE;
+    
+    // Coverage translate transform
+    uv = (uv - translate) / coverage;
+    
+    // Check if point is outside mapped region
+    if (uv.x < 0.0f || uv.x > 1.0f || uv.y < 0.0f || uv.y > 1.0f)
+        return OUTSIDE_VALUE;
+
+    // Repeat and offset transform
+    uv = uv * repeat + offset;
+
+    return uv;
+} 
+                ]]>
+            </source>
+        </implementation>
+        <implementation render="OGSRenderer" language="HLSL" lang_version="11.000000" >
+            <function_name val="xgenHairMapping" />
+            <source>
+                <![CDATA[
+float2 xgenHairMapping(float2 coverage, float2 translate, float2 repeat, float2 offset, float2 uv)
+{
+    const float2 OUTSIDE_VALUE = float2(-1.0E+07f, -1.0E+07f);
+
+    // Check if point is outside mapped region
+    if (uv.x <= -1.0E+07f && uv.y <= -1.0E+07f)
+        return OUTSIDE_VALUE;
+    
+    // Coverage translate transform
+    uv = (uv - translate) / coverage;
+    
+    // Check if point is outside mapped region
+    if (uv.x < 0.0f || uv.x > 1.0f || uv.y < 0.0f || uv.y > 1.0f)
+        return OUTSIDE_VALUE;
+
+    // Repeat and offset transform
+    uv = uv * repeat + offset;
+
+    return uv;
+} 
+                ]]>
+            </source>
+        </implementation>
+    </implementation>
+</fragment>

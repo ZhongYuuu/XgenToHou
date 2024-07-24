@@ -1,0 +1,839 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+// Copyright (C) 1997-2015 Autodesk, Inc., and/or its licensors.
+// All rights reserved.
+//
+// The coded instructions, statements, computer programs, and/or related
+// material (collectively the "Data") in these files contain unpublished
+// information proprietary to Autodesk, Inc. ("Autodesk") and/or its licensors,
+// which is protected by U.S. and Canadian federal copyright law and by
+// international treaties.
+//
+// The Data is provided for use exclusively by You. You have the right to use,
+// modify, and incorporate this Data into other products for purposes authorized 
+// by the Autodesk software license agreement, without fee.
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND. AUTODESK
+// DOES NOT MAKE AND HEREBY DISCLAIMS ANY EXPRESS OR IMPLIED WARRANTIES
+// INCLUDING, BUT NOT LIMITED TO, THE WARRANTIES OF NON-INFRINGEMENT,
+// MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE, OR ARISING FROM A COURSE 
+// OF DEALING, USAGE, OR TRADE PRACTICE. IN NO EVENT WILL AUTODESK AND/OR ITS
+// LICENSORS BE LIABLE FOR ANY LOST REVENUES, DATA, OR PROFITS, OR SPECIAL,
+// DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES, EVEN IF AUTODESK AND/OR ITS
+// LICENSORS HAS BEEN ADVISED OF THE POSSIBILITY OR PROBABILITY OF SUCH DAMAGES.
+
+/**
+ * @file xgenUI.mel
+ * @brief Contains the xgen UI MEL procedures.
+ *
+ * <b>CONFIDENTIAL INFORMATION: This software is the confidential and
+ * proprietary information of Walt Disney Animation Studios ("WDAS").
+ * This software may not be used, disclosed, reproduced or distributed
+ * for any purpose without prior written authorization and license
+ * from WDAS. Reproduction of any section of this software must include
+ * this legend and all copyright notices.
+ * Copyright Disney Enterprises, Inc. All rights reserved.</b>
+ *
+ * @author Thomas V Thompson II
+ * @author Stephen D. Bowline
+ * @author Ying Liu
+ * @author Rajesh Sharma
+ * @author Kelly Ward
+ * @author Lawrence Chai
+ *
+ * @version Created 11/30/04
+ */
+
+global proc xgenCafUI()
+{
+	// Add Caf UI only if xgen is loaded
+	if ( `pluginInfo -q -loaded xgenToolkit` )
+		xgenUI();
+}
+
+global proc xgenCafUIDel()
+{
+	// Delete Caf UI from Xgen menu
+	if ( `pluginInfo -q -loaded xgenToolkit` )
+	{
+		string $menu = "mayaAnimCacheMenu";
+		if ( `menu -q -exists $menu` ) 
+			deleteUI $menu;
+	}
+}
+
+/** 
+* This procedure adds the menu items for xgen:
+*	- After menu restructuring in Maya 2016, xgen is moved under MODELING->Generate.
+*	- In legacy menu, xgen is a standalone menu under the main menu bar.
+* This procedure checks which mode to use and set the menu items accordingly.
+*/
+global proc xgenAddMenuItems()
+{
+	global string $gMainWindow;
+
+    // Declare global variables used by the UI here...
+    global string $gXgmDynamicGuidesGroup = "xgDynamicGuides";
+    global string $gXgmGroomGroup = "xgGroom";
+
+	string $whereToInsert; // a string for where to insert the menuItem.
+
+	// Check if we can find the anchor point for xgen menu items (for current menu)
+	global string $gMainGenerateXGenAnchor;
+	int $anchorFound = `menuItem -q -exists $gMainGenerateXGenAnchor`;
+	int $buildxGenForModelingMenuSet = 0; // this variable controls whether to build xgen menu in MODELING->Generate
+
+	// Add XGen to the plugins menu (if it exists)
+	string $xgenMenu = "xgenMenu";
+	if ( `menu -q -exists $xgenMenu` ) 
+		deleteUI $xgenMenu;
+
+	// check if the anchor is found
+	if($anchorFound)
+	{
+		// when we can't find "XGen Editor" in MODELING->Generate, we have to 
+		// build xgen menu items under it. Otherwise it's already built.
+		if (!`menuItem -q -exists "XGenEditorMenuItem"`)
+		{
+			$buildxGenForModelingMenuSet = 1;
+			global string $gMainGenerateMenu;
+			$xgenMenu = $gMainGenerateMenu;
+			setParent -menu $xgenMenu;
+		}
+	}
+
+	//
+	// NOTE: Please ensure giving a string name to each menu item and make sure the 
+	//       subsequent one insert after the previous menu item. It's necessary for 
+	//       xGen menu items under the restructured MODELING->Generate menu.
+	//
+	if ($buildxGenForModelingMenuSet)
+	{
+	    menuItem -divider true -dividerLabel (uiRes("m_xgenUI.kXGenMenuDivider"))
+	        -insertAfter $gMainGenerateXGenAnchor
+	        XGenMenuDivider;
+
+		menuItem -version 2015
+			-rtc "XgCreateDescriptionEditor"
+			-insertAfter XGenMenuDivider // For MODELING->Generate, we insert it after the anchor point.
+			XGenEditorMenuItem;
+			
+		menuItem -version 2016
+			-rtc "XGenOpenLibraryWindow"
+			-insertAfter XGenEditorMenuItem
+			XGenLibraryMenuItem;
+
+		// this divider is only for restructured menu.
+		menuItem -divider on -ld off
+			-insertAfter XGenLibraryMenuItem
+			divider1MenuItem;
+
+		// A special one here as there is a divider in restructured menu.
+		$whereToInsert = "divider1MenuItem"; 
+		menuItem -version 2015
+			-rtc "XgCreateDescription" 
+			-insertAfter $whereToInsert
+			createDescMenuItem;
+
+		// Another special one here as there is a divider in legacy menu.
+		$whereToInsert = "createDescMenuItem";
+		menuItem -version 2015 -rtc "XgImportCollections"
+			-insertAfter $whereToInsert
+			impColDescMenuItem;
+
+		menuItem -version 2015 -rtc "XgExportCollections"
+			-insertAfter impColDescMenuItem
+			expColDesMenuItem;
+
+		menuItem -version 2015 
+			-rtc XgExportArchive
+			-insertAfter expColDesMenuItem
+			expSelArhvMenuItem;
+
+		menuItem -version 2015
+			-rtc XgBatchExportArchive
+			-insertAfter expSelArhvMenuItem
+			batConScnArhvMenuItem;
+
+		menuItem -version 2017 -rtc "XgConvertToPolygon"
+			-insertAfter batConScnArhvMenuItem
+			convertPrimMenuItem;
+
+		menuItem -version 2017 -rtc "XgConvertToInteractiveGroom"
+			-insertAfter convertPrimMenuItem
+			convertToInteractiveGroomMenuItem;
+
+		menuItem -version 2016 -rtc "XgImportPreset"
+			-insertAfter convertToInteractiveGroomMenuItem
+			importPresetMenuItem;
+		menuItem -version 2016 -rtc "XgExportPreset"
+			-insertAfter importPresetMenuItem
+			exportPresetMenuItem;
+
+
+		// this divider is only for restructured menu.
+		menuItem -divider on -ld off
+			-insertAfter exportPresetMenuItem
+			divider2MenuItem;
+
+		menuItem -version 2017
+			-insertAfter divider2MenuItem
+			-rtc "XgmCreateInteractiveGroomSplines"
+			createInteractiveGroomSplinesMenuItem;
+		menuItem -optionBox true
+			-insertAfter createInteractiveGroomSplinesMenuItem
+			-command "XgmCreateInteractiveGroomSplinesOption"
+			createInteractiveGroomSplinesOptionBoxMenuItem;
+			
+		menuItem -version 2017
+			-rtc "XgCreateIgSplineEditor"
+			-insertAfter createInteractiveGroomSplinesMenuItem
+			XGenIgSplineEditorMenuItem;
+			
+		menuItem -version 2017 -label (uiRes("m_xgenUI.kInteractiveGroomingToolsLabel"))
+			-annotation (uiRes("m_xgenUI.kInteractiveGroomingToolsAnn"))
+			-insertAfter XGenIgSplineEditorMenuItem
+			-tearOff true
+			-subMenu true
+			interactiveGroomingToolsMenuItem;
+
+        // density
+		menuItem -version 2017 
+			-rtc "XgmSetDensityBrushTool"
+			densityBrushMenuItem;
+		menuItem -optionBox true
+			-command "XgmSetDensityBrushToolOption"
+			densityBrushOptionBoxMenuItem;
+
+		// place
+		menuItem -version 2017
+			-rtc "XgmSetPlaceBrushTool"
+			placeBrushMenuItem;
+		menuItem -optionBox true
+			-command "XgmSetPlaceBrushToolOption"
+			placeBrushOptionBoxMenuItem;
+
+        // length
+		menuItem -version 2017
+			-rtc "XgmSetLengthBrushTool"
+			lengthBrushMenuItem;
+		menuItem -optionBox true
+			-command "XgmSetLengthBrushToolOption"
+			lengthBrushOptionBoxMenuItem;
+
+        // cut
+		menuItem -version 2017
+			-rtc "XgmSetCutBrushTool"
+			cutBrushMenuItem;
+		menuItem -optionBox true
+			-command "XgmSetCutBrushToolOption"
+			cutBrushOptionBoxMenuItem;
+
+		// width
+		menuItem -version 2017
+			-rtc "XgmSetWidthBrushTool"
+			widthBrushMenuItem;
+		menuItem -optionBox true
+			-command "XgmSetWidthBrushToolOption"
+			widthBrushOptionBoxMenuItem;
+			
+		// comb
+		menuItem -version 2017 
+			-rtc "XgmSetCombBrushTool"
+			combBrushMenuItem;
+		menuItem -optionBox true
+			-command "XgmSetCombBrushToolOption"
+			combBrushOptionBoxMenuItem;
+
+        // grab
+		menuItem -version 2017
+			-rtc "XgmSetGrabBrushTool"
+			grabBrushMenuItem;
+		menuItem -optionBox true 
+			-command "XgmSetGrabBrushToolOption"
+			grabBrushOptionBoxMenuItem;
+
+		// twist
+		menuItem -version 2017
+			-rtc "XgmSetDirectionBrushTool"
+			directionBrushMenuItem;
+		menuItem -optionBox true
+			-command "XgmSetDirectionBrushToolOption"
+			directionBrushOptionBoxMenuItem;
+
+        // smooth
+		menuItem -version 2017
+			-rtc "XgmSetSmoothBrushTool"
+			smoothBrushMenuItem;
+		menuItem -optionBox true
+			-command "XgmSetSmoothBrushToolOption"
+			smoothBrushOptionBoxMenuItem;
+
+        // noise
+		menuItem -version 2017
+			-rtc "XgmSetNoiseBrushTool"
+			noiseBrushMenuItem;
+		menuItem -optionBox true
+			-command "XgmSetNoiseBrushToolOption"
+			noiseBrushOptionBoxMenuItem;
+
+        // clump
+		menuItem -version 2017
+			-rtc "XgmSetClumpBrushTool"
+			clumpBrushMenuItem;
+		menuItem -optionBox true
+			-command "XgmSetClumpBrushToolOption"
+			clumpBrushOptionBoxMenuItem;
+
+		// part
+		menuItem -version 2017
+			-rtc "XgmSetPartBrushTool"
+			partBrushMenuItem;
+		menuItem -optionBox true
+			-command "XgmSetPartBrushToolOption"
+			partBrushOptionBoxMenuItem;
+
+        // freeze
+		menuItem -version 2017
+			-rtc "XgmSetFreezeBrushTool"
+			FreezeBrushMenuItem;
+		menuItem -optionBox true
+			-command "XgmSetFreezeBrushToolOption"
+			freezeBrushOptionBoxMenuItem;
+
+        // select
+        menuItem -version 2017
+			-rtc "XgmSetSelectBrushTool"
+			selectBrushMenuItem;
+		menuItem -optionBox true 
+			-command "XgmSetSelectBrushToolOption"
+			selectBrushOptionBoxMenuItem; 
+
+		setParent -menu ..;
+
+		menuItem -version 2017 -label (uiRes("m_xgenUI.kInteractiveGroomingCacheLabel"))
+			-annotation (uiRes("m_xgenUI.kInteractiveGroomingCacheAnn"))
+			-insertAfter interactiveGroomingToolsMenuItem
+			-tearOff true
+			-subMenu true
+			interactiveGroomingCacheMenuItem;
+
+		menuItem -version 2017
+			-rtc "XgmSplineCacheCreate"
+			createNewCacheMenuItem;
+		menuItem -optionBox true
+			-rtc "XgmSplineCacheCreateOptions"
+			createNewCacheOptionBoxMenuItem;
+
+		menuItem -version 2017
+			-rtc "XgmSplineCacheImport"
+			importCacheMenuItem;
+		menuItem -optionBox true
+			-rtc "XgmSplineCacheImportOptions"
+			importCacheOptionBoxMenuItem;
+
+		menuItem -version 2017
+			-rtc "XgmSplineCacheExport"
+			exportCacheMenuItem;
+		menuItem -optionBox true
+			-rtc "XgmSplineCacheExportOptions"
+			exportCacheOptionBoxMenuItem;
+
+		menuItem -divider on
+			-insertAfter exportCacheOptionBoxMenuItem;
+
+		menuItem -version 2017
+			-rtc "XgmSplineCacheDisableSelectedCache"
+			diableAllCacheMenuItem;
+
+		menuItem -version 2017
+			-rtc "XgmSplineCacheEnableSelectedCache"
+			enableAllCacheMenuItem;
+
+		menuItem -divider on
+			-insertAfter enableAllCacheMenuItem;
+
+		menuItem -version 2017
+			-rtc "XgmSplineCacheReplace"
+			replaceCacheMenuItem;
+		menuItem -optionBox true
+			-rtc "XgmSplineCacheReplaceOptions"
+			replaceCacheOptionBoxMenuItem;
+
+		menuItem -version 2017
+			-rtc "XgmSplineCacheDelete"
+			deleteCacheMenuItem;
+		menuItem -optionBox true
+			-rtc "XgmSplineCacheDeleteOptions"
+			deleteCacheOptionBoxMenuItem;
+
+		menuItem -version 2017
+			-rtc "XgmSplineCacheDeleteNodesAhead"
+			deleteNodesAheadOfCacheMenuItem;
+
+		setParent -menu ..;
+
+		
+		menuItem -version 2017 -rtc "XgConvertInteractiveGroomToPoly"
+			//-annotation _L10N( kXgmSplineGeometryConvertAnn, "Convert hair and fur using interactive groom splines to geometry.")
+			-insertAfter interactiveGroomingCacheMenuItem
+			//-command "XgmSplineGeometryConvert"
+			xgmSplineGeometryConvertMenuItem;
+			
+		menuItem -version 2017 -checkBox `optionVar -query xgenHUDVisibility`
+			-insertAfter xgmSplineGeometryConvertMenuItem
+ 			-rtc "ToggleXGenDisplayHUD"
+ 			xgenDisplayHUDItem;
+
+
+		// TODO: help
+	//    menuItem -label _L10N( kHelpOnXgen, "Help on XGen..." )
+	//        -ann _L10N( kHelpOnXgenAnn, "Go to XGen project's main page." )
+	//        -c "showHelp -a \"http://techweb/community/tech-storefront/look_tools/xgen/\""
+	//		  -ia $menu
+	//        XGenHelpMenuItem;
+
+	} // End of creating menu items
+}
+
+
+/** 
+* This procedure deletes the menu items for xgen:
+*	- After menu restructuring in Maya 2016, xgen is moved under MODELING->Generate.
+*	- In legacy menu, xgen is a standalone menu under the main menu bar.
+* This procedure checks which mode to use and set the menu items accordingly.
+*/
+global proc xgenDeleteMenuItems()
+{
+	deleteUI -menuItem XGenMenuDivider;
+	deleteUI -menuItem XGenEditorMenuItem;
+	deleteUI -menuItem XGenLibraryMenuItem;
+	deleteUI -menuItem divider1MenuItem;
+	
+	deleteUI -menuItem createDescMenuItem;
+	deleteUI -menuItem impColDescMenuItem;
+	deleteUI -menuItem expColDesMenuItem;
+	deleteUI -menuItem expSelArhvMenuItem;
+	deleteUI -menuItem batConScnArhvMenuItem;
+	deleteUI -menuItem convertPrimMenuItem;
+	deleteUI -menuItem convertToInteractiveGroomMenuItem;
+	deleteUI -menuItem importPresetMenuItem;
+	deleteUI -menuItem exportPresetMenuItem;
+
+	deleteUI -menuItem divider2MenuItem;
+	deleteUI -menuItem createInteractiveGroomSplinesMenuItem;
+	deleteUI -menuItem createInteractiveGroomSplinesOptionBoxMenuItem;
+	deleteUI -menuItem XGenIgSplineEditorMenuItem;
+	deleteUI -menuItem interactiveGroomingToolsMenuItem;
+	deleteUI -menuItem interactiveGroomingCacheMenuItem;
+
+	deleteUI -menuItem xgenDisplayHUDItem;
+
+}
+
+/**
+ * This procedure does all the setup needed to load everything related to
+ * the XGen User Interface.
+ */
+global proc xgenUI()
+{
+    waitCursor -state on;
+    
+	// Register if the scene was dirty, if not, we'll have to
+	// restore the scene to be unmodified.
+	// This was done to make new scene not be immediately dirty (MAYA-105363)
+    $sceneDirty = `file -query -modified`;
+
+	MakeXGenHUD();
+	
+	// create menu items, for legacy menu the xgen menu items will be created here.
+	// but for restructured menu, it actually does nothing, as the anchor point 
+	// is not created yet. The actual menu item creating for restructured menu is 
+	// called separately in refreshModelingGenerateMenu() in ModelingGenerateMenu.mel
+	xgenAddMenuItems();
+
+	registerXGenPrefTab();
+
+	// Add an icon to the Plugins shelf
+	xgmAddXGenToShelf("XGen");
+	//python("xgui.createDescriptionEditor(False)");
+    
+    //---Removed f7 hotkey functionality in MAYA-26209    
+    //hotkey -k "F7" -n "XgCreateDescriptionEditor";
+
+    global int $gDlUseSceneNavigator;
+    if ( $gDlUseSceneNavigator ) {
+        eval("python(\"xg.xgpipe.xgenIOManager.XGenIOManager.registerWithSceneMgr()\")");
+    }
+    
+    // Get the description editor to refresh after a new palette is created
+    python("xg.registerCallback(\"PostDescriptionCreate\",\"xgenm.ui.xgDescriptionEditor._refreshCB\")");
+
+	// Reset the un-modified flag on the scene, in case setting the renderer modified it.
+	if (!$sceneDirty) {
+		file -modified false;
+	}
+
+    waitCursor -state off;
+}
+
+
+/**
+ * Add the XGen description editor button to a shelf of the users choice.
+ */
+global proc xgmAddXGenToShelf( string $shelf )
+{
+    string $root = python("xg.rootDir()");
+    string $iconDir = $root + "icons/";
+    
+    if ( `exists muAddShelfButton` ) {
+		
+		// XGen Description Editor
+		muAddShelfButton( $shelf,
+		                  "Open Description Editor",
+		                  "if (!`pluginInfo -q -loaded xgenToolkit`) loadPlugin xgenToolkit.mll;XgCreateDescriptionEditor",
+		                  (uiRes("m_xgenUI.kOpenTheXgenWindow")),
+		                  ($iconDir + "xgDEditor.png"),
+		                  "", "2015" );
+		
+		// Preview
+		muAddShelfButton( $shelf,
+		                  "Update Preview",
+		                  "XgPreview",
+		                  (uiRes("m_xgenUI.kPreviewXgenDescriptionsInTheViewport")),
+		                  ($iconDir + "xgPreview.png"),
+		                  "", "2015" );
+		
+		// Hide Preview
+		muAddShelfButton( $shelf,
+		                  "Clear Preview",
+		                  "python(\"xgui.createDescriptionEditor(False).preview(True)\")",
+		                  (uiRes("m_xgenUI.kCleanPreviewsOfXgenDescriptionsInTheViewport")),
+		                  ($iconDir + "xgPreviewClear.png"),
+		                  "", "2015" );
+		                  
+		// Create Description
+		muAddShelfButton( $shelf,
+		                  "Create Description",
+		                  "if (!`pluginInfo -q -loaded xgenToolkit`) loadPlugin xgenToolkit.mll;XgCreateDescription",
+		                  (uiRes("m_xgenUI.kCreateANewXgenDescriptionAndBindItOnTheSelectedObjects")),
+		                  ($iconDir + "xgCreateDescription.png"),
+		                  "", "2015" );
+		
+		// Bind Patches with a popup menu.
+		string $appendfaces = (uiRes("m_xgenUI.kAppendFaces"));
+		string $replacefaces = (uiRes("m_xgenUI.kReplaceFaces"));
+		string $removefaces = (uiRes("m_xgenUI.kRemoveFaces"));
+		string $mapfaces = (uiRes("m_xgenUI.kMapFaces"));
+		string $selectfaces = (uiRes("m_xgenUI.kSelectFaces"));
+		string $bindScript;
+                $bindScript = "from PySide2 import QtGui, QtCore, QtWidgets\\n";
+                $bindScript = $bindScript +  "from PySide2.QtGui import *\\n";
+                $bindScript = $bindScript +  "from PySide2.QtCore import *\\n";
+                $bindScript = $bindScript +  "from PySide2.QtWidgets import *\\n";
+                $bindScript = $bindScript + "m = QMenu()\\n";
+                $bindScript = $bindScript + "m.addAction(u\\\""+$appendfaces+"\\\",  lambda: xgui.createDescriptionEditor(False).modifyBinding(\\\"Append\\\") )\\n";
+                $bindScript = $bindScript + "m.addAction(u\\\""+$replacefaces+"\\\", lambda: xgui.createDescriptionEditor(False).modifyBinding(\\\"Replace\\\") )\\n";
+                $bindScript = $bindScript + "m.addAction(u\\\""+$removefaces+"\\\",  lambda: xgui.createDescriptionEditor(False).modifyBinding(\\\"Remove\\\") )\\n";
+                $bindScript = $bindScript + "m.addAction(u\\\""+$mapfaces+"\\\",     lambda: xgui.createDescriptionEditor(False).modifyBinding(\\\"Map\\\") )\\n";
+                $bindScript = $bindScript + "m.addSeparator()\\n";
+                $bindScript = $bindScript + "m.addAction(u\\\""+$selectfaces+"\\\",  lambda: xgui.createDescriptionEditor(False).selectBinding() )\\n";
+                $bindScript = $bindScript + "m.popup(QCursor.pos())\\n";
+		muAddShelfButton( $shelf,
+		                  "Bind Patches",
+		                  "python(\"" + $bindScript + "\")",
+		                  (uiRes("m_xgenUI.kPatchesBindingsMenu")),
+		                  ($iconDir + "xgBindFaces.png"),
+		                  "", "2015" );
+		                  
+		// Guide Context Tool
+        muAddShelfButton( $shelf,
+		                  "Add/Move Guides",
+		                  "XgGuideTool",
+		                  (uiRes("m_xgenUI.kAddOrMoveGuidesForTheCurrentDescription")),
+		                  ($iconDir + "xgGuideContext.png"),
+		                  "", "2015" );
+		
+		// Toggle guide visibility
+		muAddShelfButton( $shelf,
+		                  "Toggle Guides Visibility",
+		                  "python(\"xgen.toggleGuideDisplay(xgui.createDescriptionEditor(False).currentDescription())\")",
+		                  (uiRes("m_xgenUI.kToggleVisibilityOfCurrentDescriptionsGuides")),
+		                  ($iconDir + "xgToggleGuide.png"),
+		                  "", "2015" );
+		           
+		// Toggle guide reference
+		muAddShelfButton( $shelf,
+		                  "Toggle Guides Selectability",
+		                  "python(\"xgen.toggleGuideReference(xgui.createDescriptionEditor(False).currentDescription())\")",
+		                  (uiRes("m_xgenUI.kToggleAbilityToSelectCurrentDescriptionsGuides")),
+		                  ($iconDir + "xgToggleGuideReference.png"),
+		                  "", "2015" );
+		
+		// Flip guides across model
+		muAddShelfButton( $shelf,
+		                  "Mirror Guides X-axis",
+		                  "xgmFlipGuides( python(\"xgui.createDescriptionEditor(False).currentDescription()\") )",
+		                  (uiRes("m_xgenUI.kFlipSelectedGuidesAcrossXAxis")),
+		                  ($iconDir + "xgFlipGuides.png"),
+		                  "", "2015" );
+    
+		// Sync patch to geometry visibility
+		muAddShelfButton( $shelf,
+		              "Sync Patch Visibility",
+			          "xgmSyncPatchVisibility",
+			          (uiRes("m_xgenUI.kMatchXgenPatchVisibilityToGeometryVisibility")),   
+			          ($iconDir + "xgSyncPatchVisibility.png"),
+		              "", "2015" );
+		                  
+		// Toggle selection of xgen and geometry
+		muAddShelfButton( $shelf,
+		                  "Flip Selected",
+                          "python(\"xgen.selectionToggle(xgui.createDescriptionEditor(False).currentDescription())\")",
+		                  (uiRes("m_xgenUI.kToggleBetweenXgenPatchesAndGeometry")),
+		                  ($iconDir + "xgSelectionToggle.png"),
+		                  "", "2015" );
+		                  
+		// Isolate select of primitives
+		muAddShelfButton( $shelf,
+		                  "Select Primitives",
+		                  "python(\"xgui.createDescriptionEditor(False).primSelectionContext()\")",
+		                  (uiRes("m_xgenUI.kCreatePrimitiveSelectionBox")),
+		                  ($iconDir + "xgPrimSelection.png"),
+		                  "", "2015" );
+
+		// Cull primitives
+		muAddShelfButton( $shelf,
+		                  "Cull Primitives",
+		                  "python(\"xgui.createDescriptionEditor(False).cullSelectedPrimitives()\")",
+		                  (uiRes("m_xgenUI.kCullPrimitivesWithinSelectionBox")),
+		                  ($iconDir + "xgCullPrimContextSelect.png"),
+		                  "", "2015" );
+
+        // Sculpt guides
+		string $button = muAddShelfButton( $shelf,
+		                  "Sculpt Guides",
+		                  "python(\"xgui.createDescriptionEditor(False).guideSculptContext(False)\")",
+		                  (uiRes("m_xgenUI.kSculptGuidesSelectionBox")),
+		                  ($iconDir + "xgGuideSculptTool.png"),
+		                  "", "2016" );
+		if (size($button) > 0)
+ 		    shelfButton -e -doubleClickCommand "python(\"xgui.createDescriptionEditor(False).guideSculptContext(True)\")" $button;
+
+		// Convert primitives to polygons
+		$button = muAddShelfButton( $shelf,
+		                  "Convert Primitives to Polygons",
+		                  "python(\"import xgenm.xmaya.xgmConvertPrimToPolygon as cpp;cpp.convertPrimToPolygon(False)\")",
+		                  (uiRes("m_xgenUI.kConvertPrimToPolygonSelectionBox")),
+		                  ($iconDir + "xgConvertToPoly.png"),
+		                  "", "2017" );
+		if (size($button) > 0)
+		    shelfButton -e -doubleClickCommand "python(\"import xgenm.xmaya.xgmConvertPrimToPolygon as cpp;cpp.convertPrimToPolygon(True)\")" $button;
+		
+		muAddSeparator($shelf, "XGenSeparator");
+		
+		//Maya2017: new tools for interactive groom 
+		$button = muAddShelfGroomingButton( $shelf,
+		                  "Interactive Groom Editor",
+		                  "XgCreateIgSplineEditor",
+		                  "xgmInteractiveGroomEditorBtn",
+		                  ($iconDir + "xgIG_editor.png"),
+		                  "", "2017" );
+			
+		$button = muAddShelfGroomingButton( $shelf,
+		                  "Create Interactive Groom Splines",
+		                  "XgmCreateInteractiveGroomSplinesOption",
+		                  "xgmCreateInteractiveGroomSplineBtn",
+		                  ($iconDir + "xgIG_creation.png"),
+		                  "", "2017" );
+		if (size($button) > 0)
+		    shelfButton -e -doubleClickCommand "XgmCreateInteractiveGroomSplinesOption" $button;
+		
+		$button = muAddShelfGroomingButton( $shelf,
+		                  "Density Brush",
+		                  "XgmSetDensityBrushTool",
+		                  "xgmDensityBrushBtn",
+		                  ($iconDir + "xgIG_density.png"),
+		                  "", "2017" );
+		if (size($button) > 0)
+		    shelfButton -e -doubleClickCommand "XgmSetDensityBrushToolOption" $button;
+		
+		$button = muAddShelfGroomingButton( $shelf,
+		                  "Place Brush",
+		                  "XgmSetPlaceBrushTool",
+		                  "xgmPlaceBrushBtn",
+		                  ($iconDir + "xgIG_place.png"),
+		                  "", "2017" );
+		if (size($button) > 0)
+		    shelfButton -e -doubleClickCommand "XgmSetPlaceBrushToolOption" $button;
+
+		$button = muAddShelfGroomingButton( $shelf,
+		                  "Length Brush",
+		                  "XgmSetLengthBrushTool",
+		                  "xgmLengthBrushBtn",
+		                  ($iconDir + "xgIG_length.png"),
+		                  "", "2017" );
+		if (size($button) > 0)
+		    shelfButton -e -doubleClickCommand "XgmSetLengthBrushToolOption" $button;
+		
+		$button = muAddShelfGroomingButton( $shelf,
+		                  "Cut Brush",
+		                  "XgmSetCutBrushTool",
+		                  "xgmCutBrushBtn",
+		                  ($iconDir + "xgIG_cut.png"),
+		                  "", "2017" );
+		if (size($button) > 0)
+		    shelfButton -e -doubleClickCommand "XgmSetCutBrushToolOption" $button;
+		
+		$button = muAddShelfGroomingButton( $shelf,
+		                  "Width Brush",
+		                  "XgmSetWidthBrushTool",
+		                  "xgmWidthBrushBtn",
+		                  ($iconDir + "xgIG_width.png"),
+		                  "", "2017" );
+		if (size($button) > 0)
+		    shelfButton -e -doubleClickCommand "XgmSetWidthBrushToolOption" $button;
+		
+		$button = muAddShelfGroomingButton( $shelf,
+						  "Twist Brush",
+		                  "XgmSetDirectionBrushTool",
+		                  "xgmTwistBrushBtn",
+		                  ($iconDir + "xgIG_twist.png"),
+		                  "", "2017" );
+		if (size($button) > 0)
+		    shelfButton -e -doubleClickCommand "XgmSetDirectionBrushToolOption" $button;
+			
+		$button = muAddShelfGroomingButton( $shelf,
+		                  "Comb Brush",
+		                  "XgmSetCombBrushTool",
+		                  "xgmCombBrushBtn",
+		                  ($iconDir + "xgIG_comb.png"),
+		                  "", "2017" );
+		if (size($button) > 0)
+		    shelfButton -e -doubleClickCommand "XgmSetCombBrushToolOption" $button;
+			
+		$button = muAddShelfGroomingButton( $shelf,
+		                  "Grab Brush",
+		                  "XgmSetGrabBrushTool",
+		                  "xgmGrabBrushBtn",
+		                  ($iconDir + "xgIG_grab.png"),
+		                  "", "2017" );
+		if (size($button) > 0)
+		    shelfButton -e -doubleClickCommand "XgmSetGrabBrushToolOption" $button;
+			
+		$button = muAddShelfGroomingButton( $shelf,
+		                  "Smooth Brush",
+		                  "XgmSetSmoothBrushTool",
+		                  "xgmSmoothBrushBtn",
+		                  ($iconDir + "xgIG_smooth.png"),
+		                  "", "2017" );
+		if (size($button) > 0)
+		    shelfButton -e -doubleClickCommand "XgmSetSmoothBrushToolOption" $button;
+		
+		$button = muAddShelfGroomingButton( $shelf,
+		                  "Noise Brush",
+		                  "XgmSetNoiseBrushTool",
+		                  "xgmNoiseBrushBtn",
+		                  ($iconDir + "xgIG_noise.png"),
+		                  "", "2017" );
+		if (size($button) > 0)
+		    shelfButton -e -doubleClickCommand "XgmSetNoiseBrushToolOption" $button;
+		
+		$button = muAddShelfGroomingButton( $shelf,
+		                  "Clump Brush",
+		                  "XgmSetClumpBrushTool",
+		                  "xgmClumpBrushBtn",
+		                  ($iconDir + "xgIG_clump.png"),
+		                  "", "2017" );
+		if (size($button) > 0)
+		    shelfButton -e -doubleClickCommand "XgmSetClumpBrushToolOption" $button;
+		
+		$button = muAddShelfGroomingButton( $shelf,
+		                  "Part Brush",
+		                  "XgmSetPartBrushTool",
+		                  "xgmPartBrushBtn",
+		                  ($iconDir + "xgIG_part.png"),
+		                  "", "2017" );
+		if (size($button) > 0)
+		    shelfButton -e -doubleClickCommand "XgmSetPartBrushToolOption" $button;
+		
+		$button = muAddShelfGroomingButton( $shelf,
+		                  "Freeze Brush",
+		                  "XgmSetFreezeBrushTool",
+		                  "xgmFreezeBrushBtn",
+		                  ($iconDir + "xgIG_freeze.png"),
+		                  "", "2017" );
+		if (size($button) > 0)
+		    shelfButton -e -doubleClickCommand "XgmSetFreezeBrushToolOption" $button;
+
+		$button = muAddShelfGroomingButton( $shelf,
+		                  "Select Brush",
+		                  "XgmSetSelectBrushTool",
+		                  "xgmSelectBrushBtn",
+		                  ($iconDir + "xgIG_select.png"),
+		                  "", "2017" );
+		if (size($button) > 0)
+		    shelfButton -e -doubleClickCommand "XgmSetSelectBrushToolOption" $button;
+
+    }
+
+	// Add the version tag to this shelf for the what's new highlighting.
+	if ( `shelfLayout -ex $shelf` )
+	{
+		shelfLayout -e -version "2015" $shelf;
+    }
+}
+
+global proc xgenSelectMenuItems( string $parent, string $item )
+{
+	string $shape = $item;
+	string $object[] = `listRelatives -path -s $item`;
+
+	for ($i = 0; $i < size($object); ++$i) 
+	{
+		// Check if the shape is not an intermadiate object
+		if( 0 == getAttr($object[$i] + ".io") )
+		{
+			$shape = $object[$i];
+			break;
+		}
+	}
+
+	string $nt = `nodeType $shape`;
+	if( $nt == "xgmSplineGuide" || $nt == "xgmArchiveGuide" || $nt == "xgmCardGuide" || $nt == "xgmSphereGuide" )
+	{
+		menuItem 
+		-label (uiRes("m_xgenUI.kAddOrMoveGuidesSelectMenu"))
+		-echoCommand true
+		-c "XgGuideTool"
+		-rp "N";
+
+		menuItem 
+		-label (uiRes("m_xgenUI.kGuideControlPointsMenu"))
+		-echoCommand true
+		-c "selectMode -component; selectType -vertex true;"
+		-rp "NW";
+
+		menuItem 
+		-label (uiRes("m_xgenUI.kObjectModeSelectMenu"))
+		-echoCommand true
+		-c "selectMode -object"
+		-rp "NE";
+
+		menuItem 
+		-label (uiRes("m_xgenUI.kPasteGuideShapeSelectMenu"))
+		-echoCommand true
+		-c "selectMode -object; xgmCopyGuides(\"paste\")"
+		-rp "W";
+
+		menuItem 
+		-label (uiRes("m_xgenUI.kCopyGuideShapeSelectMenu"))
+		-echoCommand true
+		-c "selectMode -object; xgmCopyGuides(\"copy\")"
+		-rp "E";
+	}
+}

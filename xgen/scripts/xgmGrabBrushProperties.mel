@@ -1,0 +1,121 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+// ===========================================================================
+// Copyright 2015 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+
+
+//  Description:    defines behaviour and layout of xgmGrabBrushContext
+//                    tool property sheet
+//
+
+global string $gXgmGrabBrushLayout = "xgmGrabBrush";
+global string $gXgmGrabBrushCmd = "xgmGrabBrushContext";
+global string $gXgmGrabBrushToolName = "xgmGrabBrushTool";
+
+global string $gXgmGrabBrushSettingFrame = "xgmGrabBrushSettingFrame";
+global string $gXgmGrabBrushFalloffFrame = "xgmGrabBrushFalloffFrame";
+global string $gXgmGrabRootToTipFalloffFrame = "xgmGrabRootToTipFalloffFrame";
+global string $gXgmGrabBrushDisplaySettingFrame = "xgmGrabBrushDisplaySettingFrame";
+global string $gXgmGrabBrushSymmetrySettingFrame = "xgmGrabBrushSymmetrySettingFrame";
+
+//
+//    Description:
+//        Creates the UI of the custom brush settings for the grab brush
+//
+//    Input Arguments:
+//        None.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmGrabBrushSettingsCustom()
+{
+    global string $gXgmGrabBrushCmd;
+
+    string $curctx = `currentCtx`;
+
+    checkBoxGrp
+        -label (uiRes("m_xgmGrabBrushProperties.kXgmGrabBrushPreserveLength"))
+        -numberOfCheckBoxes 1
+        -on1 ( $gXgmGrabBrushCmd + " -e -preserveLength 1 " + $curctx )
+        -of1 ( $gXgmGrabBrushCmd + " -e -preserveLength 0 " + $curctx )
+        xgmGrabBrushPreserveLengthGRP;
+}
+
+//
+//    Description:
+//        layout of grab brush tool property sheet
+//
+//    Input Arguments:
+//        None.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmGrabBrushProperties ()
+{
+    global string $gXgmGrabBrushLayout;
+    global string $gXgmGrabBrushCmd;
+    global string $gXgmGrabBrushToolName;
+    global string $gXgmGrabBrushSettingFrame;
+    global string $gXgmGrabBrushFalloffFrame;
+    global string $gXgmGrabRootToTipFalloffFrame;
+    global string $gXgmGrabBrushDisplaySettingFrame;
+    global string $gXgmGrabBrushSymmetrySettingFrame;
+    global string $gXgmDefaultBrushFalloffTypes;
+    global string $gXgmDefaultBrushFalloffTypesL10N[];
+
+    string $parent = `toolPropertyWindow -q -location`;
+    setParent $parent;
+
+    setUITemplate -pushTemplate OptionsTemplate;
+
+    columnLayout $gXgmGrabBrushLayout;
+
+    xgmBrushSettingsProperties( $gXgmGrabBrushLayout, 
+                            $gXgmGrabBrushSettingFrame, 
+                            $gXgmGrabBrushCmd, 
+                            $gXgmGrabBrushToolName, 
+                            "xgmGrabBrushSettingsCustom" );
+
+    xgmBrushFalloffProperties( $gXgmGrabBrushLayout, 
+                            $gXgmGrabBrushFalloffFrame, 
+                            $gXgmGrabBrushCmd, 
+                            $gXgmGrabBrushToolName,
+                            "",
+                            $gXgmDefaultBrushFalloffTypes,
+                            $gXgmDefaultBrushFalloffTypesL10N ); 
+
+    string $temp[];
+    xgmRootToTipFalloffProperties( $gXgmGrabBrushLayout, 
+                            $gXgmGrabRootToTipFalloffFrame, 
+                            $gXgmGrabBrushCmd, 
+                            $gXgmGrabBrushToolName,
+                            $temp,
+                            "" ); 
+
+    xgmBrushDisplaySettingsProperties( $gXgmGrabBrushLayout, 
+                            $gXgmGrabBrushDisplaySettingFrame,
+                            $gXgmGrabBrushCmd, 
+                            $gXgmGrabBrushToolName,
+                            "" );  
+
+    xgmBrushSymmetrySettingsProperties( $gXgmGrabBrushLayout, 
+                            $gXgmGrabBrushSymmetrySettingFrame,
+                            $gXgmGrabBrushCmd, 
+                            $gXgmGrabBrushToolName,
+                            "" );  
+
+    setUITemplate -popTemplate;
+}
+

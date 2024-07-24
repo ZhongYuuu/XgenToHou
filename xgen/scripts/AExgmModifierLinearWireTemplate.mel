@@ -1,0 +1,197 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+
+global proc xgmModifierLinearWireOpCB(int $mode, string $nodeName)
+{
+    if ($mode == 0)
+    {
+        xgmModifierGuideOp -createGuide $nodeName;
+    }
+    else    // destroy
+    {
+        xgmModifierGuideOp -removeGuide $nodeName;
+    }
+}
+
+global proc onXgmModifierOpenWireDescriptionClickedCB(string $nodeName)
+{
+    // find input guide description, select it,
+    // then XGen UI panel will jump into the input guide description
+    string $inAttr = $nodeName + ".inWireData";
+    while (1)
+    {
+        string $nodes[] = `listConnections -d off -s on -sh on $inAttr`;
+        if (size($nodes) == 0)
+        {
+            break;
+        }
+        if (`nodeType $nodes[0]` == "xgmSplineDescription")
+        {
+            select $nodes[0];
+            return;
+        }
+
+        if ( `attributeExists "inSplineData" $nodes[0]`)
+            $inAttr = $nodes[0] + ".inSplineData";
+        else
+            break;
+    }
+
+    warning (uiRes("m_AExgmModifierLinearWireTemplate.kNoInGuideDescFound"));
+}
+
+global proc xgmLinearWireModifierUpdateCreateBtn(string $nodeName)
+{
+    // the button maybe not exist if current UI is not the modifier node tab
+    // when new scene, the callback may be called after the node is deleted
+    if (`button -ex xgmLinearWireModifierCreateWireButton` && `objExists $nodeName`)
+    {
+        string $attrName = $nodeName + ".inWireData";
+        int $mode = `connectionInfo -isDestination $attrName`;
+        if ($mode == 0)
+        {
+            button -e -label (uiRes("m_AExgmModifierLinearWireTemplate.kCreate"))
+                    -c ("xgmModifierLinearWireOpCB 0 " + $nodeName) xgmLinearWireModifierCreateWireButton;
+            symbolButton -e -enable 0 xgmLinearWireModifierOpenDescButton;
+        }
+        else
+        {
+            button -e -label (uiRes("m_AExgmModifierLinearWireTemplate.kDelete"))
+                    -c ("xgmModifierLinearWireOpCB 1 " + $nodeName) xgmLinearWireModifierCreateWireButton;
+            symbolButton -e -enable 1 xgmLinearWireModifierOpenDescButton;
+        }
+    }
+}
+
+global proc AExgmModifierLinearWireInputWireNew(string $attrName)
+{
+    setUITemplate -pst attributeEditorTemplate;
+        rowLayout -numberOfColumns 3 inputGuideLayout;
+            text -label (uiRes("m_AExgmModifierLinearWireTemplate.kInputWire2"));
+            button -label "" xgmLinearWireModifierCreateWireButton;
+            symbolButton -image "inArrow.png" xgmLinearWireModifierOpenDescButton;
+        setParent ..;
+        rowLayout -numberOfColumns 2;
+            text -label "";
+            button -label ((uiRes("m_AExgmModifierLinearWireTemplate.kCreateWireFromCurve"))) xgmGuideModifierCreateGuideFromCurveButton;
+        setParent ..;
+    setUITemplate -ppt;
+
+    AExgmModifierLinearWireInputWireReplace($attrName);
+}
+
+global proc AExgmModifierLinearWireInputWireReplace(string $attrName)
+{
+    string $nodeName = `plugNode $attrName`;
+    string $parent = `setParent -q`;
+    string $setParentCmd = ("setParent " + $parent + ";");
+
+    xgmLinearWireModifierUpdateCreateBtn($nodeName);
+
+    // create a script job when inWireData connection changed,
+    // then the button label is up-to-date
+    scriptJob -p `button -q -p xgmLinearWireModifierCreateWireButton` -rp
+                -con ($nodeName + ".inWireData") ("xgmLinearWireModifierUpdateCreateBtn " + $nodeName);
+
+    symbolButton -e -command ("onXgmModifierOpenWireDescriptionClickedCB " + $nodeName) xgmLinearWireModifierOpenDescButton;
+
+    button -e -c ($setParentCmd + "AExgmModifierLinearWireCreateGuideFromCurvesOnClick " + $nodeName) xgmGuideModifierCreateGuideFromCurveButton;
+}
+
+global proc AExgmModifierLinearWireRefUpdateNew(string $attrName)
+{
+    setUITemplate -pst attributeEditorTemplate;
+            rowLayout -numberOfColumns 2 -columnWidth 2 50;
+                text -label ((uiRes("m_AExgmModifierLinearWireTemplate.kReferenceState")));
+                button -label ((uiRes("m_AExgmModifierLinearWireTemplate.kUpdate"))) -command ""
+                                xgmLinearWireModifierUpdateRefButton;
+            setParent ..;
+    setUITemplate -ppt;
+
+    AExgmModifierLinearWireRefUpdateReplace($attrName);
+}
+
+global proc AExgmModifierLinearWireCreateGuideFromCurvesOnClick(string $nodeName)
+{
+    select -add $nodeName;
+
+    python("xgui.createXgIgCurveToGuideWindow('"+$nodeName+"', 0)");
+}
+
+global proc AExgmModifierLinearWireRefUpdateReplace(string $attrName)
+{
+    string $nodeName = `plugNode $attrName`;
+    button -e -c ("xgmModifierGuideOp -updateRef " + $nodeName) xgmLinearWireModifierUpdateRefButton;
+}
+
+global proc AExgmModifierLinearWireModifyWireNew(string $attrName)
+{
+    setUITemplate -pst attributeEditorTemplate;
+            rowLayout -numberOfColumns 2;
+                text -label "";
+                button -label ((uiRes("m_AExgmModifierLinearWireTemplate.kMakeGuidesDynamic"))) xgmModifierLinearWireMakeDynamicButton;
+            setParent ..;
+    setUITemplate -ppt;
+
+    AExgmModifierLinearWireModifyWireReplace($attrName);
+}
+
+global proc AExgmModifierLinearWireModifyWireReplace(string $attrName)
+{
+    string $nodeName = `plugNode $attrName`;
+
+    button -e -c ("AExgmModifierLinearWireMakeGuideDynamicOnClick " + $nodeName) xgmModifierLinearWireMakeDynamicButton;
+}
+
+global proc AExgmModifierLinearWireMakeGuideDynamicOnClick(string $nodeName)
+{
+    if (0 == `xgmMakeGuideDynamic -q -hg $nodeName`){
+        error (uiRes("m_AExgmModifierLinearWireTemplate.kNoWireData"));
+        return;
+    }
+
+    // Launch setting dialog
+    python("xgui.createXgIgNHairGuideWindow('"+$nodeName+"'"+")");
+}
+
+global proc AExgmModifierLinearWireTemplate(string $nodeName)
+{
+    editorTemplate -beginScrollLayout;
+        // Common Attributes
+        AExgmModifierBaseTemplate $nodeName;
+
+        editorTemplate -beginLayout (uiRes("m_AExgmModifierLinearWireTemplate.kLinearWireModifier")) -collapse 0;
+            xgmCreateAEUiForFloatAttr "mask" (uiRes("m_AExgmModifierLinearWireTemplate.kMask")) "xgmModifierLinearWire";
+            xgmCreateAEUiForFloatAttr "magnitude" (uiRes("m_AExgmModifierLinearWireTemplate.kMagnitude")) "xgmModifierLinearWire";
+
+            AEaddRampControl ($nodeName+".magnitudeScale");
+
+            editorTemplate -addSeparator;
+            xgmCreateAEUiForFloatAttr "smoothness" (uiRes("m_AExgmModifierLinearWireTemplate.kSmoothness")) "xgmModifierLinearWire";
+            xgmCreateAEUiForFloatAttr "breakage" (uiRes("m_AExgmModifierLinearWireTemplate.kBreakage")) "xgmModifierLinearWire";
+
+            editorTemplate -callCustom "AExgmModifierLinearWireRefUpdateNew"
+                "AExgmModifierLinearWireRefUpdateReplace" "refWire";
+        editorTemplate -endLayout;
+
+        // "Input Wire"
+        editorTemplate -beginLayout (uiRes("m_AExgmModifierLinearWireTemplate.kInputGuide")) -collapse 0;
+            editorTemplate -callCustom "AExgmModifierLinearWireInputWireNew"
+                "AExgmModifierLinearWireInputWireReplace" "inWireData";
+
+            editorTemplate -callCustom "AExgmModifierLinearWireModifyWireNew"
+                "AExgmModifierLinearWireModifyWireReplace" "inSplineData";
+        editorTemplate -endLayout;
+
+        AEdependNodeTemplate $nodeName ;
+
+        // Dynamic Attributes
+        editorTemplate -addExtraControls;
+
+    editorTemplate -endScrollLayout;
+}

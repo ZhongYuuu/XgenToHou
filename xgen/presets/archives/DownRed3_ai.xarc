@@ -1,0 +1,14 @@
+#ArchiveGroup 0 name="DownRed3_ai" description="No description." thumbnail="archives/DownRed3.png" materials="archives/materials/DownRed3_ai.ma" color=[1,0,0]
+0 "archives/abc/DownRed3_ai.abc" material=DownRed3_ai:paintfx_archives:downRed3ShaderSG objects=|paintfx_archives:downRed3MeshGroup|paintfx_archives:downRed3Main
+0 "archives/abc/DownRed3_ai.abc" material=DownRed3_ai:paintfx_archives:downRed3LeafShaderSG objects=|paintfx_archives:downRed3MeshGroup|paintfx_archives:downRed3Leaf
+3 "archives/ass/DownRed3_ai_Main.ass.gz" material=DownRed3_ai:paintfx_archives:downRed3ShaderSG objects=|paintfx_archives:downRed3MeshGroup|paintfx_archives:downRed3Leaf
+3 "archives/ass/DownRed3_ai_Leaf.ass.gz" material=DownRed3_ai:paintfx_archives:downRed3LeafShaderSG objects=|paintfx_archives:downRed3MeshGroup|paintfx_archives:downRed3Leaf
+1 "archives/abc/DownRed3_ai_med.abc" material=DownRed3_ai:paintfx_archives:downRed3ShaderSG objects=|paintfx_archives:downRed3MeshGroup|paintfx_archives:downRed3Main
+1 "archives/abc/DownRed3_ai_med.abc" material=DownRed3_ai:paintfx_archives:downRed3LeafShaderSG objects=|paintfx_archives:downRed3MeshGroup|paintfx_archives:downRed3Leaf
+4 "archives/ass/DownRed3_ai_Main_med.ass.gz" material=DownRed3_ai:paintfx_archives:downRed3ShaderSG objects=|paintfx_archives:downRed3MeshGroup|paintfx_archives:downRed3Leaf
+4 "archives/ass/DownRed3_ai_Leaf_med.ass.gz" material=DownRed3_ai:paintfx_archives:downRed3LeafShaderSG objects=|paintfx_archives:downRed3MeshGroup|paintfx_archives:downRed3Leaf
+2 "archives/abc/DownRed3_ai_lo.abc" material=DownRed3_ai:paintfx_archives:downRed3ShaderSG objects=|paintfx_archives:downRed3MeshGroup|paintfx_archives:downRed3Main
+2 "archives/abc/DownRed3_ai_lo.abc" material=DownRed3_ai:paintfx_archives:downRed3LeafShaderSG objects=|paintfx_archives:downRed3MeshGroup|paintfx_archives:downRed3Leaf
+5 "archives/ass/DownRed3_ai_Main_lo.ass.gz" material=DownRed3_ai:paintfx_archives:downRed3ShaderSG objects=|paintfx_archives:downRed3MeshGroup|paintfx_archives:downRed3Leaf
+5 "archives/ass/DownRed3_ai_Leaf_lo.ass.gz" material=DownRed3_ai:paintfx_archives:downRed3LeafShaderSG objects=|paintfx_archives:downRed3MeshGroup|paintfx_archives:downRed3Leaf
+

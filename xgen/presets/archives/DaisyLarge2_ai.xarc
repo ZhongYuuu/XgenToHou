@@ -1,0 +1,20 @@
+#ArchiveGroup 0 name="DaisyLarge2_ai" description="No description." thumbnail="archives/DaisyLarge2.png" materials="archives/materials/DaisyLarge2_ai.ma" color=[1,0,0]
+0 "archives/abc/DaisyLarge2_ai.abc" material=DaisyLarge2_ai:paintfx_archives:daisyLarge2ShaderSG objects=|paintfx_archives:daisyLarge2MeshGroup|paintfx_archives:daisyLarge2Main
+0 "archives/abc/DaisyLarge2_ai.abc" material=DaisyLarge2_ai:paintfx_archives:daisyLarge2LeafShaderSG objects=|paintfx_archives:daisyLarge2MeshGroup|paintfx_archives:daisyLarge2Leaf
+0 "archives/abc/DaisyLarge2_ai.abc" material=DaisyLarge2_ai:paintfx_archives:daisyLarge2FlowerShaderSG objects=|paintfx_archives:daisyLarge2MeshGroup|paintfx_archives:daisyLarge2Flower
+3 "archives/ass/DaisyLarge2_ai_Main.ass.gz" material=DaisyLarge2_ai:paintfx_archives:daisyLarge2ShaderSG objects=|paintfx_archives:daisyLarge2MeshGroup|paintfx_archives:daisyLarge2Flower
+3 "archives/ass/DaisyLarge2_ai_Leaf.ass.gz" material=DaisyLarge2_ai:paintfx_archives:daisyLarge2LeafShaderSG objects=|paintfx_archives:daisyLarge2MeshGroup|paintfx_archives:daisyLarge2Flower
+3 "archives/ass/DaisyLarge2_ai_Flower.ass.gz" material=DaisyLarge2_ai:paintfx_archives:daisyLarge2FlowerShaderSG objects=|paintfx_archives:daisyLarge2MeshGroup|paintfx_archives:daisyLarge2Flower
+1 "archives/abc/DaisyLarge2_ai_med.abc" material=DaisyLarge2_ai:paintfx_archives:daisyLarge2ShaderSG objects=|paintfx_archives:daisyLarge2MeshGroup|paintfx_archives:daisyLarge2Main
+1 "archives/abc/DaisyLarge2_ai_med.abc" material=DaisyLarge2_ai:paintfx_archives:daisyLarge2LeafShaderSG objects=|paintfx_archives:daisyLarge2MeshGroup|paintfx_archives:daisyLarge2Leaf
+1 "archives/abc/DaisyLarge2_ai_med.abc" material=DaisyLarge2_ai:paintfx_archives:daisyLarge2FlowerShaderSG objects=|paintfx_archives:daisyLarge2MeshGroup|paintfx_archives:daisyLarge2Flower
+4 "archives/ass/DaisyLarge2_ai_Main_med.ass.gz" material=DaisyLarge2_ai:paintfx_archives:daisyLarge2ShaderSG objects=|paintfx_archives:daisyLarge2MeshGroup|paintfx_archives:daisyLarge2Flower
+4 "archives/ass/DaisyLarge2_ai_Leaf_med.ass.gz" material=DaisyLarge2_ai:paintfx_archives:daisyLarge2LeafShaderSG objects=|paintfx_archives:daisyLarge2MeshGroup|paintfx_archives:daisyLarge2Flower
+4 "archives/ass/DaisyLarge2_ai_Flower_med.ass.gz" material=DaisyLarge2_ai:paintfx_archives:daisyLarge2FlowerShaderSG objects=|paintfx_archives:daisyLarge2MeshGroup|paintfx_archives:daisyLarge2Flower
+2 "archives/abc/DaisyLarge2_ai_lo.abc" material=DaisyLarge2_ai:paintfx_archives:daisyLarge2ShaderSG objects=|paintfx_archives:daisyLarge2MeshGroup|paintfx_archives:daisyLarge2Main
+2 "archives/abc/DaisyLarge2_ai_lo.abc" material=DaisyLarge2_ai:paintfx_archives:daisyLarge2LeafShaderSG objects=|paintfx_archives:daisyLarge2MeshGroup|paintfx_archives:daisyLarge2Leaf
+2 "archives/abc/DaisyLarge2_ai_lo.abc" material=DaisyLarge2_ai:paintfx_archives:daisyLarge2FlowerShaderSG objects=|paintfx_archives:daisyLarge2MeshGroup|paintfx_archives:daisyLarge2Flower
+5 "archives/ass/DaisyLarge2_ai_Main_lo.ass.gz" material=DaisyLarge2_ai:paintfx_archives:daisyLarge2ShaderSG objects=|paintfx_archives:daisyLarge2MeshGroup|paintfx_archives:daisyLarge2Flower
+5 "archives/ass/DaisyLarge2_ai_Leaf_lo.ass.gz" material=DaisyLarge2_ai:paintfx_archives:daisyLarge2LeafShaderSG objects=|paintfx_archives:daisyLarge2MeshGroup|paintfx_archives:daisyLarge2Flower
+5 "archives/ass/DaisyLarge2_ai_Flower_lo.ass.gz" material=DaisyLarge2_ai:paintfx_archives:daisyLarge2FlowerShaderSG objects=|paintfx_archives:daisyLarge2MeshGroup|paintfx_archives:daisyLarge2Flower
+

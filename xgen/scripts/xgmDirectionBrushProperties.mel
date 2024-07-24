@@ -1,0 +1,217 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+// ===========================================================================
+// Copyright 2015 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+
+
+//  Description:    defines behaviour and layout of xgmDirectionBrushContext
+//                    tool property sheet
+//
+
+global string $gXgmDirectionBrushLayout = "xgmDirectionBrush";
+global string $gXgmDirectionBrushCmd = "xgmDirectionBrushContext";
+global string $gXgmDirectionBrushToolName = "xgmDirectionBrushTool";
+
+global string $gXgmDirectionBrushSettingFrame = "xgmDirectionBrushSettingFrame";
+global string $gXgmDirectionBrushFalloffFrame = "xgmDirectionBrushFalloffFrame";
+global string $gXgmDirectionRootToTipFalloffFrame = "xgmDirectionRootToTipFalloffFrame";
+global string $gXgmDirectionBrushDisplaySettingFrame = "xgmDirectionBrushDisplaySettingFrame";
+global string $gXgmDirectionBrushSymmetrySettingFrame = "xgmDirectionBrushSymmetrySettingFrame";
+
+global string $gXgmDirectionBrushFalloffTypes;
+global string $gXgmDirectionBrushFalloffTypesL10N[];
+global int $gXgmDirectionSurfaceFalloffIndex;
+
+//
+//    Description:
+//        Initializes the Direction brush falloff types
+//
+//    Input Arguments:
+//        None.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmInitDirectionBrushFalloffTypes()
+{
+    global string $gXgmDirectionBrushFalloffTypes;
+    global string $gXgmDirectionBrushFalloffTypesL10N[];
+    global int $gXgmDirectionSurfaceFalloffIndex;
+
+    if( $gXgmDirectionBrushFalloffTypes == "" || size($gXgmDirectionBrushFalloffTypesL10N) == 0 ) {
+        $gXgmDirectionBrushFalloffTypes = "screen,volume,surface";
+        $gXgmDirectionBrushFalloffTypesL10N  = { (uiRes("m_xgmDirectionBrushProperties.kXgmDirectionBrushFalloffTypeScreen")),
+                                              (uiRes("m_xgmDirectionBrushProperties.kXgmDirectionBrushFalloffTypeVolume")),
+                                              (uiRes("m_xgmDirectionBrushProperties.kXgmDirectionBrushFalloffTypeSurface"))};
+        $gXgmDirectionSurfaceFalloffIndex = size($gXgmDirectionBrushFalloffTypesL10N) - 1 ;
+    }
+}
+
+
+//
+//    Description:
+//        Creates the UI of the custom brush settings for the Direction brush
+//
+//    Input Arguments:
+//        None.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmDirectionBrushSettingsCustom()
+{
+    global string $gXgmDirectionBrushCmd;
+
+    string $curctx = `currentCtx`;
+
+    radioButtonGrp -label (uiRes("m_xgmDirectionBrushProperties.kXgmDirectionBrushBrushMode"))
+                -numberOfRadioButtons 2
+                -label1 (uiRes("m_xgmDirectionBrushProperties.kXgmDirectionBrushBrushModeGlobal"))
+                -label2 (uiRes("m_xgmDirectionBrushProperties.kXgmDirectionBrushBrushModeLocal"))
+                -on1 ( $gXgmDirectionBrushCmd + " -e -globalSelection 1 " + $curctx )
+                -on2 ( $gXgmDirectionBrushCmd + " -e -globalSelection 0 " + $curctx )
+                xgmDirectionBrushBrushModeRBG;
+				
+	radioButtonGrp -label (uiRes("m_xgmDirectionBrushProperties.kXgmDirectionBrushSelectMode"))
+                -numberOfRadioButtons 2
+                -label1 (uiRes("m_xgmDirectionBrushProperties.kXgmDirectionBrushSelectModeLocked"))
+                -label2 (uiRes("m_xgmDirectionBrushProperties.kXgmDirectionBrushSelectModeFloating"))
+                -on1 ( $gXgmDirectionBrushCmd + " -e -selectMode 0 " + $curctx )
+                -on2 ( $gXgmDirectionBrushCmd + " -e -selectMode 1 " + $curctx )
+                xgmDirectionBrushSelectModeRBG;
+
+    separator -style "none";
+	
+	checkBoxGrp -label (uiRes("m_xgmDirectionBrushProperties.kXgmDirectionBrushAlignToSurface"))
+                -numberOfCheckBoxes 1
+                -on1 ( $gXgmDirectionBrushCmd + " -e -alignToSurface 1 " + $curctx )
+                -of1 ( $gXgmDirectionBrushCmd + " -e -alignToSurface 0 " + $curctx )
+                xgmDirectionBrushAlignToSurfaceGRP;
+
+    floatSliderGrp -field true -pre 3
+                -min -180
+                -max 180
+                -fieldMinValue -10000000
+                -fieldMaxValue 10000000
+                -label (uiRes("m_xgmDirectionBrushProperties.kXgmDirectionBrushIncrement"))
+                -cc ( $gXgmDirectionBrushCmd + " -e -increment #1 " + $curctx )
+                xgmDirectionBrushIncrementFSG;
+
+    floatSliderGrp -field true -pre 3
+                -min -180
+                -max 180
+                -fieldMinValue -10000000
+                -fieldMaxValue 10000000
+                -label (uiRes("m_xgmDirectionBrushProperties.kXgmDirectionBrushMinAngle"))
+                -cc ( $gXgmDirectionBrushCmd + " -e -minAngle #1 " + $curctx )
+                xgmDirectionBrushMinAngleFSG;
+
+    floatSliderGrp -field true -pre 3
+                -min -180
+                -max 180
+                -fieldMinValue -10000000
+                -fieldMaxValue 10000000
+                -label (uiRes("m_xgmDirectionBrushProperties.kXgmDirectionBrushMaxAngle"))
+                -cc ( $gXgmDirectionBrushCmd + " -e -maxAngle #1 " + $curctx )
+                xgmDirectionBrushMaxAngleFSG;
+	
+	separator -style "none";
+	
+	string $flood = (uiRes("m_xgmDirectionBrushProperties.kFloodSetting"));               
+	string $all        = (uiRes("m_xgmDirectionBrushProperties.kAll"));
+	string $selected     = (uiRes("m_xgmDirectionBrushProperties.kSelected"));
+	radioButtonGrp -nrb 2
+		-label (uiRes("m_xgmDirectionBrushProperties.kFlood")) 
+		-labelArray2 $all $selected
+		-annotation (uiRes("m_xgmDirectionBrushProperties.kFloodMode"))
+		-on1 ($gXgmDirectionBrushCmd + " -e -floodMode 1 " + $curctx)
+		-on2 ($gXgmDirectionBrushCmd + " -e -floodMode 2 " + $curctx)
+		floodRbg;
+		
+    rowLayout -numberOfColumns 1
+        -columnAttach 1 "left" 135
+        xgmBrushButtonsRow;
+        button -label (uiRes("m_xgmDirectionBrushProperties.kXgmBrushFlood"))
+            -command ($gXgmDirectionBrushCmd + " -e -flood " + $curctx )
+            -width 60
+            xgmBrushFloodButton;
+    setParent ..;              
+}
+
+//
+//    Description:
+//        layout of Direction brush tool property sheet
+//
+//    Input Arguments:
+//        None.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmDirectionBrushProperties ()
+{
+    global string $gXgmDirectionBrushLayout;
+    global string $gXgmDirectionBrushCmd;
+    global string $gXgmDirectionBrushToolName;
+    global string $gXgmDirectionBrushSettingFrame;
+    global string $gXgmDirectionBrushFalloffFrame;
+    global string $gXgmDirectionRootToTipFalloffFrame;
+    global string $gXgmDirectionBrushDisplaySettingFrame;
+    global string $gXgmDirectionBrushSymmetrySettingFrame;
+    global string $gXgmDirectionBrushFalloffTypes;
+    global string $gXgmDirectionBrushFalloffTypesL10N[];
+
+    xgmInitDirectionBrushFalloffTypes();
+
+    string $parent = `toolPropertyWindow -q -location`;
+    setParent $parent;
+
+    setUITemplate -pushTemplate OptionsTemplate;
+
+    columnLayout $gXgmDirectionBrushLayout;
+
+    xgmBrushSettingsProperties( $gXgmDirectionBrushLayout,
+                            $gXgmDirectionBrushSettingFrame,
+                            $gXgmDirectionBrushCmd,
+                            $gXgmDirectionBrushToolName,
+                            "xgmDirectionBrushSettingsCustom" );
+
+    xgmBrushFalloffProperties( $gXgmDirectionBrushLayout,
+                            $gXgmDirectionBrushFalloffFrame,
+                            $gXgmDirectionBrushCmd,
+                            $gXgmDirectionBrushToolName,
+                            "",
+                            $gXgmDirectionBrushFalloffTypes,
+                            $gXgmDirectionBrushFalloffTypesL10N );
+    string $temp[];
+    xgmRootToTipFalloffProperties( $gXgmDirectionBrushLayout,
+                            $gXgmDirectionRootToTipFalloffFrame,
+                            $gXgmDirectionBrushCmd,
+                            $gXgmDirectionBrushToolName,
+                            $temp,
+                            "" );
+
+    xgmBrushDisplaySettingsProperties( $gXgmDirectionBrushLayout,
+                            $gXgmDirectionBrushDisplaySettingFrame,
+                            $gXgmDirectionBrushCmd,
+                            $gXgmDirectionBrushToolName,
+                            "" );
+
+    xgmBrushSymmetrySettingsProperties( $gXgmDirectionBrushLayout,
+                            $gXgmDirectionBrushSymmetrySettingFrame,
+                            $gXgmDirectionBrushCmd,
+                            $gXgmDirectionBrushToolName,
+                            "" );
+
+    setUITemplate -popTemplate;
+}

@@ -1,0 +1,45 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+// ===========================================================================
+// Copyright 2015 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+
+global proc xgmSetBrushToolOptVars( string $brushCmd, string $tool, int $forceSet )
+{
+    if( !eval( $brushCmd + " -exists " + $tool ) ) {
+        return;
+    }
+
+    if( !`optionVar -exists $tool` || $forceSet ) {
+        optionVar -stringValue $tool "";
+    } else {
+        string $cmd = `optionVar -q $tool`;
+        catch( `eval($cmd)` );
+    }
+}
+
+global proc xgmSetBrushTool( string $brushCmd, string $tool, string $niceName )
+{
+    if( !eval( $brushCmd + " -exists " + $tool ) ) {
+        $tool = eval( $brushCmd + " " + $tool );
+        xgmSetBrushToolOptVars( $brushCmd, $tool, false);
+    }
+
+    // As we didn't support dynamically updating the sculpt node at runtime yet.
+    // commented out this line to make sure that the Comb tool can always be reset when xgmSetCombBrushTool is called.
+    // So that we can get the correct sculpt node which is initiallized at the setup of the tool
+    // if( `currentCtx` != $tool ) {
+        setToolTo $tool;
+        string $msg = $niceName + " " + (uiRes("m_xgmSetBrushTool.kActivated"));
+        inViewMessage -message $msg -position "midCenterBot" -backColor 0x00000000 -fade;
+    //}
+}

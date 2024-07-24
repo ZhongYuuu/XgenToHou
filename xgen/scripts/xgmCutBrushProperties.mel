@@ -1,0 +1,171 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+// ===========================================================================
+// Copyright 2015 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+
+global string $gXgmCutBrushLayout = "xgmCutBrush";
+global string $gXgmCutBrushCmd = "xgmCutBrushContext";
+global string $gXgmCutBrushToolName = "xgmCutBrushTool";
+
+global string $gXgmCutBrushSettingFrame = "xgmCutBrushSettingFrame";
+global string $gXgmCutBrushDisplaySettingFrame = "xgmCutBrushDisplaySettingFrame";
+global string $gXgmCutBrushSymmetrySettingFrame = "xgmCutBrushSymmetrySettingFrame";
+
+global proc xgmCutBrushSettingsProperties( string $parent, string $frameLayout, string $brushCmd, string $tool )
+{
+    setParent $parent;
+
+    frameLayout -collapsable true -collapse false -mh 5 -l (uiRes("m_xgmCutBrushProperties.kXgmBrushSettings")) $frameLayout;
+        columnLayout -adj true -rs 5 xgmBrushSettingsColumnLayout;
+
+            // Base Properties
+            rowLayout -numberOfColumns 2 -columnWidth 1 50 -columnWidth 2 20 -adjustableColumn 1 -rowAttach 2 "top" 0 xgmBrushSettingsSizeLayout;
+                floatSliderGrp -field true -pre 3
+                    -min 0
+                    -max 1000
+                    -fieldMaxValue 10000000
+                    -label (uiRes("m_xgmCutBrushProperties.kXgmBrushSize"))
+                    -annotation (uiRes("m_xgmCutBrushProperties.kXgmBrushSizeAnnotation"))
+                    -cc ( $brushCmd + " -e -radius #1 " + $tool )
+                xgmBrushSizeFSG;
+
+                iconTextCheckBox -width 22 -height 22 -style "iconOnly" -image "nodeGrapherUnpinnedLarge.png" -selectionImage "nodeGrapherPinnedLarge.png" 
+                    -annotation (uiRes("m_xgmCutBrushProperties.kUseGlobalBrushSizeAnnotation"))
+                    -onCommand  ( $brushCmd + " -e -useGlobalRadius false " + $tool )
+                    -offCommand ( $brushCmd + " -e -useGlobalRadius true " + $tool )
+                xgmBrushPinITCB;
+
+            setParent ..;
+
+            separator -style "none";
+
+            checkBoxGrp -label (uiRes("m_xgmCutBrushProperties.kXgmBrushInvertFrozenEffect"))
+                -numberOfCheckBoxes 1
+                -on1 ( $brushCmd + " -e -freezeMode 0 " + $tool )
+                -of1 ( $brushCmd + " -e -freezeMode 1 " + $tool )
+                xgmBrushInvertFrozenEffectCBG;
+
+			optionMenuGrp -label (uiRes("m_xgmCutBrushProperties.kXgmCutBrushCutMode"))
+				-cc ( "xgmCutBrushSetCutMode( \"" + $tool + "\")" )
+				xgmCutBrushCutModeOMG;
+				menuItem -label (uiRes("m_xgmCutBrushProperties.kXgmCutBrushCutModeScreen"));
+				menuItem -label (uiRes("m_xgmCutBrushProperties.kXgmCutBrushCutModeVolume"));
+			
+			floatSliderGrp -field true -pre 3
+                -min 0.001
+                -max 1
+                -fieldMaxValue 10000000
+                -label (uiRes("m_xgmCutBrushProperties.kXgmCutBrushMinRemainingLength"))
+                -cc ( $brushCmd + " -e -minLength #1 " + $tool )
+                xgmCutBrushMinLengthFSG;
+
+			separator -style "none";
+            checkBoxGrp -label (uiRes("m_xgmCutBrushProperties.kXgmBrushFilterBackface"))
+                -numberOfCheckBoxes 1
+                -on1 ( $brushCmd + " -e -filterBackface 1 " + $tool )
+                -of1 ( $brushCmd + " -e -filterBackface 0 " + $tool )
+                xgmBrushFilterBackfaceGRP;
+
+            floatSliderGrp -field true -pre 3
+                -min 0
+                -max 180
+                -label (uiRes("m_xgmCutBrushProperties.kXgmBrushFilterBackfaceCutoffAngle"))
+                -cc ( $brushCmd + " -e -fea #1 " + $tool + "; xgmBrushFilterBackFaceAngleChanged " + $parent + " " + $brushCmd + " " + $tool + ";")
+                xgmBrushFilterBackfaceEndAngleFSG;
+
+            floatSliderGrp -field true -pre 3
+                -min 0
+                -max 180
+                -label (uiRes("m_xgmCutBrushProperties.kXgmBrushFilterBackfaceFalloffStartAngle"))
+                -cc ( $brushCmd + " -e -fsa #1 " + $tool + "; xgmBrushFilterBackFaceAngleChanged " + $parent + " " + $brushCmd + " " + $tool + ";")
+                -visible false
+                xgmBrushFilterBackfaceStartAngleFSG;
+
+            separator -style "none";
+
+            floatSliderGrp -field true -pre 3
+                -min 0
+                -max 1
+                -fieldMaxValue 1
+                -label (uiRes("m_xgmCutBrushProperties.kXgmBrushOverallColorIntensity"))
+                -cc ( $brushCmd + " -e -overallColorIntensity #1 " + $tool )
+                xgmBrushOverallColorIntensityFSG;
+
+            // preselection hightlight
+            checkBoxGrp -label (uiRes("m_xgmCutBrushProperties.kXgmPreSelHighlightingEnable"))
+                -annotation (uiRes("m_xgmCutBrushProperties.kXgmPreSelHighlightingEnableAnnot"))
+                -on1 ($brushCmd + " -e -ps 1 " + $tool)
+                -of1 ($brushCmd + " -e -ps 0 " + $tool)
+                xgmPreSelHighlightingEnableCBG;
+xgmCutBrushContext -e -ps 1 xgmCutBrushTool;
+            colorSliderGrp 
+                -label (uiRes("m_xgmCutBrushProperties.kXgmPreSelHighlightColorSlider")) 
+                -cc ( "xgmPreSelHighlightColorChanged( \"" + $parent + "\", \"" + $brushCmd + "\", \"" + $tool + "\")" )
+                xgmPreSelHighlightColorCSG;
+
+        setParent ..;
+    setParent ..;
+}
+
+global proc xgmCutBrushProperties ()
+{
+    global string $gXgmCutBrushLayout;
+    global string $gXgmCutBrushCmd;
+    global string $gXgmCutBrushToolName;
+    global string $gXgmCutBrushSettingFrame;
+    global string $gXgmCutBrushDisplaySettingFrame;
+    global string $gXgmCutBrushSymmetrySettingFrame;
+
+    string $parent = `toolPropertyWindow -q -location`;
+    setParent $parent;
+
+    setUITemplate -pushTemplate OptionsTemplate;
+
+    columnLayout $gXgmCutBrushLayout;
+
+    xgmCutBrushSettingsProperties( $gXgmCutBrushLayout, 
+                            $gXgmCutBrushSettingFrame, 
+                            $gXgmCutBrushCmd, 
+                            $gXgmCutBrushToolName );
+
+    xgmBrushDisplaySettingsProperties( $gXgmCutBrushLayout, 
+                            $gXgmCutBrushDisplaySettingFrame,
+                            $gXgmCutBrushCmd, 
+                            $gXgmCutBrushToolName,
+                            "" );
+
+    xgmBrushSymmetrySettingsProperties( $gXgmCutBrushLayout, 
+                            $gXgmCutBrushSymmetrySettingFrame,
+                            $gXgmCutBrushCmd, 
+                            $gXgmCutBrushToolName,
+                            "" );
+
+    setUITemplate -popTemplate;
+}
+
+global proc xgmCutBrushSetCutMode (string $tool)
+{
+	global string $gXgmCutBrushCmd;
+	
+    int $selectedIndex = `optionMenuGrp -q -select xgmCutBrushCutModeOMG` - 1;
+	string $newVal;
+	if ($selectedIndex == 0)
+	{
+		$newVal = "screen";
+	}
+	else
+	{
+		$newVal = "volume";
+	}
+    eval( $gXgmCutBrushCmd + " -e -mode " + $newVal + " " + $tool);
+}

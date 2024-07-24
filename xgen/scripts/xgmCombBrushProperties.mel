@@ -1,0 +1,120 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+// ===========================================================================
+// Copyright 2015 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+
+
+//  Description:    defines behaviour and layout of xgmCombBrushContext
+//                    tool property sheet
+//
+
+global string $gXgmCombBrushLayout = "xgmCombBrush";
+global string $gXgmCombBrushCmd = "xgmCombBrushContext";
+global string $gXgmCombBrushToolName = "xgmCombBrushTool";
+
+global string $gXgmCombBrushSettingFrame = "xgmCombBrushSettingFrame";
+global string $gXgmCombBrushFalloffFrame = "xgmCombBrushFalloffFrame";
+global string $gXgmCombRootToTipFalloffFrame = "xgmCombRootToTipFalloffFrame";
+global string $gXgmCombBrushDisplaySettingFrame = "xgmCombBrushDisplaySettingFrame";
+global string $gXgmCombBrushSymmetrySettingFrame = "xgmCombBrushSymmetrySettingFrame";
+
+//
+//    Description:
+//        Creates the UI of the custom brush settings for the comb brush
+//
+//    Input Arguments:
+//        None.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmCombBrushSettingsCustom()
+{
+    global string $gXgmCombBrushCmd;
+    
+    string $curctx = `currentCtx`;
+
+    checkBoxGrp
+        -label (uiRes("m_xgmCombBrushProperties.kLockSelection"))
+        -numberOfCheckBoxes 1
+        -on1 ( $gXgmCombBrushCmd + " -e -lockSelection 1 " + $curctx)
+        -of1 ( $gXgmCombBrushCmd + " -e -lockSelection 0 " + $curctx)
+        xgmCombBrushLockSelectionGRP;
+}
+
+//
+//    Description:
+//        layout of comb brush tool property sheet
+//
+//    Input Arguments:
+//        None.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmCombBrushProperties ()
+{
+    global string $gXgmCombBrushLayout;
+    global string $gXgmCombBrushCmd;
+    global string $gXgmCombBrushToolName;
+    global string $gXgmCombBrushSettingFrame;
+    global string $gXgmCombBrushFalloffFrame;
+    global string $gXgmCombRootToTipFalloffFrame;
+    global string $gXgmCombBrushDisplaySettingFrame;
+    global string $gXgmCombBrushSymmetrySettingFrame;
+    global string $gXgmDefaultBrushFalloffTypes;
+    global string $gXgmDefaultBrushFalloffTypesL10N[];
+
+    string $parent = `toolPropertyWindow -q -location`;
+    setParent $parent;
+
+    setUITemplate -pushTemplate OptionsTemplate;
+
+    columnLayout $gXgmCombBrushLayout;
+
+    xgmBrushSettingsProperties( $gXgmCombBrushLayout, 
+                            $gXgmCombBrushSettingFrame, 
+                            $gXgmCombBrushCmd, 
+                            $gXgmCombBrushToolName, 
+                            "xgmCombBrushSettingsCustom" );
+
+    xgmBrushFalloffProperties( $gXgmCombBrushLayout, 
+                            $gXgmCombBrushFalloffFrame, 
+                            $gXgmCombBrushCmd, 
+                            $gXgmCombBrushToolName,
+                            "",
+                            $gXgmDefaultBrushFalloffTypes,
+                            $gXgmDefaultBrushFalloffTypesL10N ); 
+    string $temp[];
+    xgmRootToTipFalloffProperties( $gXgmCombBrushLayout, 
+                            $gXgmCombRootToTipFalloffFrame, 
+                            $gXgmCombBrushCmd, 
+                            $gXgmCombBrushToolName,
+                            $temp,
+                            "" ); 
+
+    xgmBrushDisplaySettingsProperties( $gXgmCombBrushLayout, 
+                            $gXgmCombBrushDisplaySettingFrame,
+                            $gXgmCombBrushCmd, 
+                            $gXgmCombBrushToolName,
+                            "" );
+
+    xgmBrushSymmetrySettingsProperties( $gXgmCombBrushLayout, 
+                            $gXgmCombBrushSymmetrySettingFrame,
+                            $gXgmCombBrushCmd, 
+                            $gXgmCombBrushToolName,
+                            "" );
+
+    setUITemplate -popTemplate;
+}
+

@@ -1,0 +1,95 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+// ===========================================================================
+// Copyright 2015 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+
+
+//    Description:    initializes the custom cut brush setting values
+//
+//    Input Arguments:
+//        parent    Parent layout of the custom cut brush settings layout.
+//                  Required so that UI object names can be successfully resolved
+//        tool      this is the name of the instance of the tool
+//                    that the property sheet is modifying.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmCutBrushSettingsValues( string $parent, string $brushCmd, string $tool )
+{
+    setParent $parent;
+
+    float $radius = eval( $brushCmd + " -q -radius " + $tool );
+    floatSliderGrp -e -value $radius xgmBrushSizeFSG;
+
+    int $useGlobalRadius = 1 - eval( $brushCmd + " -q -useGlobalRadius " + $tool ); 
+    iconTextCheckBox -e -value $useGlobalRadius xgmBrushPinITCB;
+	
+    int $freezeMode = !eval( $brushCmd + " -q -freezeMode " + $tool );
+    checkBoxGrp -e -value1 $freezeMode xgmBrushInvertFrozenEffectCBG;
+	
+	string $cutMode = eval ( $brushCmd + " -q -mode " + $tool );
+    if($cutMode == "screen") {
+        optionMenuGrp -e -select 1 xgmCutBrushCutModeOMG;
+    } 
+	else {
+        optionMenuGrp -e -select 2 xgmCutBrushCutModeOMG;
+    }
+	
+	float $minLength = eval( $brushCmd + " -q -minLength " + $tool );
+    floatSliderGrp -e -value $minLength xgmCutBrushMinLengthFSG;
+	
+    int $filterBackface = eval( $brushCmd + " -q -filterBackface " + $tool );
+    checkBoxGrp -e -value1 $filterBackface xgmBrushFilterBackfaceGRP;
+	
+    float $filterBackfaceEndAngle = eval( $brushCmd + " -q -fea " + $tool );
+    floatSliderGrp -e -value $filterBackfaceEndAngle xgmBrushFilterBackfaceEndAngleFSG;
+	
+	float $intensity = eval( $brushCmd + " -q -overallColorIntensity " + $tool );
+    floatSliderGrp -e -value $intensity xgmBrushOverallColorIntensityFSG;
+
+    int $preSelHighlight = eval( $brushCmd + " -q -preselectionHighlight " + $tool );
+    checkBoxGrp -e -value1 $preSelHighlight xgmPreSelHighlightingEnableCBG;
+
+    float $preSelHighlightR = eval( $brushCmd + " -q -psr " + $tool );
+    float $preSelHighlightG = eval( $brushCmd + " -q -psg " + $tool );
+    float $preSelHighlightB = eval( $brushCmd + " -q -psb " + $tool );
+    colorSliderGrp -e -en $preSelHighlight -rgb $preSelHighlightR $preSelHighlightG $preSelHighlightB xgmPreSelHighlightColorCSG;
+}
+
+global proc xgmCutBrushValues(string $tool) 
+{
+    global string $gXgmCutBrushLayout;
+    global string $gXgmCutBrushCmd;
+    global string $gXgmCutBrushSettingFrame;
+    global string $gXgmCutBrushDisplaySettingFrame;
+    global string $gXgmCutBrushSymmetrySettingFrame;
+
+    string $parent = `toolPropertyWindow -q -location`;
+    setParent $parent;
+
+    frameLayout -e -en true $gXgmCutBrushSettingFrame;
+    frameLayout -e -en true $gXgmCutBrushDisplaySettingFrame;
+
+    xgmCutBrushSettingsValues( $gXgmCutBrushSettingFrame, $gXgmCutBrushCmd, $tool );
+    xgmBrushDisplaySettingsValues( $gXgmCutBrushDisplaySettingFrame, $gXgmCutBrushCmd, $tool, "" );
+    xgmBrushSymmetrySettingsValues( $gXgmCutBrushSymmetrySettingFrame, $gXgmCutBrushCmd, $tool, "" );
+
+    string $help = "CutBrushTool";
+    toolPropertySetCommon $tool "xgmCutBrushTool.xpm" $help;
+
+    toolPropertySelect $gXgmCutBrushLayout;
+
+    string $nameField = `toolPropertyWindow -query -field`;
+    text -edit -label (uiRes("m_xgmCutBrushValues.kCutBrushToolName")) $nameField;
+}

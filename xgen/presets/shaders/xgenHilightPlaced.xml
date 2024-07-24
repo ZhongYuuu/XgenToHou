@@ -1,0 +1,26 @@
+<!--
+Copyright 2015 Autodesk, Inc. All rights reserved.
+
+Use of this software is subject to the terms of the Autodesk
+license agreement provided at the time of installation or download,
+or which otherwise accompanies this software in either electronic
+or hard copy form.
+-->
+<fragment_graph name="xgenHilightPlaced" ref="xgenHilightPlaced" class="FragmentGraph" version="1.0" feature_level="0" >
+    <fragments>
+        <fragment_ref name="xgenColorCombiner" ref="xgenColorCombiner" />
+    </fragments>
+    <connections>
+    </connections>
+    <properties>
+        <float4 name="inputColor"      ref="xgenColorCombiner.inputColorX" />
+        <float4 name="hilightPlacedColor"     ref="xgenColorCombiner.inputColorY" />
+    </properties>
+    <values>
+        <float4 name="inputColor" value="0.000000,0.000000,0.000000,0.000000" />
+        <float4 name="hilightPlacedColor" value="0.000000,0.000000,0.000000,0.000000" />
+    </values>
+    <outputs>
+        <float4 name="outColor" ref="xgenColorCombiner.outColor" />
+    </outputs>
+</fragment_graph>

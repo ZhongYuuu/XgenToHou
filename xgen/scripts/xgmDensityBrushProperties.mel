@@ -1,0 +1,189 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+// Copyright 2015 Autodesk, Inc. All rights reserved. 
+//
+// Use of this software is subject to the terms of the Autodesk 
+// license agreement provided at the time of installation or download, 
+// or which otherwise accompanies this software in either electronic 
+// or hard copy form.
+
+
+//  Description:    defines behaviour and layout of xgmDensityBrushContext
+//                    tool property sheet
+//
+global string $gXgmDensityBrushSymmetrySettingFrame = "xgmDensityBrushSymmetrySettingFrame";
+
+global proc xgmDensityBrushOperationTypeCB (string $parent, string $tool)
+{
+    setParent $parent;
+
+    int $newVal = `optionMenuGrp -q -select xgmDensityBrushOperationOMG`;
+    eval( "xgmDensityBrushContext -e -po " + $newVal + " `currentCtx`");
+}
+
+global proc xgmDensityBrushProperties ()
+//
+//    Procedure Name:
+//        xgmDensityBrushProperties
+//
+//    Description:
+//        layout of tool property sheet
+//
+//    Input Arguments:
+//        None.
+//
+//    Return Value:
+//        None.
+//
+{
+    global string $gXgmDensityBrushSymmetrySettingFrame;
+
+    string $curctx = `currentCtx`;
+
+    string $parent = `toolPropertyWindow -q -location`;
+    setParent $parent;
+
+    setUITemplate -pushTemplate OptionsTemplate;
+    
+    columnLayout xgmDensityBrush;
+    frameLayout -collapsable true -collapse false -l (uiRes("m_xgmDensityBrushProperties.kBrushSettings")) xgmDensityBrushFrame;
+        string $densityOptsLayout = `columnLayout xgmDensityBrushOptions`;
+
+            xgmBrushRadiusGroupProperties($densityOptsLayout, "xgmDensityBrushContext", $curctx);
+            
+            floatSliderGrp -field true -pre 3
+                -min 0
+                -max 100
+                -fieldMaxValue 10000000
+                -label (uiRes("m_xgmDensityBrushProperties.kBrushStrength"))  
+                -annotation (uiRes("m_xgmDensityBrushProperties.kBrushStrengthAnnotation"))
+                -cc ( ("xgmDensityBrushContext -e -strength #1 " + $curctx) )
+                    brushStrengthFsg;
+
+            separator -style "none";
+
+            optionMenuGrp -label (uiRes("m_xgmDensityBrushProperties.kPaintOperation"))
+                -cc ( "xgmDensityBrushOperationTypeCB(\"xgmDensityBrushOptions\", \"xgmDensityBrushTool\")" )
+                xgmDensityBrushOperationOMG;
+                    
+                menuItem -label (uiRes("m_xgmDensityBrushProperties.kSet"));
+                menuItem -label (uiRes("m_xgmDensityBrushProperties.kIncrease"));
+                menuItem -label (uiRes("m_xgmDensityBrushProperties.kDecrease"));
+                menuItem -label (uiRes("m_xgmDensityBrushProperties.kSmooth"));
+
+            floatSliderGrp -field true -pre 3
+                -min 0
+                -max 100
+                -fieldMaxValue 10000000
+                -label (uiRes("m_xgmDensityBrushProperties.kValue"))  
+                -annotation (uiRes("m_xgmDensityBrushProperties.kDensityAnnotation"))
+                -cc ( ("xgmDensityBrushContext -e -density #1 " + $curctx) )
+                densityFsg;
+
+            floatSliderGrp -field true -pre 3
+                -min 0
+                -max 100
+                -fieldMaxValue 10000000
+                -label (uiRes("m_xgmDensityBrushProperties.kMaxDensity"))  
+                -annotation (uiRes("m_xgmDensityBrushProperties.kMaxDensityAnnotation"))
+                -cc ( ("xgmDensityBrushContext -e -maxDensity #1 " + $curctx) )
+                maxDensityFsg;
+
+            separator -style "none";
+
+            checkBoxGrp
+                -label (uiRes("m_xgmDensityBrushProperties.kInterpolate"))
+                -numberOfCheckBoxes 1
+                -l1 " "
+                -on1 ("xgmDensityBrushContext -e -interpolate 1 " + $curctx)
+                -of1 ("xgmDensityBrushContext -e -interpolate 0 " + $curctx)
+                interpolateSelGrp;
+
+            optionMenuGrp -label (uiRes("m_xgmDensityBrushProperties.kInterpolateFrom"))
+                -cc ( "xgmDensityBrushContext -e -if `optionMenuGrp -q -select xgmDensityBrushInterpolateFromOMG` `currentCtx`" )
+                xgmDensityBrushInterpolateFromOMG;
+                    
+                menuItem -label (uiRes("m_xgmDensityBrushProperties.kCurrentDescription"));
+                menuItem -label (uiRes("m_xgmDensityBrushProperties.kInterpolateSource"));
+
+            floatSliderGrp -label (uiRes("m_xgmDensityBrushProperties.kInterpSmoothness")) -field true
+                -precision 3
+                -minValue 0.0
+                -maxValue 1.0
+                -fieldMinValue 0.0
+                -fieldMaxValue 1.0
+                -annotation (uiRes("m_xgmDensityBrushProperties.kInterpSmoothnessAnnotation"))
+                -cc ( ("xgmDensityBrushContext -e -interpSmoothness #1 " + $curctx) )
+                xgmDensityBrushInterpSmoothnessFsg;
+
+            floatSliderGrp -field true -pre 3
+                -min 0
+                -max 100
+                -fieldMaxValue 10000000
+                -label (uiRes("m_xgmDensityBrushProperties.kInitialLength"))  
+                -annotation (uiRes("m_xgmDensityBrushProperties.kInitLengthAnnotation"))
+                -cc ( ("xgmDensityBrushContext -e -initLength #1 " + $curctx) )
+                    initLengthFsg;
+
+        setParent ..; // xgmDensityBrushOptions
+    setParent ..; // xgmDensityBrushFrame
+    
+    
+    string $brushFalloffName = "xgmDensityBrushToolBrushFalloff";
+    string $falloffColumnLayout = "xgmBrushFalloffColumnLayout";
+    string $cmdFlag = "-brushFalloffCurve";
+    string $defaultFlag = "-defaultBrushFalloffCurve";
+
+    global string $gXgmCurvePresets[];
+    xgmInitCurvePreset();
+
+    //setParent $parent;
+    frameLayout -collapsable true -collapse true -mh 5 -l (uiRes("m_xgmDensityBrushProperties.kXgmBrushFalloff")) xgmFalloffFrame;
+        $falloffColumnLayout = `columnLayout -adj true -rs 5 $falloffColumnLayout`;
+
+            // Base Properties
+            optionMenuGrp -label (uiRes("m_xgmDensityBrushProperties.kXgmBrushFalloffType"))
+                xgmBrushFalloffTypeOMG;
+                    
+                menuItem -label (uiRes("m_xgmDensityBrushProperties.kFalloffTypeSurface"));
+
+            xgmFalloffCurveGroupProperties( $falloffColumnLayout, $brushFalloffName, "xgmDensityBrushContext", $cmdFlag, $defaultFlag, "xgmDensityBrushTool", $gXgmCurvePresets, 0 );
+
+        setParent ..;
+    setParent ..; //xgmFalloffFrame
+
+    string $flood = (uiRes("m_xgmDensityBrushProperties.kFloodSetting"));
+    frameLayout -collapsable true -collapse true -l $flood xgmFloodFrame;
+        columnLayout xgmFloodOptions;
+                        
+            string $all        = (uiRes("m_xgmDensityBrushProperties.kAll"));
+            string $selected     = (uiRes("m_xgmDensityBrushProperties.kSelected"));
+            radioButtonGrp -nrb 2
+                -label (uiRes("m_xgmDensityBrushProperties.kFlood")) 
+                -labelArray2 $all $selected
+                -annotation (uiRes("m_xgmDensityBrushProperties.kFloodMode"))
+                -on1 ("xgmDensityBrushContext -e -floodMode 1 " + $curctx)
+                -on2 ("xgmDensityBrushContext -e -floodMode 2 " + $curctx)
+                floodRbg;
+            
+            rowLayout -nc 1  -columnAttach 1 "both" 120;
+                button -label $flood -command "xgmDensityBrushContext  -e -flood `currentCtx`" -width 60;
+            setParent ..;
+                    
+        setParent ..; // xgmFloodOptions
+    setParent ..; // xgmFloodFrame
+    xgmBrushSymmetrySettingsProperties( $parent+"|xgmDensityBrush",
+                            $gXgmDensityBrushSymmetrySettingFrame,
+                            "xgmDensityBrushContext", 
+                            `currentCtx`,
+                            "" );
+
+    setParent ..; // xgmDensityBrush
+
+    setUITemplate -popTemplate;
+}

@@ -1,0 +1,104 @@
+<!--
+Copyright 2015 Autodesk, Inc. All rights reserved.
+
+Use of this software is subject to the terms of the Autodesk
+license agreement provided at the time of installation or download,
+or which otherwise accompanies this software in either electronic
+or hard copy form.
+-->
+<fragment uiName="xgenCPVRemapTint" name="xgenCPVRemapTint" type="plumbing" class="ShadeFragment" version="1.0" feature_level="0" >
+    <description>
+        <![CDATA[
+XGen remap float to CPV color (plumbing)]]>
+    </description>
+    <properties>
+        <float    name="remapValue" semantic="TEXCOORD5" flags="varyingInputParam" />
+        <texture1 name="remapCurve" />
+        <sampler  name="remapCurveSampler" />
+        <float2   name="remapRange" />
+        <float4   name="remapMinColor" />
+        <float4   name="remapMaxColor" />
+        <float    name="remapAlpha" />
+        <float4   name="inputColor" />
+    </properties>
+    <values>
+        <float2   name="remapRange"    value="0.000000,1.000000" />
+        <float4   name="remapMinColor" value="0.000000,0.000000,0.000000,0.000000" />
+        <float4   name="remapMaxColor" value="0.000000,0.000000,0.000000,0.000000" />
+        <float    name="remapAlpha"    value="0.000000" />
+    </values>
+    <outputs>
+        <float4 name="outColor" />
+    </outputs>
+    <implementation>
+        <implementation render="OGSRenderer" language="Cg" lang_version="2.100000" >
+            <function_name val="xgenCPVRemapTint" />
+            <source>
+                <![CDATA[
+float4 xgenCPVRemapTint(float remapValue, texture1D remapCurve, sampler1D remapCurveSampler,
+    float2 remapRange, float4 remapMinColor, float4 remapMaxColor,
+    float remapAlpha, float4 inputColor) 
+{
+    float4 remapColor = remapMinColor;
+    if( remapValue >= remapRange.x)
+    {
+        remapColor = remapMaxColor;
+        if(remapAlpha > 0.0f && remapValue <= remapRange.y) 
+        {
+            float normalizedValue = (remapValue - remapRange.x) / (remapRange.y - remapRange.x);
+            remapColor = float4(tex1D(remapCurveSampler, normalizedValue).rgb, remapAlpha);
+        }
+    }
+    return float4(lerp(inputColor.rgb, remapColor.rgb, remapColor.a), inputColor.a);
+} 
+                ]]>
+            </source>
+        </implementation>
+        <implementation render="OGSRenderer" language="GLSL" lang_version="3.000000" >
+            <function_name val="xgenCPVRemapTint" />
+            <source>
+                <![CDATA[
+vec4 xgenCPVRemapTint(float remapValue, sampler1D remapCurveSampler,
+    vec2 remapRange, vec4 remapMinColor, vec4 remapMaxColor,
+    float remapAlpha, vec4 inputColor) 
+{
+    vec4 remapColor = remapMinColor;
+    if( remapValue >= remapRange.x)
+    {
+        remapColor = remapMaxColor;
+        if(remapAlpha > 0.0f && remapValue <= remapRange.y) 
+        {
+            float normalizedValue = (remapValue - remapRange.x) / (remapRange.y - remapRange.x);
+            remapColor = vec4(texture(remapCurveSampler, normalizedValue).rgb, remapAlpha);
+        }
+    }
+    return vec4(lerp(inputColor.rgb, remapColor.rgb, remapColor.a), inputColor.a);
+} 
+                ]]>
+            </source>
+        </implementation>
+        <implementation render="OGSRenderer" language="HLSL" lang_version="11.000000" >
+            <function_name val="xgenCPVRemapTint" />
+            <source>
+                <![CDATA[
+float4 xgenCPVRemapTint(float remapValue, Texture1D remapCurve, sampler remapCurveSampler,
+    float2 remapRange, float4 remapMinColor, float4 remapMaxColor,
+    float remapAlpha, float4 inputColor) 
+{
+    float4 remapColor = remapMinColor;
+    if( remapValue >= remapRange.x)
+    {
+        remapColor = remapMaxColor;
+        if(remapAlpha > 0.0f && remapValue <= remapRange.y) 
+        {
+            float normalizedValue = (remapValue - remapRange.x) / (remapRange.y - remapRange.x);
+            remapColor = float4(remapCurve.SampleLevel(remapCurveSampler, normalizedValue, 0.0f).rgb, remapAlpha);
+        }
+    }
+    return float4(lerp(inputColor.rgb, remapColor.rgb, remapColor.a), inputColor.a);
+} 
+                ]]>
+            </source>
+        </implementation>
+    </implementation>
+</fragment>

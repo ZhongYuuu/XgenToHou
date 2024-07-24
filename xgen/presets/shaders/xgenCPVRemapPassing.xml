@@ -1,0 +1,93 @@
+<!--
+Copyright 2015 Autodesk, Inc. All rights reserved.
+
+Use of this software is subject to the terms of the Autodesk
+license agreement provided at the time of installation or download,
+or which otherwise accompanies this software in either electronic
+or hard copy form.
+-->
+<fragment uiName="xgenCPVRemapPassing" name="xgenCPVRemapPassing" type="interpolant" class="ShadeFragment" version="1.0" feature_level="0" >
+    <description>
+        <![CDATA[
+XGen remap float to CPV color (interpolant)]]>
+    </description>
+    <properties>
+        <float name="remapValue" semantic="TEXCOORD5" flags="varyingInputParam" />
+    </properties>
+    <values>
+    </values>
+    <outputs>
+        <!-- The semantic is COLOR1 because we run out of the number of TEXCOORDs (0-7) in Cg. -->
+        <float name="remapValue" semantic="COLOR1" />
+    </outputs>
+    <implementation>
+        <implementation render="OGSRenderer" language="Cg" lang_version="2.100000" >
+            <function_name val="xgenCPVRemapPassing" />
+            <vertex_source>
+                <![CDATA[
+float ixgenCPVRemapPassing(float remapValue)
+{
+    // We use COLOR1 semantic because we run out of the number of TEXCOORDs (0-7). Cg will
+    // clamp COLORn to [0,1] automatically while we use -1.0 for CVs not being affected..
+    // We change -1 to 0 and 0 to 0.00001 in VS. When a primitive is not affected, all its
+    // remapValue are -1 so we should not have interpolation issues.
+    if (remapValue == -1.0f) return 0.0f;
+    if (remapValue ==  0.0f) return 0.00001f;
+    if (remapValue >= 2.0f && remapValue < 1.0e30f) return 0.00001f; // COUNTING_INDEX
+    return remapValue;
+}
+                ]]>
+            </vertex_source>
+            <source>
+                <![CDATA[
+float xgenCPVRemapPassing(float iRemapValue)
+{
+    if (iRemapValue == 0.0f) return -1.0f;
+    return iRemapValue;
+}
+                ]]>
+            </source>
+        </implementation>
+        <implementation render="OGSRenderer" language="GLSL" lang_version="3.000000" >
+            <function_name val="xgenCPVRemapPassing" />
+            <vertex_source>
+                <![CDATA[
+float ixgenCPVRemapPassing(float remapValue)
+{
+    if (remapValue >= 2.0f && remapValue < 1.0e30f) return 0.0f; // COUNTING_INDEX
+    return remapValue;
+}
+                ]]>
+            </vertex_source>
+            <source>
+                <![CDATA[
+float xgenCPVRemapPassing(float iRemapValue)
+{
+    return iRemapValue;
+}
+                ]]>
+            </source>
+        </implementation>
+        <implementation render="OGSRenderer" language="HLSL" lang_version="11.000000" >
+            <function_name val="xgenCPVRemapPassing" />
+            <vertex_source>
+                <![CDATA[
+float ixgenCPVRemapPassing(float remapValue)
+{
+    if (remapValue >= 2.0f && remapValue < 1.0e30f) return 0.0f; // COUNTING_INDEX
+    return remapValue;
+}
+                ]]>
+            </vertex_source>
+            <source>
+                <![CDATA[
+float xgenCPVRemapPassing(float iRemapValue)
+{
+    return iRemapValue;
+}
+                ]]>
+            </source>
+        </implementation>
+    </implementation>
+</fragment>
+

@@ -1,0 +1,180 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+global proc xgmFloatAttrBrowserMapDir()
+{
+    string $dirs[] = `fileDialog2 -caption (uiRes("m_xgmCreateMapOptionsWin.kSelectMapDir")) 
+						-okCaption (uiRes("m_xgmCreateMapOptionsWin.kSelect")) -fileMode 3`;
+    if (size($dirs) == 1)
+	{
+		textFieldButtonGrp -e -text $dirs[0] xgmMapTextureFileTFBG;
+	}
+}
+
+global proc xgmCreateMapOptionsWinReset(string $mapName)
+{
+	textFieldGrp -e -text $mapName xgmMapMapNameTFG;
+	textFieldButtonGrp -e -text "" xgmMapTextureFileTFBG;
+	optionMenuGrp -e -sl 3 xgmMapSizeOMG;
+	optionMenuGrp -e -sl 2 xgmMapStartColorOMG;
+	optionMenuGrp -e -sl 1 xgmMapUvSetOMG;
+	optionMenuGrp -e -sl 7 xgmMapImageFormatOMG;
+	imageFormatsMenuSelectImfKey("xgmMapImageFormatOMG", "maya");
+}
+
+global proc xgmCreateMapOptionsWinCreate(string $attrName, string $mesh)
+{
+	string $mapName = `textFieldGrp -q -text xgmMapMapNameTFG`;
+	string $filePath = `textFieldButtonGrp -q -text xgmMapTextureFileTFBG`;
+	string $resolution = `optionMenuGrp -q -value xgmMapSizeOMG`;
+	int $startColor = `optionMenuGrp -q -sl xgmMapStartColorOMG`;
+	string $uvSet = `optionMenuGrp -q -value xgmMapUvSetOMG`;
+	string $imfKey = imageFormatsMenuImfKey("xgmMapImageFormatOMG");
+	
+	if (size($mapName)>0 && size($filePath)>0)
+	{
+		if (! `filetest -d $filePath`)
+		{
+			warning (uiRes("m_xgmCreateMapOptionsWin.kNotValidMapPath"));
+			return;
+		}
+
+		string $fileName = $filePath + "/" + $mapName;
+
+		string $fileFormat = `optionMenuGrp -q -value xgmMapImageFormatOMG`;
+		string $buffer[];
+		tokenize $fileFormat "(" $buffer;
+		if (size($buffer) != 2)
+		{
+			warning (uiRes("m_xgmCreateMapOptionsWin.kFailToParseFileFormat"));
+		}
+		else
+		{
+			string $suffix[];
+			tokenize $buffer[1] ")" $suffix;
+			$fileName += "." + $suffix[0];
+		}
+		
+		// if file has exsited, confirm to override
+		if (`filetest -e $fileName`)
+		{
+			string $msg = (uiRes("m_xgmCreateMapOptionsWin.kOverride"));
+			$msg += $fileName;
+			$msg += "?";
+			string $yesLabel = (uiRes("m_xgmCreateMapOptionsWin.kYes"));
+			string $noLabel = (uiRes("m_xgmCreateMapOptionsWin.kNo"));
+			string $ret = `confirmDialog -title (uiRes("m_xgmCreateMapOptionsWin.kConfirm")) -message $msg
+							-button $yesLabel -button $noLabel -defaultButton $yesLabel
+							-cancelButton $noLabel`;
+			if ($ret == $yesLabel)
+				layoutDialog -dismiss ($mapName+"|"+$fileName+"|"+$resolution+"|"+$startColor+"|"+$uvSet+"|"+$imfKey);
+		}
+		else
+		{
+			layoutDialog -dismiss ($mapName+"|"+$fileName+"|"+$resolution+"|"+$startColor+"|"+$uvSet+"|"+$imfKey);
+		}
+	}
+	else
+	{
+		warning (uiRes("m_xgmCreateMapOptionsWin.kNotAllowEmptyMapNameOrFile"));
+	}
+}
+
+global proc xgmCreateMapOptionsWin(string $attrName, string $mesh)
+{
+	string $mapName = `plugAttr $attrName`;
+
+    string $form = `formLayout -numberOfDivisions 100 -width 500`;
+
+    textFieldGrp -label (uiRes("m_xgmCreateMapOptionsWin.kMapName"))  -text $mapName xgmMapMapNameTFG;
+
+	optionMenuGrp -label (uiRes("m_xgmCreateMapOptionsWin.kImageFormat")) xgmMapImageFormatOMG;
+    buildImageFormatsMenu(0, 0, 0, 0, 0);
+
+    textFieldButtonGrp -label (uiRes("m_xgmCreateMapOptionsWin.kFileName")) -text "" 
+						-buttonLabel (uiRes("m_xgmCreateMapOptionsWin.kBrowser"))
+						-bc "xgmFloatAttrBrowserMapDir"
+						xgmMapTextureFileTFBG;
+    optionMenuGrp -label (uiRes("m_xgmCreateMapOptionsWin.kSize")) xgmMapSizeOMG;
+        menuItem -label "256";
+        menuItem -label "512";
+		menuItem -label "1024";
+		menuItem -label "2048";
+		menuItem -label "4096";
+
+    optionMenuGrp -label (uiRes("m_xgmCreateMapOptionsWin.kStartColor")) xgmMapStartColorOMG;
+	    menuItem -label (uiRes("m_xgmCreateMapOptionsWin.kBasedOnAttr"));
+        menuItem -label (uiRes("m_xgmCreateMapOptionsWin.kWhite"));
+        menuItem -label (uiRes("m_xgmCreateMapOptionsWin.kBlack"));
+		menuItem -label (uiRes("m_xgmCreateMapOptionsWin.kGray"));
+
+    optionMenuGrp -label (uiRes("m_xgmCreateMapOptionsWin.kUVSet")) xgmMapUvSetOMG;
+		// only list current uvSet
+		string $curUVSet[] = `polyUVSet -q -cuv $mesh`;
+		if (size($curUVSet) > 0)
+			menuItem -label $curUVSet[0];
+        
+	button -label (uiRes("m_xgmCreateMapOptionsWin.kCreate"))
+	       -command ("xgmCreateMapOptionsWinCreate \"" + $attrName + "\" \"" + $mesh + "\"")
+		   xgmCreateMapWinCreateButton;
+	button -label (uiRes("m_xgmCreateMapOptionsWin.kReset"))
+	       -command ("xgmCreateMapOptionsWinReset " + $mapName)
+		   xgmCreateMapWinResetButton;
+	button -label (uiRes("m_xgmCreateMapOptionsWin.kCancel"))
+	       -command "layoutDialog -dismiss \"dismiss\""
+		   xgmCreateMapWinCancelButton;
+    
+    formLayout -edit
+		-attachForm     xgmMapMapNameTFG   "top"    8
+		-attachForm     xgmMapMapNameTFG   "left"   5
+		-attachControl  xgmMapMapNameTFG   "bottom" 5 xgmMapImageFormatOMG
+		-attachForm     xgmMapMapNameTFG   "right"  5
+		
+		-attachNone     xgmMapImageFormatOMG   "top"
+		-attachForm     xgmMapImageFormatOMG   "left"   5
+		-attachControl  xgmMapImageFormatOMG   "bottom" 5 xgmMapTextureFileTFBG
+		-attachForm     xgmMapImageFormatOMG   "right"  5
+
+		-attachNone     xgmMapTextureFileTFBG      "top"
+		-attachForm     xgmMapTextureFileTFBG      "left"   5
+		-attachControl  xgmMapTextureFileTFBG      "bottom" 5 xgmMapSizeOMG
+		-attachForm     xgmMapTextureFileTFBG      "right"  5
+		
+		-attachNone     xgmMapSizeOMG  "top"
+		-attachForm     xgmMapSizeOMG  "left"   5
+		-attachControl  xgmMapSizeOMG  "bottom" 5 xgmMapStartColorOMG
+		-attachForm     xgmMapSizeOMG  "right"  5
+		
+		-attachNone     xgmMapStartColorOMG   "top"
+		-attachForm     xgmMapStartColorOMG   "left"   5
+		-attachControl  xgmMapStartColorOMG   "bottom" 5 xgmMapUvSetOMG
+		-attachForm     xgmMapStartColorOMG   "right"  5
+		
+		-attachNone     xgmMapUvSetOMG   "top"
+		-attachForm     xgmMapUvSetOMG   "left"   5
+		-attachControl  xgmMapUvSetOMG   "bottom" 30 xgmCreateMapWinCreateButton
+		-attachForm     xgmMapUvSetOMG   "right"  5
+
+		-attachNone  	xgmCreateMapWinCreateButton    "top"
+		-attachForm     xgmCreateMapWinCreateButton    "left"   5
+		-attachForm     xgmCreateMapWinCreateButton    "bottom" 5
+		-attachForm 	xgmCreateMapWinCreateButton    "right" 335
+
+		-attachNone     xgmCreateMapWinResetButton  "top"
+		-attachForm  xgmCreateMapWinResetButton  "left" 170
+		-attachForm     xgmCreateMapWinResetButton  "bottom" 5
+		-attachForm     xgmCreateMapWinResetButton  "right"  170
+
+		-attachNone     xgmCreateMapWinCancelButton  "top"
+		-attachForm  xgmCreateMapWinCancelButton  "left"   335
+		-attachForm     xgmCreateMapWinCancelButton  "bottom" 5
+		-attachForm     xgmCreateMapWinCancelButton  "right"  5 
+
+		$form;
+	
+	xgmCreateMapOptionsWinReset($mapName);
+}

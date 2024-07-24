@@ -1,0 +1,139 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+// ===========================================================================
+// Copyright 2015 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+
+
+//    Description:    initializes the custom Direction brush setting values
+//
+//    Input Arguments:
+//        parent    Parent layout of the custom Direction brush settings layout.
+//                  Required so that UI object names can be successfully resolved
+//        tool      this is the name of the instance of the tool
+//                    that the property sheet is modifying.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmDirectionBrushSettingsValues(string $parent, string $tool)
+{
+    global string $gXgmDirectionBrushCmd;
+
+    setParent $parent;
+
+    separator -e -visible 0 xgmBrushCollisionSEP;
+    checkBoxGrp -e -visible 0 xgmBrushCollisionGRP;
+    floatSliderGrp -e -visible 0 xgmBrushCollisionDistanceFSG;
+
+    int $globalSel = eval ( $gXgmDirectionBrushCmd + " -q -globalSelection " + $tool );
+    if($globalSel) {
+        radioButtonGrp -e -select 1 xgmDirectionBrushBrushModeRBG;
+    } else {
+        radioButtonGrp -e -select 2 xgmDirectionBrushBrushModeRBG;
+    }
+	
+	int $selectMode = eval ( $gXgmDirectionBrushCmd + " -q -selectMode " + $tool );
+    if($selectMode == 0) {
+		radioButtonGrp -e -select 1 xgmDirectionBrushSelectModeRBG;
+    } 
+	else {
+		radioButtonGrp -e -select 2 xgmDirectionBrushSelectModeRBG;
+    }
+	
+	int $alignToSurface = eval( $gXgmDirectionBrushCmd + " -q -alignToSurface " + $tool );
+    checkBoxGrp -e -value1 $alignToSurface xgmDirectionBrushAlignToSurfaceGRP;
+	
+	int $enableControlValue = 1;
+	if ($alignToSurface > 0){
+		$enableControlValue = 0;
+	}
+	
+    float $increment = eval( $gXgmDirectionBrushCmd + " -q -increment " + $tool );
+    floatSliderGrp -e -en $enableControlValue -value $increment xgmDirectionBrushIncrementFSG;
+
+    float $minAngle = eval( $gXgmDirectionBrushCmd + " -q -minAngle " + $tool );
+    floatSliderGrp -e -en $enableControlValue -value $minAngle xgmDirectionBrushMinAngleFSG;
+
+    float $maxAngle = eval( $gXgmDirectionBrushCmd + " -q -maxAngle " + $tool );
+    floatSliderGrp -e -en $enableControlValue -value $maxAngle xgmDirectionBrushMaxAngleFSG;
+	
+	button -e -en $globalSel xgmBrushFloodButton;
+	
+	// flood mode
+    int $floodMode = eval( $gXgmDirectionBrushCmd + " -q -floodMode " + $tool);
+	radioButtonGrp -e -en $globalSel -select $floodMode floodRbg;
+}
+
+//    Description:    initializes the custom Direction brush faloff values
+//
+//    Input Arguments:
+//        parent    Parent layout of the custom Direction brush settings layout.
+//                  Required so that UI object names can be successfully resolved
+//        tool      this is the name of the instance of the tool
+//                    that the property sheet is modifying.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmDirectionBrushFalloffValues(string $parent, string $tool)
+{
+    global string $gXgmDirectionBrushCmd;
+
+    setParent $parent;
+}
+
+//
+//    Description:    initializes DirectionBrushContext tool property sheet values
+//
+//    Input Arguments:
+//        tool      this is the name of the instance of the tool
+//                    that the property sheet is modifying.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmDirectionBrushValues(string $tool)
+{
+    global string $gXgmDirectionBrushLayout;
+    global string $gXgmDirectionBrushCmd;
+    global string $gXgmDirectionBrushSettingFrame;
+    global string $gXgmDirectionBrushFalloffFrame;
+    global string $gXgmDirectionRootToTipFalloffFrame;
+    global string $gXgmDirectionBrushDisplaySettingFrame;
+    global string $gXgmDirectionBrushSymmetrySettingFrame;
+    global string $gXgmDirectionBrushFalloffTypes;
+
+    string $parent = `toolPropertyWindow -q -location`;
+    setParent $parent;
+
+    frameLayout -e -en true $gXgmDirectionBrushSettingFrame;
+    frameLayout -e -en true $gXgmDirectionBrushFalloffFrame;
+    frameLayout -e -en true $gXgmDirectionRootToTipFalloffFrame;
+    frameLayout -e -en true $gXgmDirectionBrushDisplaySettingFrame;
+
+    string $settingsCustom = "xgmDirectionBrushSettingsValues( \"" + $gXgmDirectionBrushLayout + "\", \"" + $tool + "\")";
+    string $falloffCustom = "xgmDirectionBrushFalloffValues( \"" + $gXgmDirectionBrushLayout + "\", \"" + $tool + "\")";
+    xgmBrushSettingsValues( $gXgmDirectionBrushSettingFrame, $gXgmDirectionBrushCmd, $tool, $settingsCustom );
+    xgmBrushFalloffValues( $gXgmDirectionBrushFalloffFrame, $gXgmDirectionBrushCmd, $tool, $falloffCustom, $gXgmDirectionBrushFalloffTypes );
+    xgmRootToTipFalloffValues( $gXgmDirectionRootToTipFalloffFrame, $gXgmDirectionBrushCmd, $tool, "" );
+    xgmBrushDisplaySettingsValues( $gXgmDirectionBrushDisplaySettingFrame, $gXgmDirectionBrushCmd, $tool, "" );
+    xgmBrushSymmetrySettingsValues( $gXgmDirectionBrushSymmetrySettingFrame, $gXgmDirectionBrushCmd, $tool, "" );
+
+    string $help = "DirectionBrushTool";
+    toolPropertySetCommon $tool "xgmDirectionBrushTool.xpm" $help;
+
+    toolPropertySelect $gXgmDirectionBrushLayout;
+
+    string $nameField = `toolPropertyWindow -query -field`;
+    text -edit -label (uiRes("m_xgmDirectionBrushValues.kDirectionBrushToolName")) $nameField;
+}

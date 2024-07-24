@@ -1,0 +1,148 @@
+<!--
+Copyright 2015 Autodesk, Inc. All rights reserved.
+
+Use of this software is subject to the terms of the Autodesk
+license agreement provided at the time of installation or download,
+or which otherwise accompanies this software in either electronic
+or hard copy form.
+-->
+<fragment uiName="xgenFacingCameraVSToGSTw" name="xgenFacingCameraVSToGSTw" type="interpolant" class="ShadeFragment" version="1.0" feature_level="0" >
+    <description>
+        <![CDATA[
+XGen wide spline vertex tangent generator (object space!)]]>
+    </description>
+    <properties>
+      <float3   name="Pm"                     semantic="Pm"         flags="varyingInputParam" />
+      <float3   name="mayaBitangentIn"        semantic="BITANGENT"  flags="varyingInputParam" />
+	  <float3   name="xgenCVDirection"        semantic="TANGENT"    flags="varyingInputParam" />
+	  <float    name="xgenCVWidth"            semantic="TEXCOORD2"  flags="varyingInputParam" />
+	  <bool     name="bFaceCamera" />
+      <float4x4 name="worldInverse"           semantic="worldinverse" />
+      <float3   name="viewDirection"          semantic="viewdirection" />
+      <float3   name="worldCameraPosition"    semantic="worldcameraposition" />
+      <bool     name="isOrthographic"         semantic="isorthographic" />>
+    </properties>
+    <values>
+	  <bool name="bFaceCamera" value="true"    />
+    </values>
+    <outputs>
+        <float3 name="Tw" />
+    </outputs>
+    <implementation>
+        <implementation render="OGSRenderer" language="Cg" lang_version="2.100000" >
+            <function_name val="xgenFacingCameraVSToGSTw" />
+            <vertex_source>
+                <![CDATA[
+float3 ixgenFacingCameraVSToGSTw(float3 Pm, float3 Bw, float3 xgenCVDirection, float xgenCVWidth, bool bFaceCamera, float4x4 worldInverse, float3 viewDirection, float3 worldCameraPosition, bool isOrthographic)
+{
+    // In case of a zero-length tangent..
+    xgenCVWidth = max(xgenCVWidth, 0.00001f);
+
+	if (!bFaceCamera)
+	{
+		return xgenCVWidth * normalize(xgenCVDirection);
+	}
+    // Get a view vector from camera to vertex
+    float3 viewVector = Pm - mul(worldInverse, float4(worldCameraPosition, 1.0f)).xyz;
+
+    // Orthographic camera is directional
+    if (isOrthographic)
+    {
+        float3 viewOrigin = mul(worldInverse, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
+        float3 viewTarget = mul(worldInverse, float4(viewDirection, 1.0f)).xyz;
+        viewVector = viewTarget - viewOrigin;
+    }
+
+    // Tangent is the cross product of view vector and bitangent
+    return xgenCVWidth * normalize(cross(viewVector, Bw));
+}
+                ]]>
+            </vertex_source>
+            <source>
+                <![CDATA[
+float3 xgenFacingCameraVSToGSTw(float3 iTw)
+{
+    return normalize(iTw);
+}
+                ]]>
+            </source>
+        </implementation>
+        <implementation render="OGSRenderer" language="GLSL" lang_version="3.000000" >
+            <function_name val="xgenFacingCameraVSToGSTw" />
+            <vertex_source>
+                <![CDATA[
+vec3 ixgenFacingCameraVSToGSTw(vec3 Pm, vec3 Bw, vec3 xgenCVDirection, float xgenCVWidth, bool bFaceCamera, mat4 worldInverse, vec3 viewDirection, vec3 worldCameraPosition, bool isOrthographic)
+{
+    // In case of a zero-length tangent..
+    xgenCVWidth = max(xgenCVWidth, 0.00001f);
+
+	if (!bFaceCamera)
+	{
+		return xgenCVWidth * normalize(xgenCVDirection);
+	}
+    // Get a view vector from camera to vertex
+    vec3 viewVector = Pm - mul(worldInverse, vec4(worldCameraPosition, 1.0f)).xyz;
+
+    // Orthographic camera is directional
+    if (isOrthographic)
+    {
+        vec3 viewOrigin = mul(worldInverse, vec4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
+        vec3 viewTarget = mul(worldInverse, vec4(viewDirection, 1.0f)).xyz;
+        viewVector = viewTarget - viewOrigin;
+    }
+
+    // Tangent is the cross product of view vector and bitangent
+    return xgenCVWidth * normalize(cross(viewVector, Bw));
+}
+                ]]>
+            </vertex_source>
+            <source>
+                <![CDATA[
+vec3 xgenFacingCameraVSToGSTw(vec3 iTw)
+{
+    return normalize(iTw);
+}
+                ]]>
+            </source>
+        </implementation>
+        <implementation render="OGSRenderer" language="HLSL" lang_version="11.000000" >
+            <function_name val="xgenFacingCameraVSToGSTw" />
+            <vertex_source>
+                <![CDATA[
+float3 ixgenFacingCameraVSToGSTw(float3 Pm, float3 Bw, float3 xgenCVDirection, float xgenCVWidth, bool bFaceCamera, float4x4 worldInverse, float3 viewDirection, float3 worldCameraPosition, bool isOrthographic)
+{
+    // In case of a zero-length tangent..
+    xgenCVWidth = max(xgenCVWidth, 0.00001f);
+
+	if (!bFaceCamera)
+	{
+		return xgenCVWidth * normalize(xgenCVDirection);
+	}
+    // Get a view vector from camera to vertex
+    float3 viewVector = Pm - mul(float4(worldCameraPosition, 1.0f), worldInverse).xyz;
+
+    // Orthographic camera is directional
+    if (isOrthographic)
+    {
+        float3 viewOrigin = mul(float4(0.0f, 0.0f, 0.0f, 1.0f), worldInverse).xyz;
+        float3 viewTarget = mul(float4(viewDirection, 1.0f), worldInverse).xyz;
+        viewVector = viewTarget - viewOrigin;
+    }
+
+    // Tangent is the cross product of view vector and bitangent
+    return xgenCVWidth * normalize(cross(viewVector, Bw));
+}
+                ]]>
+            </vertex_source>
+            <source>
+                <![CDATA[
+float3 xgenFacingCameraVSToGSTw(float3 iTw)
+{
+    return normalize(iTw);
+}
+                ]]>
+            </source>
+        </implementation>
+    </implementation>
+</fragment>
+

@@ -1,0 +1,122 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+// ===========================================================================
+// Copyright 2017 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+
+
+//  Description:    defines behaviour and layout of xgmBifrostBrushContext
+//                    tool property sheet
+//
+
+global string $gXgmBifrostBrushLayout = "xgmBifrostBrush";
+global string $gXgmBifrostBrushCmd = "xgmBifrostBrushContext";
+global string $gXgmBifrostBrushToolName = "xgmBifrostBrushTool";
+
+global string $gXgmBifrostBrushSettingFrame = "xgmBifrostBrushSettingFrame";
+global string $gXgmBifrostBrushFalloffFrame = "xgmBifrostBrushFalloffFrame";
+global string $gXgmBifrostRootToTipFalloffFrame = "xgmBifrostRootToTipFalloffFrame";
+global string $gXgmBifrostBrushDisplaySettingFrame = "xgmBifrostBrushDisplaySettingFrame";
+global string $gXgmBifrostBrushSymmetrySettingFrame = "xgmBifrostBrushSymmetrySettingFrame";
+
+//
+//    Description:
+//        Creates the UI of the custom brush settings for the bifrost brush
+//
+//    Input Arguments:
+//        None.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmBifrostBrushSettingsCustom()
+{
+    global string $gXgmBifrostBrushCmd;
+
+    string $curctx = `currentCtx`;
+    string $parent = `setParent -q`;
+
+    string $setParentCmd = ("setParent " + $parent + ";");
+
+    textFieldGrp
+        -label (uiRes("m_xgmBifrostBrushProperties.kBifrostBoard"))
+        -cc ( $setParentCmd + $gXgmBifrostBrushCmd + " -e -bifrostBoard `textFieldGrp -q -text xgmBifrostBrushBifrostBoardName` " + $curctx )
+        xgmBifrostBrushBifrostBoardName;
+}
+
+//
+//    Description:
+//        layout of bifrost brush tool property sheet
+//
+//    Input Arguments:
+//        None.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmBifrostBrushProperties ()
+{
+    global string $gXgmBifrostBrushLayout;
+    global string $gXgmBifrostBrushCmd;
+    global string $gXgmBifrostBrushToolName;
+    global string $gXgmBifrostBrushSettingFrame;
+    global string $gXgmBifrostBrushFalloffFrame;
+    global string $gXgmBifrostRootToTipFalloffFrame;
+    global string $gXgmBifrostBrushDisplaySettingFrame;
+    global string $gXgmBifrostBrushSymmetrySettingFrame;
+    global string $gXgmDefaultBrushFalloffTypes;
+    global string $gXgmDefaultBrushFalloffTypesL10N[];
+
+    string $parent = `toolPropertyWindow -q -location`;
+    setParent $parent;
+
+    setUITemplate -pushTemplate OptionsTemplate;
+
+    columnLayout $gXgmBifrostBrushLayout;
+
+    xgmBrushSettingsProperties( $gXgmBifrostBrushLayout, 
+                            $gXgmBifrostBrushSettingFrame, 
+                            $gXgmBifrostBrushCmd, 
+                            $gXgmBifrostBrushToolName, 
+                            "xgmBifrostBrushSettingsCustom" );
+
+    xgmBrushFalloffProperties( $gXgmBifrostBrushLayout, 
+                            $gXgmBifrostBrushFalloffFrame, 
+                            $gXgmBifrostBrushCmd, 
+                            $gXgmBifrostBrushToolName,
+                            "",
+                            $gXgmDefaultBrushFalloffTypes,
+                            $gXgmDefaultBrushFalloffTypesL10N ); 
+
+    string $temp[];
+    xgmRootToTipFalloffProperties( $gXgmBifrostBrushLayout, 
+                            $gXgmBifrostRootToTipFalloffFrame, 
+                            $gXgmBifrostBrushCmd, 
+                            $gXgmBifrostBrushToolName,
+                            $temp,
+                            "" ); 
+
+    xgmBrushDisplaySettingsProperties( $gXgmBifrostBrushLayout, 
+                            $gXgmBifrostBrushDisplaySettingFrame,
+                            $gXgmBifrostBrushCmd, 
+                            $gXgmBifrostBrushToolName,
+                            "" );  
+
+    xgmBrushSymmetrySettingsProperties( $gXgmBifrostBrushLayout, 
+                            $gXgmBifrostBrushSymmetrySettingFrame,
+                            $gXgmBifrostBrushCmd, 
+                            $gXgmBifrostBrushToolName,
+                            "" );  
+
+    setUITemplate -popTemplate;
+}
+

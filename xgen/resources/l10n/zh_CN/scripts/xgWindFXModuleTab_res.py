@@ -1,0 +1,51 @@
+import maya
+
+maya.stringTable['y_xgenm_ui_fxmodules_xgWindFXModuleTab.kClump'] = u'束'
+maya.stringTable['y_xgenm_ui_fxmodules_xgWindFXModuleTab.kClumpType'] = u'束类型'
+maya.stringTable['y_xgenm_ui_fxmodules_xgWindFXModuleTab.kClumpTypeAnn'] = u'应用风的束类型'
+maya.stringTable['y_xgenm_ui_fxmodules_xgWindFXModuleTab.kConstStrength'] = u'恒定强度'
+maya.stringTable['y_xgenm_ui_fxmodules_xgWindFXModuleTab.kConstStrengthAnn'] = u'风在其主要方向上的恒定强度。(表达式)'
+maya.stringTable['y_xgenm_ui_fxmodules_xgWindFXModuleTab.kDirection'] = u'方向'
+maya.stringTable['y_xgenm_ui_fxmodules_xgWindFXModuleTab.kDirectionAnn'] = u'主要风方向的向量。(表达式: 向量)'
+maya.stringTable['y_xgenm_ui_fxmodules_xgWindFXModuleTab.kGustStrength'] = u'阵风强度'
+maya.stringTable['y_xgenm_ui_fxmodules_xgWindFXModuleTab.kGustStrengthAnn'] = u'由噪波场位置控制的变量风组件在其主要方向上的最高强度。(表达式)'
+maya.stringTable['y_xgenm_ui_fxmodules_xgWindFXModuleTab.kHiBias'] = u'高偏移'
+maya.stringTable['y_xgenm_ui_fxmodules_xgWindFXModuleTab.kHiBiasAnn'] = u'噪波高频组件的偏移。(表达式)'
+maya.stringTable['y_xgenm_ui_fxmodules_xgWindFXModuleTab.kHiFreq'] = u'高频率'
+maya.stringTable['y_xgenm_ui_fxmodules_xgWindFXModuleTab.kHiFreqAnn'] = u'噪波的高频率。(表达式)'
+maya.stringTable['y_xgenm_ui_fxmodules_xgWindFXModuleTab.kHiS'] = u'高强度'
+maya.stringTable['y_xgenm_ui_fxmodules_xgWindFXModuleTab.kHisAnn'] = u'噪波高频组件的比例因子。(表达式)'
+maya.stringTable['y_xgenm_ui_fxmodules_xgWindFXModuleTab.kLoBias'] = u'低偏移'
+maya.stringTable['y_xgenm_ui_fxmodules_xgWindFXModuleTab.kLoBiasAnn'] = u'噪波低频组件的偏移。(表达式)'
+maya.stringTable['y_xgenm_ui_fxmodules_xgWindFXModuleTab.kLoopEndFrame'] = u'循环结束帧'
+maya.stringTable['y_xgenm_ui_fxmodules_xgWindFXModuleTab.kLoopEndFrameAnn'] = u'可循环风的结束帧。(整数)'
+maya.stringTable['y_xgenm_ui_fxmodules_xgWindFXModuleTab.kLoopNoiseSpan'] = u'循环噪波跨度'
+maya.stringTable['y_xgenm_ui_fxmodules_xgWindFXModuleTab.kLoopNoiseSpanAnn'] = u'风在循环中移动的噪波场单位。(整数)'
+maya.stringTable['y_xgenm_ui_fxmodules_xgWindFXModuleTab.kLoopStartFrame'] = u'循环开始帧'
+maya.stringTable['y_xgenm_ui_fxmodules_xgWindFXModuleTab.kLoopStartFrameAnn'] = u'可循环风的开始帧。(整数)'
+maya.stringTable['y_xgenm_ui_fxmodules_xgWindFXModuleTab.kLoopable'] = u'可循环'
+maya.stringTable['y_xgenm_ui_fxmodules_xgWindFXModuleTab.kLoopableAnn'] = u'打开以生成可循环噪波。'
+maya.stringTable['y_xgenm_ui_fxmodules_xgWindFXModuleTab.kLoopableWind'] = u'可循环风'
+maya.stringTable['y_xgenm_ui_fxmodules_xgWindFXModuleTab.kLowS'] = u'低强度'
+maya.stringTable['y_xgenm_ui_fxmodules_xgWindFXModuleTab.kLowSAnn'] = u'噪波低频组件的比例因子。(表达式)'
+maya.stringTable['y_xgenm_ui_fxmodules_xgWindFXModuleTab.kNone'] = u'无'
+maya.stringTable['y_xgenm_ui_fxmodules_xgWindFXModuleTab.kPrefNoise'] = u'首选噪波'
+maya.stringTable['y_xgenm_ui_fxmodules_xgWindFXModuleTab.kPrefNoiseAnn'] = u'基于首选几何体计算噪波。'
+maya.stringTable['y_xgenm_ui_fxmodules_xgWindFXModuleTab.kRigidBody'] = u'刚体'
+maya.stringTable['y_xgenm_ui_fxmodules_xgWindFXModuleTab.kRigidBodyAnn'] = u'选中以表明该基本体为刚体。'
+maya.stringTable['y_xgenm_ui_fxmodules_xgWindFXModuleTab.kSeed'] = u'种子'
+maya.stringTable['y_xgenm_ui_fxmodules_xgWindFXModuleTab.kSeedAnn'] = u'用于播种风的噪波场的值。(表达式)'
+maya.stringTable['y_xgenm_ui_fxmodules_xgWindFXModuleTab.kShearFreq'] = u'斜切频率'
+maya.stringTable['y_xgenm_ui_fxmodules_xgWindFXModuleTab.kShearFreqAnn'] = u'风组件的横向斜切频率。(表达式)'
+maya.stringTable['y_xgenm_ui_fxmodules_xgWindFXModuleTab.kShearStrength'] = u'斜切强度'
+maya.stringTable['y_xgenm_ui_fxmodules_xgWindFXModuleTab.kShearStrengthAnn'] = u'变量风组件在其次要方向(垂直于主要方向)上的最高强度。(表达式)'
+maya.stringTable['y_xgenm_ui_fxmodules_xgWindFXModuleTab.kStiffness'] = u'刚度'
+maya.stringTable['y_xgenm_ui_fxmodules_xgWindFXModuleTab.kStiffnessAnn'] = u'基本体的刚度，即它们对风的响应程度。(表达式: [0, 1])'
+maya.stringTable['y_xgenm_ui_fxmodules_xgWindFXModuleTab.kWindModifier'] = u'风修改器'
+# ===========================================================================
+# Copyright 2021 Autodesk, Inc. All rights reserved.
+#
+# Use of this software is subject to the terms of the Autodesk license
+# agreement provided at the time of installation or download, or which
+# otherwise accompanies this software in either electronic or hard copy form.
+# ===========================================================================

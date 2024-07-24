@@ -1,0 +1,125 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+// Copyright 2014 Autodesk, Inc. All rights reserved. 
+//
+// Use of this software is subject to the terms of the Autodesk 
+// license agreement provided at the time of installation or download, 
+// or which otherwise accompanies this software in either electronic 
+// or hard copy form.
+
+
+//  Description:	defines behaviour and layout of guideSculptContext
+//					tool property sheet
+//
+
+global proc xgmGuideSelVolumeColorChanged()
+{
+    float $color[] = `colorSliderGrp -q -rgbValue selectedVolumeColorSlider`;
+    xgmGuideSculptContext -e -selVolumeColorR $color[0] `currentCtx`;
+    xgmGuideSculptContext -e -selVolumeColorG $color[1] `currentCtx`;
+    xgmGuideSculptContext -e -selVolumeColorB $color[2] `currentCtx`;
+}
+
+global proc xgmGuideSelGuideColorChanged()
+{
+    float $color[] = `colorSliderGrp -q -rgbValue selectedGuideColorSlider`;
+    xgmGuideSculptContext -e -selGuideColorR $color[0] `currentCtx`;
+    xgmGuideSculptContext -e -selGuideColorG $color[1] `currentCtx`;
+    xgmGuideSculptContext -e -selGuideColorB $color[2] `currentCtx`;
+}
+
+global proc xgmGuideSculptProperties ()
+//
+//	Procedure Name:
+//		xgmGuideSculptProperties
+//
+//	Description:
+//		layout of tool property sheet
+//
+//	Input Arguments:
+//		None.
+//
+//	Return Value:
+//		None.
+//
+{
+	string $curctx = `currentCtx`;
+
+	string $parent = `toolPropertyWindow -q -location`;
+    setParent $parent;
+
+    setUITemplate -pushTemplate OptionsTemplate;
+    
+    columnLayout xgmGuideSculpt;
+    frameLayout -collapsable true -collapse false -l (uiRes("m_xgmGuideSculptProperties.kBrushSettings")) xgmGuideSculptBrushFrame;
+        columnLayout xgmGuideSculptBrushOptions;
+            separator -style "none";
+
+            checkBoxGrp
+                -label (uiRes("m_xgmGuideSculptProperties.kLockLength"))
+                -numberOfCheckBoxes 1
+                -l1 " "
+                -on1 ("xgmGuideSculptContext -e -lockLength 1 `currentCtx`")
+                -of1 ("xgmGuideSculptContext -e -lockLength 0 `currentCtx`")
+                lockLengthGrp;
+            
+            string $curDesc		= (uiRes("m_xgmGuideSculptProperties.kCurrentDescription"));
+            string $allDesc     = (uiRes("m_xgmGuideSculptProperties.kAllDescInCollection"));
+            string $allCollections = (uiRes("m_xgmGuideSculptProperties.kAllCollections"));
+            radioButtonGrp -nrb 3 -vertical
+                -label (uiRes("m_xgmGuideSculptProperties.kAffects")) 
+                -labelArray3 $curDesc $allDesc $allCollections
+                -annotation (uiRes("m_xgmGuideSculptProperties.kSelectionMode"))
+                -on1 ("xgmGuideSculptContext -e -affect 1 `currentCtx`")
+                -on2 ("xgmGuideSculptContext -e -affect 2 `currentCtx`")
+                -on3 ("xgmGuideSculptContext -e -affect 3 `currentCtx`")                
+                affectsRbg;
+            
+            floatSliderGrp -field true -pre 3
+                -min 0
+                -max 1000
+                -fieldMaxValue 1000
+                -label (uiRes("m_xgmGuideSculptProperties.kBrushSize"))  
+                -annotation (uiRes("m_xgmGuideSculptProperties.kBrushSizeAnnotation"))
+                -cc ( ("xgmGuideSculptContext -e -size #1 " + $curctx) )
+                    sculptGuidesBrushSizeFsg;
+
+            checkBoxGrp
+                -label (uiRes("m_xgmGuideSculptProperties.kVolumetricFalloff"))
+                -numberOfCheckBoxes 1
+                -l1 " "
+                -on1 ("xgmGuideSculptContext -e -volumetricSel 1 " + $curctx)
+                -of1 ("xgmGuideSculptContext -e -volumetricSel 0 " + $curctx)
+                volumetricSelGrp;
+
+        setParent ..; // xgmGuideSculptBrushOptions
+    setParent ..; // xgmGuideSculptBrushFrame
+    
+    frameLayout -collapsable true -collapse false -label (uiRes("m_xgmGuideSculptProperties.kSelectionHilightSettings")) ;
+		columnLayout selectHilightOptions;
+            checkBoxGrp
+                -label (uiRes("m_xgmGuideSculptProperties.kSelectionHilight"))
+                -numberOfCheckBoxes 1
+                -l1 " "
+                -on1 ("xgmGuideSculptContext -e -selHilight 1 " + $curctx)
+                -of1 ("xgmGuideSculptContext -e -selHilight 0 " + $curctx)
+                selHilightGrp;
+            colorSliderGrp -label (uiRes("m_xgmGuideSculptProperties.kSelectedVoumeColor"))
+                    -changeCommand "xgmGuideSelVolumeColorChanged()"
+					selectedVolumeColorSlider;
+            colorSliderGrp -label (uiRes("m_xgmGuideSculptProperties.kSelectedGuideColor"))
+                    -changeCommand "xgmGuideSelGuideColorChanged()"
+					selectedGuideColorSlider;
+            
+        setParent ..; // selectHilightOptions
+    setParent ..; // 
+    
+    setParent ..; // xgmGuideSculpt
+
+    setUITemplate -popTemplate;
+}

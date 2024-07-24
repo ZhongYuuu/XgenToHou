@@ -1,0 +1,1001 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+// ===========================================================================
+// Copyright 2015 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+
+global string $gXgmCurvePresets[];
+
+global int $gXgmMaxCustomCurveSize = 8;
+global int $gXgmCurrCustomIndex = -1;
+
+//
+//    Description:
+//        Initializes the falloff curve presets
+//
+//    Input Arguments:
+//        None.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmInitCurvePreset()
+{
+    global string $gXgmCurvePresets[];
+    if (size($gXgmCurvePresets) == 0)
+    {
+        $gXgmCurvePresets = { "0,1,0.12,0.422,0.452,0,1,0",
+                            "0,1,0.3,0.5,0.6,0.2,1,0",
+                            "0,1,0.5,1,0.5,0,1,0",
+                            "0,1,0.503,1,0.741,0,1,0",
+                            "0,1,0.753,1,0.709,0,1,0",
+                            "0,1,0.547,1,0.834,0.555,1,0",
+                            "0,0.5,0.508,0.492,0.506,0,1,0",
+                            "0,1,0.273,1,0.772,1,1,1"
+                        };
+    }
+}
+
+//
+//    Description:
+//        Procedure to call when the "Snap To Grid" checkbox on the large curve widget is changed.
+//
+//    Input Arguments:
+//        snapToGrid        Value of the "Snap To Grid" checkbox
+//        falloffWidget     The falloff curve widget to be synced with the large one.
+//        snapToGridWidget  The snapToGrid widget to be synced with the one on the large curve widget.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmLargeCurveSnapToGridChanged(int $snapToGrid, string $tool, string $flag)
+{
+    if(`falloffCurve -exists xgmLargeCurveWidget`) {
+        falloffCurve -e -snapToGrid $snapToGrid xgmLargeCurveWidget;
+    }
+
+    string $curveTypePrefix;
+    if($flag == "-brushFalloffCurve")
+    {
+        $curveTypePrefix = "Brush_";
+    }
+    else if($flag == "-rootToTipCurve")
+    {
+        $curveTypePrefix = "RootToTip_";
+    }
+
+    // Update snapToGrid for tool setting panel.
+    string $toolSettingFalloffCurveWidget = $curveTypePrefix + "ToolSetting_" + $tool + "FalloffCurveWidget";
+    string $toolSettingSnapToGridWidget = $curveTypePrefix + "ToolSetting_" + $tool + "FalloffUseSnapToGridCBG";
+    if(`falloffCurve -exists $toolSettingFalloffCurveWidget`) 
+    {
+        falloffCurve -e -snapToGrid $snapToGrid $toolSettingFalloffCurveWidget;
+    }
+    
+    if(`checkBoxGrp -exists $toolSettingSnapToGridWidget`) 
+    {
+        checkBoxGrp -e -value1 $snapToGrid $toolSettingSnapToGridWidget;
+    }
+       
+    // Update snapToGrid checkboxGrp for marking menu window.
+    string $markingMenuFalloffCurveWidget = $curveTypePrefix + "MarkingMenu_" + $tool + "FalloffCurveWidget";
+    string $markingMenuSnapToGridWidget = $curveTypePrefix + "MarkingMenu_" + $tool + "FalloffUseSnapToGridCBG";
+    if(`falloffCurve -exists $markingMenuFalloffCurveWidget`) {
+        falloffCurve -e -snapToGrid $snapToGrid $markingMenuFalloffCurveWidget;
+    }
+    
+    if(`checkBoxGrp -exists $markingMenuSnapToGridWidget`) {
+        checkBoxGrp -e -value1 $snapToGrid $markingMenuSnapToGridWidget;
+    }
+}
+
+//
+//    Description:
+//        Update the layout and the command for the large curve widget.
+//
+//    Input Arguments:
+//        brushCmd          The command to be evaluated in the procedure.
+//        flag              The flag to be used with the given command.
+//                          It gives the info of the falloff attribute.
+//                          Note that it leaves to the the caller to decide if it's a query or an edit command.
+//        defaultValFlag    Flag to retrieve the default value of the attribute.
+//        tool              Name of the instance of the tool that the command is applied on.
+//        falloffWidget     The falloff curve widget to be synced with the large one.
+//        snapToGridWidget  The snapToGrid widget to be synced with the one on the larget curve widget.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmUpdateLargeCurveWidget(string $brushCmd, 
+                            string $flag, 
+                            string $defaultValFlag,
+                            string $tool, 
+                            string $falloffWidget,
+                            string $snapToGridWidget)
+{
+    if(!`window -exists xgmLargeCurveWindow`) return;
+
+    string $curveString = `falloffCurve -q -asString $falloffWidget`;
+    falloffCurve -e -asString $curveString xgmLargeCurveWidget;
+
+}
+
+global proc xgmUpdateLargeSnapToGrid(string $brushCmd, 
+                            string $flag, 
+                            string $defaultValFlag,
+                            string $tool, 
+                            string $falloffWidget,
+                            string $snapToGridWidget)
+{
+    if(!`window -exists xgmLargeCurveWindow`) return;
+
+    int $stgl = `checkBoxGrp -q -value1 $snapToGridWidget`;
+    checkBoxGrp -e -value1 $stgl xgmLargeCurveUseSnapToGridCBG;
+    falloffCurve -e -snapToGrid $stgl xgmLargeCurveWidget;
+}
+
+global proc xgmRefreshLargeCurveWindow(string $brushCmd, 
+                            string $flag, 
+                            string $defaultValFlag,
+                            string $tool, 
+                            string $falloffWidget,
+                            string $snapToGridWidget)
+{
+    if(!`window -exists xgmLargeCurveWindow`) return;
+
+    int $stgl = `checkBoxGrp -q -value1 $snapToGridWidget`;
+    checkBoxGrp -e -value1 $stgl 
+                -cc ( "xgmLargeCurveSnapToGridChanged( #1, \"" + $tool + "\", \"" + $flag + "\" )" )
+    xgmLargeCurveUseSnapToGridCBG;
+
+    string $param = $brushCmd + "\", \"" + $flag + "\", \"" + $defaultValFlag + "\", \"" + $tool + "\", \"" + $falloffWidget + "\", \"" + $snapToGridWidget;
+    button -e -command ( "xgmResetCurve( \"" + $param + "\" )" ) 
+        xgmLargeCurveResetCurveBTN;
+
+    string $curveString = eval($brushCmd + " -q " + $flag + " " + $tool );
+    falloffCurve -e 
+        -asString $curveString
+        -snapToGrid $stgl
+        -cc ( "xgmCurveChanged( \"" + $param + "\", \"#1\")" )
+        xgmLargeCurveWidget;
+
+    if(`falloffCurve -exists $falloffWidget`) {
+        falloffCurve -e -asString $curveString $falloffWidget;
+    }
+}
+
+//
+//    Description:
+//        Creates the layout for the large curve widget, which includes:
+//            - the falloff curve widget
+//            - "Snap to grid" checkbox 
+//            - "Reset Curve" button
+//
+//    Input Arguments:
+//        brushCmd          The command to be evaluated in the procedure.
+//        flag              The flag to be used with the given command.
+//                          It gives the info of the falloff attribute.
+//                          Note that it leaves to the the caller to decide if it's a query or an edit command.
+//        defaultValFlag    Flag to retrieve the default value of the attribute.
+//        tool              Name of the instance of the tool that the command is applied on.
+//        falloffWidget     The falloff curve widget to be synced with the large one.
+//        snapToGridWidget  The snapToGrid widget to be synced with the one on the larget curve widget.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmMakeLargeCurveWidget(string $brushCmd, 
+                            string $flag,
+                            string $defaultValFlag, 
+                            string $tool, 
+                            string $falloffWidget,
+                            string $snapToGridWidget)
+{
+    if(`window -exists xgmLargeCurveWindow`) {
+        xgmRefreshLargeCurveWindow($brushCmd, $flag, $defaultValFlag, $tool, $falloffWidget, $snapToGridWidget);
+        showWindow xgmLargeCurveWindow;
+    } else {
+
+        string $window = `window -title (uiRes("m_xgmFalloffCurveUtils.kXgmLargeCurveWindow")) xgmLargeCurveWindow`;
+        string $form = `formLayout -numberOfDivisions 100`; 
+        string $curve = `falloffCurve -h 400 -w 400 xgmLargeCurveWidget`;
+        string $column = `columnLayout`;
+
+        checkBoxGrp -label1 (uiRes("m_xgmFalloffCurveUtils.kXgmLargeCurveSnapToGrid"))
+            -cc ( "xgmLargeCurveSnapToGridChanged( #1, \"" + $tool + "\", \"" + $flag + "\" )" )
+            xgmLargeCurveUseSnapToGridCBG;
+
+        string $param = $brushCmd + "\", \"" + $flag + "\", \"" + $defaultValFlag + "\", \"" + $tool + "\", \"" + $falloffWidget + "\", \"" + $snapToGridWidget;
+        button -label (uiRes("m_xgmFalloffCurveUtils.kResetCurveButton")) 
+            -command ( "xgmResetCurve( \"" + $param + "\" )" )
+            xgmLargeCurveResetCurveBTN;
+
+        string $curveString = eval($brushCmd + " -q " + $flag + " " + $tool );
+        int $snap = eval("falloffCurve -q -snapToGrid " + $falloffWidget );
+
+        falloffCurve -e 
+            -asString $curveString
+            -snapToGrid $snap
+            -cc ( "xgmCurveChanged( \"" + $param + "\", \"#1\")" )
+            xgmLargeCurveWidget;
+        
+        int $stgl = `checkBoxGrp -q -value1 $snapToGridWidget`;
+        checkBoxGrp -e -value1 $stgl xgmLargeCurveUseSnapToGridCBG;
+
+        formLayout -edit
+        -attachForm     $curve     "top"    5
+        -attachForm     $curve     "left"   5
+        -attachControl  $curve     "bottom" 1 $column
+        -attachForm     $curve     "right"  5
+
+        -attachNone     $column     "top"
+        -attachForm     $column     "left"   5
+        -attachForm     $column     "bottom" 5
+        -attachForm     $column     "right"  5
+        $form;
+
+        showWindow;
+    }
+}
+
+//
+//    Description:
+//        Procedure to call when the "Snap To Grid" checkbox on the normal curve widget is changed.
+//
+//    Input Arguments:
+//        snapToGrid        Value of the "Snap To Grid" checkbox
+//        brushCmd          The command to be evaluated in the procedure.
+//        flag              The flag to be used with the given command.
+//                          It gives the info of the falloff attribute.
+//                          Note that it leaves to the the caller to decide if it's a query or an edit command.
+//        defaultValFlag    Flag to retrieve the default value of the attribute.
+//        tool              Name of the instance of the tool that the command is applied on.
+//        falloffWidget     The falloff curve widget to be modified and to be synced with the large curve widget.
+//        snapToGridWidget  The snapToGrid widget to be synced with the one on the larget curve widget.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmSnapToGridChanged(int $snapToGrid,
+                            string $brushCmd, 
+                            string $flag, 
+                            string $defaultValFlag, 
+                            string $tool, 
+                            string $falloffWidget, 
+                            string $snapToGridWidget)
+{
+    string $curveTypePrefix;
+    if($flag == "-brushFalloffCurve")
+    {
+        $curveTypePrefix = "Brush_";
+    }
+    else if($flag == "-rootToTipCurve")
+    {
+        $curveTypePrefix = "RootToTip_";
+    }
+
+    // Update snapToGrid for tool setting panel.
+    string $toolSettingFalloffCurveWidget = $curveTypePrefix + "ToolSetting_" + $tool + "FalloffCurveWidget";
+    string $toolSettingSnapToGridWidget = $curveTypePrefix + "ToolSetting_" + $tool + "FalloffUseSnapToGridCBG";
+    if(`falloffCurve -exists $toolSettingFalloffCurveWidget`) 
+    {
+        falloffCurve -e -snapToGrid $snapToGrid $toolSettingFalloffCurveWidget;
+    }
+    
+    if(`checkBoxGrp -exists $toolSettingSnapToGridWidget`) 
+    {
+        checkBoxGrp -e -value1 $snapToGrid $toolSettingSnapToGridWidget;
+    }
+    
+    // Update snapToGrid for marking menu window.
+    string $markingMenuFalloffCurveWidget = $curveTypePrefix + "MarkingMenu_" + $tool + "FalloffCurveWidget";
+    string $markingMenuSnapToGridWidget = $curveTypePrefix + "MarkingMenu_" + $tool + "FalloffUseSnapToGridCBG";
+    if(`falloffCurve -exists $markingMenuFalloffCurveWidget`) {
+        falloffCurve -e -snapToGrid $snapToGrid $markingMenuFalloffCurveWidget;
+    }
+    
+    if(`checkBoxGrp -exists $markingMenuSnapToGridWidget`) {
+        checkBoxGrp -e -value1 $snapToGrid $markingMenuSnapToGridWidget;
+    }
+    
+    xgmUpdateLargeSnapToGrid($brushCmd, $flag, $defaultValFlag, $tool, $falloffWidget, $snapToGridWidget);
+}
+
+//
+//    Description:
+//        Procedure to call when any of the custom curve buttons clicked.
+//
+//    Input Arguments:
+//        brushCmd          The command to be evaluated in the procedure.
+//        flag              The flag to be used with the given command.
+//                          It gives the info of the falloff attribute.
+//                          Note that it leaves to the the caller to decide if it's a query or an edit command.
+//        defaultValFlag    Flag to retrieve the default value of the attribute.
+//        tool              Name of the instance of the tool that the command is applied on.
+//        falloffWidget     The falloff curve widget to be modified and to be synced with the large curve widget.
+//        snapToGridWidget  The snapToGrid widget to be synced with the one on the larget curve widget.
+//        curveValue        Curve value of the custom curve button which is clicked
+//        index             Index of the custom curve button which is clicked
+//        falloffName       The falloff curve name which is currently under control. 
+//                          This name will be used by the preference. 
+//                          Please make sure that there is no conflict among brushes and their attributes.
+//                    
+//    Return Value:
+//        return current custom curve index.
+//
+global proc int xgmCustomCurveOnClick(string $brushCmd, 
+                                string $flag, 
+                                string $defaultValFlag,
+                                string $tool, 
+                                string $falloffWidget, 
+                                string $snapToGridWidget, 
+                                string $curveValue, 
+                                int $index, 
+                                string $falloffName)
+{
+    global int $gXgmCurrCustomIndex;
+    
+    $gXgmCurrCustomIndex = $index ;
+    xgmCurveChanged( $brushCmd, $flag, $defaultValFlag, $tool, $falloffWidget, $snapToGridWidget, $curveValue );
+
+    if( $gXgmCurrCustomIndex != -1 ) {
+        xgmUpdateCustomOptionVar($gXgmCurrCustomIndex, $falloffName, $curveValue); //Mainly for update deleted custom curve.
+    }
+
+    return $gXgmCurrCustomIndex;
+}
+
+//
+//    Description:
+//        Procedure to call when falloff curve widget is changed
+//
+//    Input Arguments:
+//        brushCmd          The command to be evaluated in the procedure.
+//        flag              The flag to be used with the given command.
+//                          It gives the info of the falloff attribute.
+//                          Note that it leaves to the the caller to decide if it's a query or an edit command.
+//        defaultValFlag    Flag to retrieve the default value of the attribute.
+//        tool              Name of the instance of the tool that the command is applied on.
+//        falloffWidget     The falloff curve widget to be modified and to be synced with the large curve widget.
+//        snapToGridWidget  The snapToGrid widget to be synced with the one on the larget curve widget.
+//        curveValue        Curve value of the falloff curve which is changed
+//
+//    Return Value:
+//        None.
+//
+global proc xgmCurveChanged(string $brushCmd, 
+                        string $flag, 
+                        string $defaultValFlag,
+                        string $tool, 
+                        string $falloffWidget, 
+                        string $snapToGridWidget, 
+                        string $curveValue)
+{
+    if( $curveValue == " " || $curveValue == "" ) return;
+
+    eval( $brushCmd + " -e " + $flag + " \"" +$curveValue + "\" " + $tool );
+
+    falloffCurve -e -asString $curveValue $falloffWidget;
+    
+    string $curveTypePrefix;
+    if($flag == "-brushFalloffCurve")
+    {
+        $curveTypePrefix = "Brush_";
+    }
+    else if($flag == "-rootToTipCurve")
+    {
+        $curveTypePrefix = "RootToTip_";
+    }
+
+    // Update falloff curve widget for tool setting panel.
+    string $toolSettingFalloffCurveWidget = $curveTypePrefix + "ToolSetting_" + $tool + "FalloffCurveWidget";
+    if(`falloffCurve -exists $toolSettingFalloffCurveWidget`) 
+    {
+        falloffCurve -e -asString $curveValue $toolSettingFalloffCurveWidget;
+    }
+    
+    // Update falloff curve widget for marking menu window.
+    string $markingMenuFalloffCurveWidget = $curveTypePrefix + "MarkingMenu_" + $tool + "FalloffCurveWidget";
+    if(`falloffCurve -exists $markingMenuFalloffCurveWidget`) {
+        falloffCurve -e -asString $curveValue $markingMenuFalloffCurveWidget;
+    }
+
+    xgmUpdateLargeCurveWidget($brushCmd, $flag, $defaultValFlag, $tool, $falloffWidget, $snapToGridWidget);
+}
+
+//
+//    Description:
+//        Procedure to reset the falloff curve to the default value
+//
+//    Input Arguments:
+//        brushCmd          The command to be evaluated in the procedure.
+//        flag              The flag to be used with the given command.
+//                          It gives the info of the falloff attribute.
+//                          Note that it leaves to the the caller to decide if it's a query or an edit command.
+//        defaultValFlag    Flag to retrieve the default value of the attribute.
+//        tool              Name of the instance of the tool that the command is applied on.
+//        falloffWidget     The falloff curve widget to be modified and to be synced with the large curve widget.
+//        snapToGridWidget  The snapToGrid widget to be synced with the one on the larget curve widget.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmResetCurve(string $brushCmd, 
+                        string $flag, 
+                        string $defaultValFlag,
+                        string $tool, 
+                        string $falloffWidget, 
+                        string $snapToGridWidget)
+{
+    string $resetCurve = eval( $brushCmd + " -q " + $defaultValFlag + " " + $tool );
+    xgmCurveChanged($brushCmd, $flag, $defaultValFlag, $tool, $falloffWidget, $snapToGridWidget, $resetCurve);
+}
+
+//
+//    Description:
+//        Procedure to save the custom curve.
+//
+//    Input Arguments:
+//        parent            Parent layout of the custom falloff curve widgets.
+//                          Required so that UI object names can be successfully resolved.
+//        falloffName       Name of the curve attribute.
+//                          This name will be used by the preference. 
+//                          Please make sure that there is no conflict among brushes and their attributes.
+//        falloffWidget     The falloff curve widget to be handled.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmSaveCustomCurve(string $parent, string $falloffName, string $falloffWidget)
+{
+    global int $gXgmCurrCustomIndex;
+
+    int $customInsertSlot = xgmFindCustomInsertSlot($falloffName);
+
+    string $curveName = $falloffName + "CustomCurve" + $customInsertSlot; 
+
+    string $falloffCurve = `falloffCurve -q -asString $falloffWidget`;
+    xgmUpdateCustomOptionVar($customInsertSlot, $falloffName, $falloffCurve);
+
+    setParent $parent;
+    falloffCurve -e -asString $falloffCurve $curveName;
+
+    $gXgmCurrCustomIndex = -1;
+}
+
+//
+//    Description:
+//        Find the index to insert a custom curve
+//
+//    Input Arguments:
+//        optionVarName    optionVar name for the custom curve
+//
+//    Return Value:
+//        Return the index currently available to insert a custom curve.
+//
+global proc int xgmFindCustomInsertSlot(string $optionVarName)
+{
+    global int $gXgmCurrCustomIndex;
+    global int $gXgmMaxCustomCurveSize;
+
+    int $customInsertIndex = -1; //insert positon
+    if($gXgmCurrCustomIndex != -1) {
+         //If some slot is selected, insert position is the select slot.
+        $customInsertIndex = $gXgmCurrCustomIndex;
+    } else {
+        if(`optionVar -exists $optionVarName`) {
+
+            int $curvesSize = `optionVar -as $optionVarName`;
+             //Default:previous custom curve widgets all have curves. eg:$curveSize=3,insert position=3. |curve1|curve2|curve3|insert positon| | | | |
+             $customInsertIndex = $curvesSize;
+
+            string $customsArray[] = `optionVar -q $optionVarName`;
+            for($i = 0 ; $i < size($customsArray); ++$i) {
+
+                // Some previous custom curves/curve dont' have value, 
+                // the first blank slot is insert position. 
+                // eg: |curve1|insert postion|curve3| |curve5| | | |
+                if( $customsArray[$i] == " " || $customsArray[$i] == "" ) {
+                    $customInsertIndex = $i;
+                    break;
+                }
+
+                if( $i == ($gXgmMaxCustomCurveSize - 1) ) {
+                    $customInsertIndex = $gXgmMaxCustomCurveSize -1 ;
+                }
+            }
+        } else {
+            //When no custom curves,insert position is 0. |insert postion | | | | | | | |
+            $customInsertIndex = 0; 
+        }
+    }
+    return $customInsertIndex;
+}
+
+//
+//    Description:
+//        Update the optionvar for the custom curve
+//
+//    Input Arguments:
+//        index            Index of the custom curve to be updated
+//        optionVarName    OptionVar name for the custom curve
+//        value            Value of the custom curve to be updated
+//
+//    Return Value:
+//        None.
+//
+global proc xgmUpdateCustomOptionVar(int $index, string $optionVarName, string $value)
+{
+    if(`optionVar -exists $optionVarName`)
+    {
+        int $curvesSize = `optionVar -as $optionVarName`;
+
+        if( $curvesSize == $index) {
+            //|curve1|curve2|curve3|index| | | | |
+            optionVar -sva $optionVarName $value;
+        } else if ($curvesSize < $index) {
+            //|curve1|curve2 &&|curve3| | | |index| |
+            for($i=0; $i<($index-$curvesSize); ++$i) {
+                optionVar -sva $optionVarName " "; //Add " " to custom arrray which no value.
+            }
+            optionVar -sva $optionVarName $value;
+        } else {
+            // $curvesSize > $index, need to replace the old one.|curve1|curve2 &&index|curve3|curve4| |curve6| | |
+            string $customsArray[] = `optionVar -q $optionVarName`;
+            optionVar -ca $optionVarName;
+            $customsArray[$index] = $value;
+            for($i=0; $i<size($customsArray); ++$i) {
+                optionVar -sva $optionVarName $customsArray[$i];
+            }
+        }
+    } else {
+        optionVar -sva $optionVarName $value;
+    }
+}
+
+//
+//    Procedure Name:
+//        xgmFalloffCurveGroupProperties
+//
+//    Description:
+//        Creates a group of falloff curve UI, which includes:
+//            - the falloff curve widget
+//            - the button to open a larget falloff curve widget
+//            - "Snap to grid" checkbox 
+//            - "Reset Curve" button
+//            - "Save Custom Curve" button
+//            - a group of buttons to trigger preset curve
+//            - a group of buttons to trigget custom curve
+//
+//    Input Arguments:
+//        parent              Parent layout of the falloff curve group layout.
+//                            Required so that UI object names can be successfully resolved.
+//        falloffName         The falloff name to be used for the preference.
+//        brushCmd            The command to be evaluated in the procedure.
+//        flag                The flag to be used with the given command.
+//                            It gives the info of the falloff attribute.
+//                            Note that it leaves to the the caller to decide if it's a query or an edit command.
+//        defaultValFlag      Flag to retrieve the default value of the attribute.
+//        tool                Name of the instance of the tool that the command is applied on.
+//        presetCurves        Preset curves for this falloff attribute.
+//        isMarkingMenu       Make marking menu or not.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmFalloffCurveGroupProperties( string $parent, 
+        string $falloffName,
+        string $brushCmd, 
+        string $flag, 
+        string $defaultValFlag, 
+        string $tool, 
+        string $presetCurves[],
+        int $isMarkingMenu)
+{
+    global int $gXgmMaxCustomCurveSize;
+    
+    int $presetCellSize = 23;
+    string $saveCustomCurveWidget = "";
+    
+    string $curveTypePrefix;
+    if($flag == "-brushFalloffCurve")
+    {
+        $curveTypePrefix = "Brush_";
+    }
+    else if($flag == "-rootToTipCurve")
+    {
+        $curveTypePrefix = "RootToTip_";
+    }
+    
+    string $UITypePrefix;
+    if($isMarkingMenu == 1)
+    {
+        $UITypePrefix = "MarkingMenu_";
+    }
+    else if($isMarkingMenu == 0)
+    {
+        $UITypePrefix = "ToolSetting_";
+    }
+            
+    string $falloffWidget = $curveTypePrefix + $UITypePrefix + $tool + "FalloffCurveWidget";
+    string $snapToGridWidget = $curveTypePrefix + $UITypePrefix + $tool + "FalloffUseSnapToGridCBG";
+    string $falloffResetCurveButton = $curveTypePrefix + $UITypePrefix + $tool + "FalloffResetCurveButton";
+    string $falloffMakeLargeCurveWidgetITB = $curveTypePrefix + $UITypePrefix + $tool + "FalloffMakeLargeCurveWidgetITB";
+    string $falloffCurveRowLayout = $curveTypePrefix + $UITypePrefix + $tool + "FalloffCurveRowLayout";
+    string $falloffCurvePresetRowLayout = $curveTypePrefix + $UITypePrefix + $tool + "FalloffCurvePresetRowLayout";
+    string $falloffCurveCustomRowLayout = $curveTypePrefix + $UITypePrefix + $tool + "FalloffCurveCustomRowLayout";
+    
+    setParent $parent;
+
+    if($isMarkingMenu == 0)
+    {
+        rowLayout -nc 5 -columnWidth 3 140 $falloffCurveRowLayout;
+    }
+    else if($isMarkingMenu == 1)
+    {
+        rowLayout -nc 3 -columnAttach3 "left" "left" "left" -columnOffset3 25 71 5 $falloffCurveRowLayout;
+    }
+        text -label (uiRes("m_xgmFalloffCurveUtils.kXgmFalloffCurve"));
+
+        $falloffWidget = `falloffCurve -w 150 -h 165 $falloffWidget`;
+        
+        if($isMarkingMenu)
+        {
+            string $currentFalloffCurveValues = eval($brushCmd + " -q " + $flag + " " + $tool);
+            falloffCurve -e -asString $currentFalloffCurveValues $falloffWidget;
+        }
+
+        if($isMarkingMenu == 0)
+        {
+            setUITemplate -popTemplate;
+        }
+
+        columnLayout -columnAlign "center";
+            $falloffMakeLargeCurveWidgetITB =
+            `iconTextButton -width 23 -height 23 -image "makeBigger.png" 
+                -style "iconAndTextHorizontal" 
+                $falloffMakeLargeCurveWidgetITB`;
+            $snapToGridWidget = `checkBoxGrp -label1 (uiRes("m_xgmFalloffCurveUtils.kXgmFalloffSnapToGrid")) -width 130 $snapToGridWidget`;
+
+            $falloffResetCurveButton = `button -label (uiRes("m_xgmFalloffCurveUtils.kXgmFalloffResetCurveButton")) -width 130 $falloffResetCurveButton`;
+
+            if($isMarkingMenu == 0)
+            {
+                $saveCustomCurveWidget = `button -label (uiRes("m_xgmFalloffCurveUtils.kXgmFalloffSaveCurveButton")) -width 130 `;
+            }
+
+            setParent ..;
+        
+        if($isMarkingMenu == 0)
+        {
+            setUITemplate -pushTemplate OptionsTemplate;
+        }
+
+        //
+        // update the commands for each widget just created.
+        //
+        string $param = $brushCmd + "\", \"" + $flag + "\", \"" + $defaultValFlag + "\", \"" + $tool + "\", \"" + $falloffWidget + "\", \"" + $snapToGridWidget;
+        falloffCurve -e -cc ( "xgmCurveChanged( \"" + $param + "\", \"#1\")" ) $falloffWidget;
+        checkBoxGrp -e -cc (("xgmSnapToGridChanged(#1, \"" + $param + "\")")) $snapToGridWidget;
+        iconTextButton -e -command ( "xgmMakeLargeCurveWidget(\"" + $param + "\")" ) $falloffMakeLargeCurveWidgetITB;
+        button -e -command ( "xgmResetCurve( \"" + $param + "\" )" ) $falloffResetCurveButton;
+
+        setParent ..;
+
+    if($isMarkingMenu == 1)
+    {
+        rowLayout -nc 2 -columnAttach2 "left" "left" -columnOffset2 25 10 $falloffCurvePresetRowLayout;
+    }
+    else if($isMarkingMenu == 0)
+    {
+        rowLayout -nc 2 $falloffCurvePresetRowLayout;
+    }
+        text -label (uiRes("m_xgmFalloffCurveUtils.kXgmFalloffCurvePreset"));
+
+        int $curvePresetNum = size($presetCurves);
+        gridLayout -numberOfColumns $curvePresetNum 
+            -cellWidthHeight $presetCellSize $presetCellSize;
+
+        for($i = 0; $i < $curvePresetNum; ++$i) {
+            formLayout;
+                falloffCurve -backgroundColor 0.51 0.51 0.51 
+                    -h 20 -w 20 
+                    -readOnly true
+                    -asString $presetCurves[$i] 
+                    -cc ( "xgmCurveChanged( \"" + $param + "\", \"#1\")" );
+                setParent ..;
+            }
+            setParent ..;
+        setParent ..;
+    
+    if($isMarkingMenu == 1)
+    {
+        rowLayout -nc 2 -columnAttach2 "left" "left" -columnOffset2 25 1 $falloffCurveCustomRowLayout;
+    }
+    else if($isMarkingMenu == 0)
+    {
+        rowLayout -nc 2 $falloffCurveCustomRowLayout;
+    }
+        text -label (uiRes("m_xgmFalloffCurveUtils.kXgmFalloffCurveCustom"));
+
+        gridLayout -numberOfColumns $gXgmMaxCustomCurveSize 
+            -cellWidthHeight $presetCellSize $presetCellSize;
+
+        for($i = 0; $i<$gXgmMaxCustomCurveSize; ++$i) {
+            string $falloffCurveName = $falloffName + "CustomCurve" + $i;
+            string $customCurveLayout = `formLayout`;
+                falloffCurve -backgroundColor 0.51 0.51 0.51 
+                    -h 20 -w 20 
+                    -readOnly true
+                    -asString "" 
+                    -customCurveWidget true 
+                    -cc ( "xgmCustomCurveOnClick( \"" + $param + "\", \"#1\", " + $i + ", \"" + $falloffName + "\")" ) 
+                    $falloffCurveName;
+
+            if($isMarkingMenu == 0)
+            {
+                button -e -command (("xgmSaveCustomCurve(\"" +$customCurveLayout + "\", \"" + $falloffName + "\", \"" + $falloffWidget +"\")")) $saveCustomCurveWidget;
+            }
+
+            setParent ..;
+        }
+        
+        // If this is for marking menu, we need to read the custom curve 
+        // saved by tool setting in the custorm curve optionVar and set 
+        // them on marking menu.
+        // If this is not for marking menu, then the $falloffName is the 
+        // name of the optionVar.
+        string $optionName;
+        if($isMarkingMenu)
+        {
+            if($flag == "-brushFalloffCurve")
+            {
+                $optionName = $tool + "BrushFalloff";
+            }
+            else if($flag == "-rootToTipCurve")
+            {
+                $optionName = $tool + "RootToTipFalloff";
+            }
+        }
+        else
+        {
+            $optionName = $falloffName;
+        }
+
+        if(`optionVar -exists $optionName`) {
+
+            int $curvesSize = `optionVar -as $optionName`;
+            string $customsArray[] = `optionVar -q $optionName`;
+            for($i = 0 ; $i < size($customsArray); ++$i) {
+
+                if( $customsArray[$i] == " " || $customsArray[$i] == "" ) {
+                    continue;
+                }
+
+                string $falloffCurveName = $falloffName + "CustomCurve" + $i;
+                falloffCurve -e -asString $customsArray[$i] $falloffCurveName;
+            }
+        }
+
+        setParent ..;
+    setParent ..;
+}
+
+proc string getMarkingMenuFallOffWindowName(string $flag, string $tool)
+{
+    string $windowTitle;
+    
+    switch($tool)
+    {
+        case "xgmLengthBrushTool" : 
+            if($flag == "-brushFalloffCurve")
+            {
+                $windowTitle = (uiRes("m_xgmFalloffCurveUtils.kBrushFallOffCurveLengthWindowTitle"));
+            }
+            else if($flag == "-rootToTipCurve")
+            {
+                $windowTitle = (uiRes("m_xgmFalloffCurveUtils.kRootToTipFallOffCurveLengthWindowTitle"));
+            }
+            break;
+        case "xgmCutBrushTool" : 
+            if($flag == "-brushFalloffCurve")
+            {
+                $windowTitle = (uiRes("m_xgmFalloffCurveUtils.kBrushFallOffCurveCutWindowTitle"));
+            }
+            else if($flag == "-rootToTipCurve")
+            {
+                $windowTitle = (uiRes("m_xgmFalloffCurveUtils.kRootToTipFallOffCurveCutWindowTitle"));
+            }
+            break;
+        case "xgmWidthBrushTool" : 
+            if($flag == "-brushFalloffCurve")
+            {
+                $windowTitle = (uiRes("m_xgmFalloffCurveUtils.kBrushFallOffCurveWidthWindowTitle"));
+            }
+            else if($flag == "-rootToTipCurve")
+            {
+                $windowTitle = (uiRes("m_xgmFalloffCurveUtils.kRootToTipFallOffCurveWidthWindowTitle"));
+            }
+            break;
+		case "xgmDirectionBrushTool" : 
+            if($flag == "-brushFalloffCurve")
+            {
+                $windowTitle = (uiRes("m_xgmFalloffCurveUtils.kBrushFallOffCurveTwistWindowTitle"));
+            }
+            else if($flag == "-rootToTipCurve")
+            {
+                $windowTitle = (uiRes("m_xgmFalloffCurveUtils.kRootToTipFallOffCurveTwistWindowTitle"));
+            }
+            break;
+        case "xgmCombBrushTool" : 
+            if($flag == "-brushFalloffCurve")
+            {
+                $windowTitle = (uiRes("m_xgmFalloffCurveUtils.kBrushFallOffCurveCombWindowTitle"));
+            }
+            else if($flag == "-rootToTipCurve")
+            {
+                $windowTitle = (uiRes("m_xgmFalloffCurveUtils.kRootToTipFallOffCurveCombWindowTitle"));
+            }
+            break;
+        case "xgmGrabBrushTool" : 
+            if($flag == "-brushFalloffCurve")
+            {
+                $windowTitle = (uiRes("m_xgmFalloffCurveUtils.kBrushFallOffCurveGrabWindowTitle"));
+            }
+            else if($flag == "-rootToTipCurve")
+            {
+                $windowTitle = (uiRes("m_xgmFalloffCurveUtils.kRootToTipFallOffCurveGrabWindowTitle"));
+            }
+            break;
+        case "xgmSmoothBrushTool" : 
+            if($flag == "-brushFalloffCurve")
+            {
+                $windowTitle = (uiRes("m_xgmFalloffCurveUtils.kBrushFallOffCurveSmoothWindowTitle"));
+            }
+            else if($flag == "-rootToTipCurve")
+            {
+                $windowTitle = (uiRes("m_xgmFalloffCurveUtils.kRootToTipFallOffCurveSmoothWindowTitle"));
+            }
+            break;
+        case "xgmFreezeBrushTool" : 
+            if($flag == "-brushFalloffCurve")
+            {
+                $windowTitle = (uiRes("m_xgmFalloffCurveUtils.kBrushFallOffCurveFreezeWindowTitle"));
+            }
+            else if($flag == "-rootToTipCurve")
+            {
+                $windowTitle = (uiRes("m_xgmFalloffCurveUtils.kRootToTipFallOffCurveFreezeWindowTitle"));
+            }
+            break;
+        case "xgmClumpBrushTool" : 
+            if($flag == "-brushFalloffCurve")
+            {
+                $windowTitle = (uiRes("m_xgmFalloffCurveUtils.kBrushFallOffCurveClumpWindowTitle"));
+            }
+            else if($flag == "-rootToTipCurve")
+            {
+                $windowTitle = (uiRes("m_xgmFalloffCurveUtils.kClumpScaleFallOffCurveClumpWindowTitle"));
+            }
+            break;
+        case "xgmPartBrushTool" : 
+            if($flag == "-brushFalloffCurve")
+            {
+                $windowTitle = (uiRes("m_xgmFalloffCurveUtils.kBrushFallOffCurvePartWindowTitle"));
+            }
+            else if($flag == "-rootToTipCurve")
+            {
+                $windowTitle = (uiRes("m_xgmFalloffCurveUtils.kRootToTipFallOffCurvePartWindowTitle"));
+            }
+            break;
+        default:
+            break;
+    }
+    
+    return $windowTitle;
+}
+
+global proc xgmMarkingMenuAdjustFalloffCurve( string $brushCmd, 
+                                              string $tool,
+                                              string $flag,
+                                              string $defaultFlag)
+{
+    global string $gXgmCurvePresets[];
+    if (size($gXgmCurvePresets) == 0){
+         xgmInitCurvePreset();
+    }
+
+    string $curveTypePrefix;
+    if($flag == "-brushFalloffCurve")
+    {
+        $curveTypePrefix = "Brush_";
+    }
+    else if($flag == "-rootToTipCurve")
+    {
+        $curveTypePrefix = "RootToTip_";
+    }
+    
+    string $falloffWindowName = $curveTypePrefix + "MarkingMenu_" + $tool + "FalloffCurveWindow";
+    string $falloffCurveLayout = $curveTypePrefix + "MarkingMenu_" + $tool + "FalloffCurveLayout";
+    string $falloffName = $curveTypePrefix + "MarkingMenu_" + $tool + "Falloff";
+    
+    string $windowTitle = getMarkingMenuFallOffWindowName($flag, $tool);
+    if(!`window -exists $falloffWindowName`)
+    {
+        window -title $windowTitle -widthHeight 450 250 $falloffWindowName;  
+        columnLayout -adj true -rs 5 -parent $falloffWindowName $falloffCurveLayout;
+
+        xgmFalloffCurveGroupProperties( $falloffCurveLayout, 
+                                        $falloffName, 
+                                        $brushCmd, 
+                                        $flag, 
+                                        $defaultFlag, 
+                                        $tool, 
+                                        $gXgmCurvePresets,
+                                        1);
+    }
+    showWindow $falloffWindowName;
+}
+
+//
+//    Procedure Name:
+//        xgmFalloffCurveGroupValues
+//
+//    Description:
+//        initializes values of the group of falloff curve UI 
+//
+//    Input Arguments:
+//        parent         Parent layout of the falloff curve group layout.
+//                       Required so that UI object names can be successfully resolved.
+//        brushCmd       The command to be evaluated in the procedure.
+//        flag           The flag to be used with the given command.
+//                       It gives the info of the falloff attribute.
+//                       Note that it leaves to the the caller to decide if it's a query or an edit command.
+//        tool           Name of the instance of the tool that the command is applied on
+//        enable         Enable/disable the group of falloff curve UI 
+//
+//    Return Value:
+//        None.
+//
+global proc xgmFalloffCurveGroupValues( string $parent, 
+        string $brushCmd, 
+        string $flag, 
+        string $tool,
+        int $enable)
+{
+    global int $gXgmMaxCustomCurveSize;
+
+    setParent $parent;
+
+    string $brushFC = eval( $brushCmd + " -q " + $flag + " " + $tool );
+    
+    string $curveTypePrefix;
+    if($flag == "-brushFalloffCurve")
+    {
+        $curveTypePrefix = "Brush_";
+    }
+    else if($flag == "-rootToTipCurve")
+    {
+        $curveTypePrefix = "RootToTip_";
+    }
+    
+    string $UITypePrefix = "ToolSetting_";
+    string $falloffWidget = $curveTypePrefix + $UITypePrefix + $tool + "FalloffCurveWidget";
+    string $falloffCurveRowLayout = $curveTypePrefix + $UITypePrefix + $tool + "FalloffCurveRowLayout";
+    string $falloffCurvePresetRowLayout = $curveTypePrefix + $UITypePrefix + $tool + "FalloffCurvePresetRowLayout";
+    string $falloffCurveCustomRowLayout = $curveTypePrefix + $UITypePrefix + $tool + "FalloffCurveCustomRowLayout";
+
+    falloffCurve -e -asString $brushFC $falloffWidget;
+    rowLayout -e -en $enable $falloffCurveRowLayout;
+    rowLayout -e -en $enable $falloffCurvePresetRowLayout;
+    rowLayout -e -en $enable $falloffCurveCustomRowLayout;
+}
+

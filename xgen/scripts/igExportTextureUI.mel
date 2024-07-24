@@ -1,0 +1,369 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+
+//**************************************************************************/
+// Copyright (c) 2012 Autodesk, Inc.
+// All rights reserved.
+//
+// These coded instructions, statements, and computer programs contain
+// unpublished proprietary information written by Autodesk, Inc., and are
+// protected by Federal copyright law. They may not be disclosed to third
+// parties or copied or duplicated in any form, in whole or in part, without
+// the prior written consent of Autodesk, Inc.
+//**************************************************************************/
+
+
+/** Export texture nodes as ptex maps */
+global proc igExportTextureUI()
+{
+    global string $gIgNullDescriptionTag;
+
+    if (`window -exists igExportTextureWindow`)
+        deleteUI -window  igExportTextureWindow;
+
+    window -sizeable false -minimizeButton false -maximizeButton false
+	    -menuBar false -width 600 -height 230
+		-title (uiRes("m_igExportTextureUI.kIgroomExport")) igExportTextureWindow;
+
+    columnLayout -adj on -rs 10;
+    {
+        formLayout igExportTextureDescLayout;
+        {
+            text -label (uiRes("m_igExportTextureUI.kDescription")) igExportTextureDescLabel;
+            igCreateIconPopup( "igExportTextureDescMenu",
+                               (uiRes("m_igExportTextureUI.kDescExport")),
+                               (uiRes("m_igExportTextureUI.kDescExportAnn")),
+                               "" );
+            string $descs[] = igAllDescriptions();
+            for ( $desc in $descs ) {
+                igAddDeepMenuItem( $desc, "igExportTextureDescMenu",
+                                   "igExportTextureDescMenuCB" );
+            }
+            string $cdesc = igCurrentDescription();
+            if ( $cdesc == "" ) 
+                $cdesc = $gIgNullDescriptionTag;
+            textField -edit -tx $cdesc igExportTextureDescMenuValue;
+                
+            setParent ..;
+        }
+        // Create a text field for the filename.
+        $browser = "igFileBrowser \"iGroom Export\" igExportTexturePathField 1";
+        textFieldButtonGrp -label (uiRes("m_igExportTextureUI.kMapPath"))
+            -bl (uiRes("m_igExportTextureUI.kBrowse")) -bc $browser -cal 1 right -adj 2
+            -ann (uiRes("m_igExportTextureUI.kBrowseAnnot"))
+            igExportTexturePathField;
+
+		floatSliderGrp -label (uiRes("m_igExportTextureUI.kTexelsPerUnit")) -f true -adj 3 -cw 2 70
+            -min 0.001 -max 100.0 -fmx 10000.0 -pre 3 -step 0.001
+            -ann (uiRes("m_igExportTextureUI.kTexelsAnnot"))
+			igExportTextureTexelsPerUnitField;
+            
+		textFieldGrp -label (uiRes("m_igExportTextureUI.kTextureNode")) -adj 2
+            -ann (uiRes("m_igExportTextureUI.kTextureAnnot"))
+            igTextureField;
+
+		checkBoxGrp -label (uiRes("m_igExportTextureUI.kAutoExport")) -ncb 1 -l1 " " -v1 off
+            -ann (uiRes("m_igExportTextureUI.kAutoExportAnnot"))
+            igAutoExportField;
+            
+        checkBoxGrp -label (uiRes("m_igExportTextureUI.kSync")) -ncb 1 -l1 " " -v1 off
+            -cc igSyncButtonCB
+            -ann (uiRes("m_igExportTextureUI.kSyncAnnot"))
+            igXGenSyncField;
+
+        textFieldGrp -label (uiRes("m_igExportTextureUI.kXgenDesc")) -adj 2 -en false
+            -ann (uiRes("m_igExportTextureUI.kXGgenDescAnnot"))
+            igXGenDescriptionField;
+
+        rowLayout -numberOfColumns 3 -columnWidth3 130 130 130
+            -columnAlign3 "center" "center" "center"
+            -adjustableColumn3 1;
+        {
+            // Control over the dialog
+            text -label "";
+            button -label (uiRes("m_igExportTextureUI.kExport")) -w 130 
+				-ann (uiRes("m_igExportTextureUI.kExportTextureAnnot"))
+                -c "igExportTexture; deleteUI igExportTextureWindow";
+            button -label (uiRes("m_igExportTextureUI.kCancel")) -w 130 
+                -ann (uiRes("m_igExportTextureUI.kFinishExportAnnot"))
+                -c "deleteUI igExportTextureWindow";
+            setParent ..;
+        }
+
+        // Attach the new layouts.
+        formLayout -edit
+            -attachForm igExportTextureDescLabel left 63
+            -attachForm igExportTextureDescLabel top 8
+            -attachNone igExportTextureDescLabel right
+            -attachNone igExportTextureDescLabel bottom
+            
+            -attachForm    igExportTextureDescMenuValue top 8
+            -attachControl igExportTextureDescMenuValue left 10 igExportTextureDescLabel
+            -attachNone    igExportTextureDescMenuValue right
+            -attachNone    igExportTextureDescMenuValue bottom
+            
+            -attachForm    igExportTextureDescMenuImage top 8
+            -attachControl igExportTextureDescMenuImage left 3 igExportTextureDescMenuValue
+            -attachNone    igExportTextureDescMenuImage right
+            -attachNone    igExportTextureDescMenuImage bottom
+
+            igExportTextureDescLayout;
+        
+        setParent ..;
+    }
+
+    igExportTextureFillFields;
+    showWindow igExportTextureWindow;
+
+    // Dont let the window pop-up the wrong size
+    window -e -width 600 igExportTextureWindow;
+    window -e -height 230 igExportTextureWindow;
+}
+
+
+global proc igExportTextureFillFields()
+{
+    global string $gIgBasepath;
+    string $path = "";
+    string $xdesc = "";
+    string $texture = "";
+    float $tpu = 1.0;
+    
+    string $desc = `textField -q -tx igExportTextureDescMenuValue`;
+    if ( `attributeQuery -ex -node $desc "mapPath"` ) {
+        $path = `getAttr ($desc+".mapPath")`;
+        $path = strip($path);
+    }
+    if ( `attributeQuery -ex -node $desc "texture"` ) {
+        $texture = `getAttr ($desc+".texture")`;
+    }
+    if ( `attributeQuery -ex -node $desc "xgenDesc"` ) {
+        $xdesc = `getAttr ($desc+".xgenDesc")`;
+    }
+	if ( `attributeQuery -ex -node $desc "texelsPerUnit"` ) {
+        $tpu = `getAttr ($desc+".texelsPerUnit")`;        
+    }
+    
+    // Get the base for the path from the descriptions path. We will always
+    // grab the first entry when multiples are present.
+    $gIgBasepath = igOutputDir( $desc );
+    if ( $path == "" ) {
+        $path = $gIgBasepath + "igroom";
+    }
+    
+    textFieldButtonGrp -e -tx $path igExportTexturePathField;
+    checkBoxGrp -e -v1 off igXGenSyncField;
+    checkBoxGrp -e -v1 off igAutoExportField;
+    textFieldGrp -e -en false -tx $xdesc igXGenDescriptionField;
+    textFieldGrp -e -tx $texture igTextureField;
+    floatSliderGrp -e -v $tpu igExportTextureTexelsPerUnitField;
+}
+
+
+/** Allow editing multiple igDescriptions obejcts */ 
+global proc igExportTextureDescMenuCB( string $desc, string $menu )
+{
+    string $menuValue = $menu + "Value";
+    if (`textField -exists $menuValue`) {
+        textField -e -tx $desc $menuValue;
+    }
+    igExportTextureFillFields;
+}
+
+
+global proc igSyncButtonCB()
+{
+    int $state = `checkBoxGrp -q -v1 igXGenSyncField`;
+    if ( $state == on ) {
+        textFieldGrp -e -en true igXGenDescriptionField;
+    } else {
+        textFieldGrp -e -en false igXGenDescriptionField;
+    }
+}
+
+
+global proc igExportTexture()
+{
+    global string $gIgBasepath;
+    global string $gIgNullDescriptionTag;
+
+    string $desc = `textField -q -tx igExportTextureDescMenuValue`;
+    string $path = `textFieldButtonGrp -q -tx igExportTexturePathField`;
+    string $xdesc = `textFieldGrp -q -tx igXGenDescriptionField`;
+    string $xpal = python("xg.palette(\""+$xdesc+"\")");
+    string $texture = `textFieldGrp -q -tx igTextureField`;
+    float $tpu = `floatSliderGrp -q -v igExportTextureTexelsPerUnitField`;
+    
+    if ( $desc != $gIgNullDescriptionTag && $desc != "" && $texture!= "" ) {
+        waitCursor -state on;
+        
+        // Get the patch geometry
+        $mesh = `getAttr ($desc+".geom")`;
+
+		string $ptexPath = $path + "/" + $texture;
+		
+		string $bakeCmd = "ptexBake -inMesh \"" + $mesh + "\" -outPtex \"" + $ptexPath + "\" -bakeTexture \"" + $texture +"\" -tpu " + $tpu;
+		evalEcho( $bakeCmd );
+        // iGroom -xr $path -tpu $tpu -d $desc;
+
+        // Get path to be relative to basepath
+        $path = strip($path);
+        if ( `startsWith $path "/"`){
+            if ( `startsWith $gIgBasepath "./"`){
+                string $pwd = `getenv "PWD"` + "/";
+                $gIgBasepath = $pwd + $gIgBasepath;
+                $gIgBasepath = `substitute "/./" $gIgBasepath "/"`;
+            }
+        }
+        if ( `startsWith $path $gIgBasepath` ) {
+            $path = `substitute $gIgBasepath $path ""`;
+        }
+
+        $path = igValidPath($path);
+
+        // Remember what was entered before via attributes on the description
+        if ( !`attributeQuery -ex -node $desc "mapPath"` ) {
+            addAttr -ln "mapPath" -sn "mapPath" -dt "string" $desc;
+        }
+        if ( !`attributeQuery -ex -node $desc "xgenDesc"` ) {
+            addAttr -ln "xgenDesc" -sn "xgenDesc" -dt "string" $desc;
+        }
+        if ( !`attributeQuery -ex -node $desc "texture"` ) {
+            addAttr -ln "texture" -sn "texture" -dt "string" $desc;
+        }
+        if ( !`attributeQuery -ex -node $desc "texelsPerUnit"` ) {
+            addAttr -ln "texelsPerUnit" -sn "texelsPerUnit" -at "float" $desc;
+        }
+        setAttr -type "string" ($desc+".mapPath") $path;
+        setAttr -type "string" ($desc+".xgenDesc") $xdesc;
+        setAttr -type "string" ($desc+".texture") $texture;
+        setAttr ($desc+".texelsPerUnit") $tpu;
+
+        // If the sync option was active, copy everything over to the
+        // XGen description along with some error checking.
+        int $state = `checkBoxGrp -q -v1 igXGenSyncField`;        
+        if ( $state == on ) {
+            python("xg.setAttr(\"color\",\"map(\\\""+$ptexPath+"\\\")->clamp(0.01,1)\",\""+$xpal+"\",\""+$xdesc+"\",\""+"GLRenderer"+"\")");                                    
+            python("xgui.refreshDescriptionEditor()");
+        }
+        
+        $state = `checkBoxGrp -q -v1 igAutoExportField`;
+        if ( $state == off ) {
+        	ptexBakeTextureKillJobs();
+        }
+        else {
+        	ptexBakeTextureStartJobs( $desc );
+		}
+
+        waitCursor -state off;
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Following section is for running the ptexBake command after each paint stroke.
+//////////////////////////////////////////////////////////////////////////////
+global int $gPtexBakeTextureStartJob = -1;
+global int $gPtexBakeTextureStopJob = -1;
+
+global string $gPtexBakeCurrentMesh = "";
+global string $gPtexBakeCurrentTexture = "";
+global string $gPtexBakeFile = "";
+global float $gPtexBakeTpu = 1.0;
+
+global proc int ptexBakeTextureValidate()
+{
+    global string $gPtexBakeCurrentMesh;
+    global string $gPtexBakeCurrentTexture;
+    
+    string $selected[] = `ls -selection -type "transform"` ;
+    for( $xform in $selected )
+    {
+        if( $xform == $gPtexBakeCurrentMesh )
+        {
+            string $shapes[] = `listRelatives -fullPath -shapes $xform`;
+            for( $shape in $shapes )
+            {
+                //string $currentTextureAttrName = $shape+".currentTexture";
+                //string $currentTexture = `getAttr $currentTextureAttrName` ;
+                //if( $currentTexture == $gPtexBakeCurrentTexture )
+                {
+                    return true;    
+                }
+                break;
+            } 
+            break;    
+        }   
+    }
+    return false;
+}
+global proc ptexBakeTextureStop()
+{
+    global string $gPtexBakeCurrentMesh;
+    global string $gPtexBakeCurrentTexture;
+    global string $gPtexBakeFile;
+    global float $gPtexBakeTpu;
+    
+    if( ptexBakeTextureValidate() )
+    {
+        ptexBake -inMesh $gPtexBakeCurrentMesh -outPtex $gPtexBakeFile -bakeTexture $gPtexBakeCurrentTexture -tpu $gPtexBakeTpu; 
+        python("xgui.createDescriptionEditor(False).preview(False)");
+    }
+}
+global proc ptexBakeTextureStart()
+{
+    if( ptexBakeTextureValidate() )
+    {
+        python("xgui.createDescriptionEditor(False).preview(True)");
+    }
+}
+
+
+global proc ptexBakeTextureStartJobs( string $ig_xform )
+{
+    global string $gPtexBakeCurrentMesh;
+    global string $gPtexBakeCurrentTexture;
+    global string $gPtexBakeFile;
+    global float $gPtexBakeTpu;
+    global int $gPtexBakeTextureStartJob;
+    global int $gPtexBakeTextureStopJob;
+
+    ptexBakeTextureKillJobs();
+    
+    string $attrGeom = $ig_xform+"Shape.geom";
+    string $attrTexture = $ig_xform+".texture";
+    string $attrFile = $ig_xform+".mapPath";
+    string $attrTpu = $ig_xform+".texelsPerUnit";
+    $gPtexBakeCurrentMesh = `getAttr $attrGeom`;
+    $gPtexBakeCurrentTexture = `getAttr $attrTexture`;
+    $gPtexBakeFile = `getAttr $attrFile` + "/" + $gPtexBakeCurrentTexture;
+    $gPtexBakeTpu = `getAttr $attrTpu`;
+    
+    $gPtexBakeTextureStartJob = `scriptJob -killWithScene -event "start3dPaintTool" "ptexBakeTextureStart()"`;
+    $gPtexBakeTextureStopJob = `scriptJob -killWithScene -event "stop3dPaintTool" "ptexBakeTextureStop()"`;
+}
+
+
+global proc ptexBakeTextureKillJobs()
+{
+    global int $gPtexBakeTextureStartJob;
+    global int $gPtexBakeTextureStopJob;
+    
+    if( $gPtexBakeTextureStartJob!=-1 )
+    {
+        scriptJob -kill $gPtexBakeTextureStartJob;
+        $gPtexBakeTextureStartJob = -1;
+    }
+    
+    if( $gPtexBakeTextureStopJob!=-1 )
+    {
+        scriptJob -kill $gPtexBakeTextureStopJob;
+        $gPtexBakeTextureStopJob = -1;
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////

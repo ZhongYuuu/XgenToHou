@@ -1,0 +1,224 @@
+<!--
+Copyright 2015 Autodesk, Inc. All rights reserved.
+
+Use of this software is subject to the terms of the Autodesk
+license agreement provided at the time of installation or download,
+or which otherwise accompanies this software in either electronic
+or hard copy form.
+-->
+<fragment uiName="xgenFacingCameraGS" name="xgenFacingCameraGS" type="geometryShader" class="ShadeFragment" version="1.0" feature_level="0" >
+    <description>
+        <![CDATA[
+Expand a line to two triangles (quad)]]>
+    </description>
+    <properties>
+        <struct name="inputs" size="2" struct_name="geometryInS" />
+        <!-- OGS will require the same vertex attrib twice from geometry shader and pixel shader.
+          -- These varying vertex attribs are implicitly required by the downstream pixel shader.
+        <float3   name="Vw"                     semantic="TEXTURE"   flags="varyingInputParam, isRequirementOnly" />
+        <float3   name="Pw"                     semantic="TEXTURE"   flags="varyingInputParam, isRequirementOnly" />
+        <float3   name="mayaTangentIn"          semantic="TANGENT"   flags="varyingInputParam, isRequirementOnly" />
+        <float2   name="uvCoord"                semantic="TEXCOORD0" flags="varyingInputParam, isRequirementOnly" />
+        <float2   name="wCoord"                 semantic="TEXCOORD1" flags="varyingInputParam, isRequirementOnly" />
+        -->
+        <float4x4 name="world"                  semantic="world" />
+        <float4x4 name="worldInverse"           semantic="worldinverse" />
+        <float4x4 name="worldViewProjection"    semantic="worldviewprojection" />
+        <float3   name="worldCameraPosition"    semantic="worldcameraposition" />
+        <float    name="depthPriority"          semantic="depthpriority" />
+        <undefined name="GPUStage" semantic="GPUStage" />
+    </properties>
+    <values>
+    </values>
+    <outputs>
+        <triStream name="outStream" size="4" isInOutParam="true" struct_name="geometryInS" />
+        <undefined name="geometryShader" semantic="geometryShader" />
+    </outputs>
+    <implementation>
+        <implementation render="OGSRenderer" language="Cg" lang_version="2.100000" >
+            <function_name val="xgenFacingCameraGS" />
+            <source>
+                <![CDATA[
+void xgenFacingCameraGS(AttribArray<geometryInS> inputs,
+    float4x4 world, float4x4 worldInv, float4x4 worldViewProjection, float3 worldCameraPosition, float depthPriority
+)
+{
+    // Early Out
+    if( all(inputs[0].Pw == inputs[1].Pw) )
+    {
+        return;
+    }
+	
+    // Ideally, we should use Pm from the vertex shader but we run out of the
+    // number of TEXCOORDs in Cg. Pw is used in lighting and shadowing so we
+    // use it here as well.
+    float4 Pm;
+    geometryInS outS;
+
+    outS = inputs[0];
+    Pm = float4(mul(worldInv, float4(outS.Pw, 1.0f)).xyz - outS.mayaTangentIn * 0.5f, 1.0f);
+    outS.Vw = normalize(worldCameraPosition - mul(world, Pm).xyz);
+    outS.Pw = mul(world, Pm).xyz;
+    outS.wCoord.x = 0.0f;
+    outS.Pc = mul(worldViewProjection, Pm);
+    outS.Pc.z -= outS.Pc.w * 2.0f * depthPriority;
+    emitVertex(outS);
+
+    outS = inputs[0];
+    Pm = float4(mul(worldInv, float4(outS.Pw, 1.0f)).xyz + outS.mayaTangentIn * 0.5f, 1.0f);
+    outS.Vw = normalize(worldCameraPosition - mul(world, Pm).xyz);
+    outS.Pw = mul(world, Pm).xyz;
+    outS.wCoord.x = 1.0f;
+    outS.Pc = mul(worldViewProjection, Pm);
+    outS.Pc.z -= outS.Pc.w * 2.0f * depthPriority;
+    emitVertex(outS);
+
+    outS = inputs[1];
+    Pm = float4(mul(worldInv, float4(outS.Pw, 1.0f)).xyz - outS.mayaTangentIn * 0.5f, 1.0f);
+    outS.Vw = normalize(worldCameraPosition - mul(world, Pm).xyz);
+    outS.Pw = mul(world, Pm).xyz;
+    outS.wCoord.x = 0.0f;
+    outS.Pc = mul(worldViewProjection, Pm);
+    outS.Pc.z -= outS.Pc.w * 2.0f * depthPriority;
+    emitVertex(outS);
+
+    outS = inputs[1];
+    Pm = float4(mul(worldInv, float4(outS.Pw, 1.0f)).xyz + outS.mayaTangentIn * 0.5f, 1.0f);
+    outS.Vw = normalize(worldCameraPosition - mul(world, Pm).xyz);
+    outS.Pw = mul(world, Pm).xyz;
+    outS.wCoord.x = 1.0f;
+    outS.Pc = mul(worldViewProjection, Pm);
+    outS.Pc.z -= outS.Pc.w * 2.0f * depthPriority;
+    emitVertex(outS);
+
+    restartStrip();
+}
+                ]]>
+            </source>
+        </implementation>
+        <implementation render="OGSRenderer" language="GLSL" lang_version="3.000000" >
+            <function_name val="xgenFacingCameraGS" />
+            <source>
+                <![CDATA[
+void xgenFacingCameraGS(
+    mat4 world, mat4 worldInv, mat4 worldViewProjection, vec3 worldCameraPosition, float depthPriority
+)
+{
+    // Early Out
+    if( all(equal(copyFromGEO_IN(0).Pw, copyFromGEO_IN(1).Pw)) )
+    {
+        return;
+    }
+	
+    // Ideally, we should use Pm from the vertex shader but we run out of the
+    // number of TEXCOORDs in Cg. Pw is used in lighting and shadowing so we
+    // use it here as well.
+    vec4 Pm;
+    GEO_OUT_struct outS;
+
+    outS = copyFromGEO_IN(0);
+    Pm = vec4(mul(worldInv, vec4(outS.Pw, 1.0f)).xyz - outS.mayaTangentIn * 0.5f, 1.0f);
+    outS.Vw = normalize(worldCameraPosition - mul(world, Pm).xyz);
+    outS.Pw = mul(world, Pm).xyz;
+    outS.wCoord.x = 0.0f;
+    outS.Pc = mul(worldViewProjection, Pm);
+    outS.Pc.z -= outS.Pc.w * 2.0f * depthPriority;
+    EmitGeoStruct(outS);
+
+    outS = copyFromGEO_IN(0);
+    Pm = vec4(mul(worldInv, vec4(outS.Pw, 1.0f)).xyz + outS.mayaTangentIn * 0.5f, 1.0f);
+    outS.Vw = normalize(worldCameraPosition - mul(world, Pm).xyz);
+    outS.Pw = mul(world, Pm).xyz;
+    outS.wCoord.x = 1.0f;
+    outS.Pc = mul(worldViewProjection, Pm);
+    outS.Pc.z -= outS.Pc.w * 2.0f * depthPriority;
+    EmitGeoStruct(outS);
+
+    outS = copyFromGEO_IN(1);
+    Pm = vec4(mul(worldInv, vec4(outS.Pw, 1.0f)).xyz - outS.mayaTangentIn * 0.5f, 1.0f);
+    outS.Vw = normalize(worldCameraPosition - mul(world, Pm).xyz);
+    outS.Pw = mul(world, Pm).xyz;
+    outS.wCoord.x = 0.0f;
+    outS.Pc = mul(worldViewProjection, Pm);
+    outS.Pc.z -= outS.Pc.w * 2.0f * depthPriority;
+    EmitGeoStruct(outS);
+
+    outS = copyFromGEO_IN(1);
+    Pm = vec4(mul(worldInv, vec4(outS.Pw, 1.0f)).xyz + outS.mayaTangentIn * 0.5f, 1.0f);
+    outS.Vw = normalize(worldCameraPosition - mul(world, Pm).xyz);
+    outS.Pw = mul(world, Pm).xyz;
+    outS.wCoord.x = 1.0f;
+    outS.Pc = mul(worldViewProjection, Pm);
+    outS.Pc.z -= outS.Pc.w * 2.0f * depthPriority;
+    EmitGeoStruct(outS);
+
+    EndPrimitive();
+}
+                ]]>
+            </source>
+        </implementation>
+        <implementation render="OGSRenderer" language="HLSL" lang_version="11.000000" >
+            <function_name val="xgenFacingCameraGS" />
+            <source>
+                <![CDATA[
+void xgenFacingCameraGS(geometryInS inputs[2],
+    float4x4 world, float4x4 worldInv, float4x4 worldViewProjection, float3 worldCameraPosition, float depthPriority,
+    inout TriangleStream<geometryInS> outStream
+)
+{
+	// Early Out
+    if( all(inputs[0].Pw == inputs[1].Pw) )
+    {
+        return;
+    }
+
+    // Ideally, we should use Pm from the vertex shader but we run out of the
+    // number of TEXCOORDs in Cg. Pw is used in lighting and shadowing so we
+    // use it here as well.
+    float4 Pm;
+    geometryInS outS;
+
+    outS = inputs[0];
+    Pm = float4(mul(float4(outS.Pw, 1.0f), worldInv).xyz - outS.mayaTangentIn * 0.5f, 1.0f);
+    outS.Vw = normalize(worldCameraPosition - mul(Pm, world).xyz);
+    outS.Pw = mul(Pm, world).xyz;
+    outS.wCoord.x = 0.0f;
+    outS.Pc = mul(Pm, worldViewProjection);
+    outS.Pc.z -= outS.Pc.w * depthPriority;
+    outStream.Append(outS);
+
+    outS = inputs[0];
+    Pm = float4(mul(float4(outS.Pw, 1.0f), worldInv).xyz + outS.mayaTangentIn * 0.5f, 1.0f);
+    outS.Vw = normalize(worldCameraPosition - mul(Pm, world).xyz);
+    outS.Pw = mul(Pm, world).xyz;
+    outS.wCoord.x = 1.0f;
+    outS.Pc = mul(Pm, worldViewProjection);
+    outS.Pc.z -= outS.Pc.w * depthPriority;
+    outStream.Append(outS);
+
+    outS = inputs[1];
+    Pm = float4(mul(float4(outS.Pw, 1.0f), worldInv).xyz - outS.mayaTangentIn * 0.5f, 1.0f);
+    outS.Vw = normalize(worldCameraPosition - mul(Pm, world).xyz);
+    outS.Pw = mul(Pm, world).xyz;
+    outS.wCoord.x = 0.0f;
+    outS.Pc = mul(Pm, worldViewProjection);
+    outS.Pc.z -= outS.Pc.w * depthPriority;
+    outStream.Append(outS);
+
+    outS = inputs[1];
+    Pm = float4(mul(float4(outS.Pw, 1.0f), worldInv).xyz + outS.mayaTangentIn * 0.5f, 1.0f);
+    outS.Vw = normalize(worldCameraPosition - mul(Pm, world).xyz);
+    outS.Pw = mul(Pm, world).xyz;
+    outS.wCoord.x = 1.0f;
+    outS.Pc = mul(Pm, worldViewProjection);
+    outS.Pc.z -= outS.Pc.w * depthPriority;
+    outStream.Append(outS);
+
+    outStream.RestartStrip();
+}
+                ]]>
+            </source>
+        </implementation>
+    </implementation>
+</fragment>
+

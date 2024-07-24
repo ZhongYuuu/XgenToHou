@@ -1,0 +1,89 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+// ===========================================================================
+// Copyright 2017 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+
+// Keep track of IGBrush usage in a single Maya session
+global string $gXgmIGBrushInUse = "";
+global string $gXgmIGBrushInitialized[];
+
+// IG brush properties procedure proxy
+global proc xgmIGBrushProperties ()
+{
+    global string $gXgmIGBrushInitialized[];
+    string $context = `currentCtx`;
+
+    int $initialized = 0;
+    string $iter;
+    for ($iter in $gXgmIGBrushInitialized) {
+        if ($iter == $context) {
+            $initialized = 1;
+            break;
+        }
+    }
+    // Call proxied procedure only when necessary
+    if ($initialized) return;
+
+    switch ($context) {
+        case "xgmDensityBrushTool":
+            xgmDensityBrushProperties();
+            break;
+        case "xgmPlaceBrushTool":
+            xgmPlaceBrushProperties();
+            break;
+        case "xgmLengthBrushTool":
+            xgmLengthBrushProperties();
+            break;
+        case "xgmCutBrushTool":
+            xgmCutBrushProperties();
+            break;
+        case "xgmWidthBrushTool":
+            xgmWidthBrushProperties();
+            break;
+        case "xgmCombBrushTool":
+            xgmCombBrushProperties();
+            break;
+        case "xgmGrabBrushTool":
+            xgmGrabBrushProperties();
+            break;
+        case "xgmDirectionBrushTool":
+            xgmDirectionBrushProperties();
+            break;
+        case "xgmSmoothBrushTool":
+            xgmSmoothBrushProperties();
+            break;
+        case "xgmNoiseBrushTool":
+            xgmNoiseBrushProperties();
+            break;
+        case "xgmClumpBrushTool":
+            xgmClumpBrushProperties();
+            break;
+        case "xgmPartBrushTool":
+            xgmPartBrushProperties();
+            break;
+        case "xgmFreezeBrushTool":
+            xgmFreezeBrushProperties();
+            break;
+        case "xgmSelectBrushTool":
+            xgmSelectBrushProperties();
+            break;
+        case "xgmBifrostBrushTool":
+            xgmBifrostBrushProperties();
+            break;
+
+        default:
+            break;
+    }
+
+    $gXgmIGBrushInitialized[size($gXgmIGBrushInitialized)] = $context;
+}

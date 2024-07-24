@@ -1,0 +1,80 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+// ===========================================================================
+// Copyright 2017 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+
+
+// IG brush values procedure proxy
+global proc xgmIGBrushValues(string $tool)
+{
+    global string $gXgmIGBrushInUse;
+
+    string $context = `currentCtx`;
+
+    // Re-create UI
+    if ($context != $gXgmIGBrushInUse) {
+        $gXgmIGBrushInUse = $context;
+        xgmIGBrushProperties();
+    }
+
+    switch ($context) {
+        case "xgmDensityBrushTool":
+            xgmDensityBrushValues($tool);
+            break;
+        case "xgmPlaceBrushTool":
+            xgmPlaceBrushValues($tool);
+            break;
+        case "xgmLengthBrushTool":
+            xgmLengthBrushValues($tool);
+            break;
+        case "xgmCutBrushTool":
+            xgmCutBrushValues($tool);
+            break;
+        case "xgmWidthBrushTool":
+            xgmWidthBrushValues($tool);
+            break;
+        case "xgmCombBrushTool":
+            xgmCombBrushValues($tool);
+            break;
+        case "xgmGrabBrushTool":
+            xgmGrabBrushValues($tool);
+            break;
+        case "xgmDirectionBrushTool":
+            xgmDirectionBrushValues($tool);
+            break;
+        case "xgmSmoothBrushTool":
+            xgmSmoothBrushValues($tool);
+            break;
+        case "xgmNoiseBrushTool":
+            xgmNoiseBrushValues($tool);
+            break;
+        case "xgmClumpBrushTool":
+            xgmClumpBrushValues($tool);
+            break;
+        case "xgmPartBrushTool":
+            xgmPartBrushValues($tool);
+            break;
+        case "xgmFreezeBrushTool":
+            xgmFreezeBrushValues($tool);
+            break;
+        case "xgmSelectBrushTool":
+            xgmSelectBrushValues($tool);
+            break;
+        case "xgmBifrostBrushTool":
+            xgmBifrostBrushValues($tool);
+            break;
+
+        default:
+            break;
+    }
+}

@@ -1,0 +1,31 @@
+<!--
+Copyright 2015 Autodesk, Inc. All rights reserved.
+
+Use of this software is subject to the terms of the Autodesk
+license agreement provided at the time of installation or download,
+or which otherwise accompanies this software in either electronic
+or hard copy form.
+-->
+<!--
+OBSOLETE: remapValue1 is now merged with remapValue0.
+-->
+<fragment_graph name="xgenCPVRemap1" ref="xgenCPVRemap1" class="FragmentGraph" version="1.0" feature_level="0" >
+    <fragments>
+        <fragment_ref name="xgenCPVRemapPassing1" ref="xgenCPVRemapPassing1" />
+        <fragment_ref name="xgenCPVRemapTint1"    ref="xgenCPVRemapTint1" />
+    </fragments>
+    <connections>
+        <connect from="xgenCPVRemapPassing1.remapValue1" to="xgenCPVRemapTint1.remapValue1" />
+    </connections>
+    <properties>
+        <float    name="remapValue1"        ref="xgenCPVRemapPassing1.remapValue1" semantic="TEXCOORD4" flags="varyingInputParam" />
+        <float4   name="remapColor1"        ref="xgenCPVRemapTint1.remapColor1" />
+        <float4   name="inputColor1"        ref="xgenCPVRemapTint1.inputColor1" />
+    </properties>
+    <values>
+        <float4 name="remapColor1"     value="0.000000,0.000000,0.000000,0.000000" />
+    </values>
+    <outputs>
+        <float4 name="outColor1" ref="xgenCPVRemapTint1.outColor1" />
+    </outputs>
+</fragment_graph>

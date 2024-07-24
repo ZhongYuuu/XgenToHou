@@ -1,0 +1,60 @@
+<!--
+Copyright 2016 Autodesk, Inc. All rights reserved.
+
+Use of this software is subject to the terms of the Autodesk
+license agreement provided at the time of installation or download,
+or which otherwise accompanies this software in either electronic
+or hard copy form.
+-->
+<fragment uiName="xgenColorCombiner" name="xgenColorCombiner" type="plumbing" class="ShadeFragment" version="1.0" feature_level="0" >
+    <description>
+        <![CDATA[
+XGen combines two colors.]]>
+    </description>
+    <properties>
+        <float4 name="inputColorX" />
+        <float4 name="inputColorY" />
+    </properties>
+    <values>
+        <float4 name="inputColorX" value="0.000000,0.000000,0.000000,0.000000" />
+        <float4 name="inputColorY" value="0.000000,0.000000,0.000000,0.000000" />
+    </values>
+    <outputs>
+        <float4 name="outColor" />
+    </outputs>
+    <implementation>
+        <implementation render="OGSRenderer" language="Cg" lang_version="2.100000" >
+            <function_name val="xgenColorCombiner" />
+            <source>
+                <![CDATA[
+float4 xgenColorCombiner(float4 inputColorX, float4 inputColorY) 
+{
+    return float4(lerp(inputColorX.rgb, inputColorY.rgb, inputColorY.a), inputColorX.a);
+} 
+                ]]>
+            </source>
+        </implementation>
+        <implementation render="OGSRenderer" language="GLSL" lang_version="3.000000" >
+            <function_name val="xgenColorCombiner" />
+            <source>
+                <![CDATA[
+vec4 xgenColorCombiner(vec4 inputColorX, vec4 inputColorY) 
+{
+    return vec4(mix(inputColorX.rgb, inputColorY.rgb, inputColorY.a), inputColorX.a);
+} 
+                ]]>
+            </source>
+        </implementation>
+        <implementation render="OGSRenderer" language="HLSL" lang_version="11.000000" >
+            <function_name val="xgenColorCombiner" />
+            <source>
+                <![CDATA[
+float4 xgenColorCombiner(float4 inputColorX, float4 inputColorY) 
+{
+    return float4(lerp(inputColorX.rgb, inputColorY.rgb, inputColorY.a), inputColorX.a);
+} 
+                ]]>
+            </source>
+        </implementation>
+    </implementation>
+</fragment>

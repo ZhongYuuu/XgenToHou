@@ -1,0 +1,52 @@
+import maya
+
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.k2x2'] = u'2x2'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.k3x3'] = u'3x3'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.k4x4'] = u'4x4'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kAutoBindSkin'] = u'スキンの自動バインド'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kAutoBindSkinAnn'] = u'変換されたポリゴンを自動バインドしてジョイントを除去'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kCombineMesh'] = u'メッシュを結合'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kCombineMeshAnn'] = u'すべてのジオメトリを 1 つのメッシュに結合します。'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kConvertSelected'] = u'選択したプリミティブのみを変換'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kConvertSelectedAnn'] = u'選択したプリミティブのみをポリゴンに変換します。'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kCreateGeo'] = u'ジオメトリを作成'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kCreateGeoAnn'] = u'現在のディスクリプションをジオメトリに出力します。'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kCreateGuideJoints'] = u'ガイド上にジョイントを作成'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kCreateGuideJointsAnn'] = u'ガイド上にジョイントを作成します。'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kCreateStripJoints'] = u'ストリップ上にジョイントを作成'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kCreateStripJointsAnn'] = u'ストリップ上にジョイントを作成します。'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kCurvature'] = u'曲率:'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kCurvatureAnno'] = u'-90 〜 90 度の曲率です。'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kFrameRangeRenderNotYetSupported'] = u'フレーム レンジのレンダリングはまだサポートされていません。'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kGeoProgressInfo'] = u'プリミティブをジオメトリに変換しています。'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kGuideJointNum'] = u'ガイドごとのジョイント数:'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kGuideJointNumAnn'] = u'各ガイドのジョイント数です。'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kGuideJointPlacementAnn'] = u'ガイド上のジョイントの配置タイプです。'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kInsertWidthSpan'] = u'幅に沿ってスパンを挿入'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kInsertWidthSpanAnn'] = u'幅に沿ってスパンを挿入します。'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kJointPerCV'] = u'CV ごとに 1 つのジョイント'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kJointPerSpan'] = u'スパンごとに 1 つのジョイント'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kJointPlacement'] = u'ジョイント配置:'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kMaxInfluences'] = u'最大インフルエンス数:'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kMaxInfluencesAnn'] = u'最大インフルエンス数'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kSpanNum'] = u'スパン数:'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kSpanNumAnn'] = u'幅に沿ったスパンの数です。'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kSpecifyJointNum'] = u'ジョイント数を指定'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kStripJointNum'] = u'ストリップごとのジョイント数:'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kStripJointNumAnn'] = u'各ストリップのジョイント数です。'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kStripJointPlacementAnn'] = u'ストリップ上のジョイントの配置タイプです。'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kTileSeparation'] = u'タイルの分離:'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kTileSeparationAnn'] = u'UV タイル間の分離間隔です。'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kUVInTiles'] = u'タイル内に UV を配置'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kUVInTilesAnn'] = u'タイル内にポリゴン UV を配置します。'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kUVLayoutType'] = u'UV レイアウト タイプ:'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kUVLayoutTypeAnn'] = u'UV タイルのサブディビジョン数です。'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kUseWidthRamp'] = u'幅のランプを使用'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kUseWidthRampAnn'] = u'幅のランプをスプライン プリミティブに適用します。'
+# ===========================================================================
+# Copyright 2021 Autodesk, Inc. All rights reserved.
+#
+# Use of this software is subject to the terms of the Autodesk license
+# agreement provided at the time of installation or download, or which
+# otherwise accompanies this software in either electronic or hard copy form.
+# ===========================================================================

@@ -1,0 +1,159 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+// ===========================================================================
+// Copyright 2015 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+
+//
+//    Description:
+//        Procedure to call when the falloff color is enable/disable.
+//
+//    Input Arguments:
+//        parent         Parent layout of the falloff color group layout.
+//                       Required so that UI object names can be successfully resolved.
+//        enable         Flag to enable/disable the falloff color
+//        brushCmd       The command to be evaluated in the procedure.
+//        tool           Name of the instance of the tool that the command is applied on
+//
+//    Return Value:
+//        None.
+//
+global proc xgmFalloffColorEnable( string $parent, int $enable, string $brushCmd, string $tool )
+{
+    setParent $parent;
+
+    eval( $brushCmd + " -e -fc " + $enable + " " + $tool );
+
+    text -e -en $enable xgmFalloffColorText;
+
+    gradientControlNoAttr -e -en $enable xgmFalloffColorRamp;
+    colorSliderGrp -e -en $enable xgmFalloffColorCSG;
+}
+
+//
+//    Description:
+//        Procedure to call when the current key color is changed.
+//
+//    Input Arguments:
+//        parent         Parent layout of the falloff color group layout.
+//                       Required so that UI object names can be successfully resolved.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmFalloffColorKeyChanged( string $parent )
+{
+    setParent $parent;
+
+    float $t[] = `gradientControlNoAttr -q -currentKeyColorValue xgmFalloffColorRamp`;
+    colorSliderGrp -e -rgb $t[0] $t[1] $t[2] xgmFalloffColorCSG;
+}
+
+//
+//    Description:
+//        Procedure to call when the color of the current key color is changed
+//
+//    Input Arguments:
+//        parent         Parent layout of the falloff color group layout.
+//                       Required so that UI object names can be successfully resolved.
+//        brushCmd       The command to be evaluated in the procedure.
+//        tool           Name of the instance of the tool that the command is applied on
+//
+//    Return Value:
+//        None.
+//
+global proc xgmFalloffColorSetColorKey( string $parent, string $brushCmd, string $tool )
+{
+    setParent $parent;
+
+    float $t[] = `colorSliderGrp -q -rgb xgmFalloffColorCSG`;
+    gradientControlNoAttr -e -currentKeyColorValue $t[0] $t[1] $t[2] xgmFalloffColorRamp;
+    string $gradient = `gradientControlNoAttr -q -asString xgmFalloffColorRamp`;
+    eval( $brushCmd + " -e -fcc " + "\"" + $gradient + "\" " + $tool );
+}
+
+//
+//    Description:
+//        Creates a group of falloff color UI, which includes:
+//            - Checkbox to enable/disable falloff color
+//            - Falloff color ramp
+//            - Color slider for key color
+//
+//    Input Arguments:
+//        parent         Parent layout of the falloff color group layout.
+//                       Required so that UI object names can be successfully resolved.
+//        brushCmd       The command to be evaluated in the procedure.
+//        tool           Name of the instance of the tool that the command is applied on
+//
+//    Return Value:
+//        None.
+//
+global proc xgmFalloffColorGroupProperties( string $parent, 
+        string $brushCmd, 
+        string $tool )
+{
+    setParent $parent;
+
+    checkBoxGrp -label (uiRes("m_xgmFalloffColorUtils.kXgmFalloffColorEnable"))
+        -annotation (uiRes("m_xgmFalloffColorUtils.kXgmFalloffColorEnableAnnot"))
+        -on1 ("xgmFalloffColorEnable( \"" + $parent + "\", 1, \"" + $brushCmd + "\", \"" + $tool + "\")")
+        -of1 ("xgmFalloffColorEnable( \"" + $parent + "\", 0, \"" + $brushCmd + "\", \"" + $tool + "\")")
+        xgmFalloffColorEnableCBG;
+
+    rowLayout -nc 2 xgmFalloffColorRampRowLayout;
+        text -label (uiRes("m_xgmFalloffColorUtils.kXgmFalloffColor")) xgmFalloffColorText;
+
+        gradientControlNoAttr
+            -h 90
+            -rampAsColor true
+            -cc ( $brushCmd + " -e -fcc \"#1\" " + $tool )
+            -currentKeyChanged ( "xgmFalloffColorKeyChanged( \"" + $parent + "\" )" )
+            xgmFalloffColorRamp;
+
+        setParent ..;
+
+    colorSliderGrp 
+        -label (uiRes("m_xgmFalloffColorUtils.kXgmFalloffColorSlider")) 
+        -cc ( "xgmFalloffColorSetColorKey( \"" + $parent + "\", \"" + $brushCmd + "\", \"" + $tool + "\")" )
+        xgmFalloffColorCSG;
+}
+
+//
+//    Description:
+//        initializes values of the group of falloff color UI 
+//
+//    Input Arguments:
+//        parent         Parent layout of the falloff color group layout.
+//                       Required so that UI object names can be successfully resolved.
+//        brushCmd       The command to be evaluated in the procedure.
+//        tool           Name of the instance of the tool that the command is applied on
+//
+//    Return Value:
+//        None.
+//
+global proc xgmFalloffColorGroupValues( string $parent, 
+        string $brushCmd, 
+        string $tool )
+{
+    setParent $parent;
+
+    int $ffColor = eval( $brushCmd + " -q -fc " + $tool );
+    checkBoxGrp -e -value1 $ffColor xgmFalloffColorEnableCBG;
+
+    text -e -en $ffColor xgmFalloffColorText;
+
+    string $colorCurve = eval( $brushCmd + " -q -fcc " + $tool );
+    gradientControlNoAttr -e -en $ffColor -asString $colorCurve xgmFalloffColorRamp;
+
+    float $color[] = `gradientControlNoAttr -q -currentKeyColorValue xgmFalloffColorRamp`;
+    colorSliderGrp -e -en $ffColor -rgb $color[0] $color[1] $color[2] xgmFalloffColorCSG;
+}

@@ -1,0 +1,658 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+// ===========================================================================
+// Copyright 2015 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+
+global string $gXgmDefaultBrushFalloffTypes;
+global string $gXgmDefaultBrushFalloffTypesL10N[];
+
+//
+//    Description:
+//        Initializes the Heads-up Display
+//
+//    Input Arguments:
+//        falloffType     Current brush falloff type
+//
+//    Return Value:
+//        None.
+//
+global proc xgmBrushContextInitHUD(string $falloffType)
+{
+    if(!`headsUpDisplay -ex xgmBrushVolumeHeadsUpDisplay`) {
+        headsUpDisplay -section 7 
+            -vis 0
+            -block `headsUpDisplay -nextFreeBlock 7`
+            -label (uiRes("m_xgmBrushProperties.kXgmBrushVolumeHeadsUpDisplay")) 
+            -allowOverlap true
+        xgmBrushVolumeHeadsUpDisplay;
+    }
+
+    headsUpDisplay -e -vis ($falloffType == "volume") xgmBrushVolumeHeadsUpDisplay;
+}
+
+//
+//    Description:
+//        Removes the Heads-up Display
+//
+//    Input Arguments:
+//        None.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmBrushContextRemoveHUD()
+{
+    if (`headsUpDisplay -ex xgmBrushVolumeHeadsUpDisplay`) 
+        headsUpDisplay -remove xgmBrushVolumeHeadsUpDisplay;
+}
+
+//
+//    Description:
+//        Initializes the default brush falloff types
+//
+//    Input Arguments:
+//        None.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmInitDefaultBrushFalloffTypes()
+{
+    global string $gXgmDefaultBrushFalloffTypes;
+    global string $gXgmDefaultBrushFalloffTypesL10N[];
+
+    if( $gXgmDefaultBrushFalloffTypes == "" || size($gXgmDefaultBrushFalloffTypesL10N) == 0)
+    {
+        $gXgmDefaultBrushFalloffTypes = "screen,volume";
+        $gXgmDefaultBrushFalloffTypesL10N = { (uiRes("m_xgmBrushProperties.kXgmBrushFalloffTypeScreen")), 
+                                              (uiRes("m_xgmBrushProperties.kXgmBrushFalloffTypeVolume"))};
+    }
+}
+
+
+//
+//    Description:
+//        Procedure called when brush falloff type is changed.
+//
+//    Input Arguments:
+//        parent                Parent layout of the common brush falloff layout.
+//                              Required so that UI object names can be successfully resolved
+//        brushCmd              Brush command to be used by the UI objects
+//        tool                  Name of the instance of the tool that the command is applied on
+//        brushFalloffTypes     Brush falloff types supported by current brush
+//
+//    Return Value:
+//        None.
+//
+global proc xgmBrushFalloffSetFalloffType (string $parent, string $brushCmd, string $tool, string $brushFalloffTypes)
+{
+    string $currentBrushFalloffTypes[];
+    tokenize($brushFalloffTypes, ",", $currentBrushFalloffTypes);
+    if( size($currentBrushFalloffTypes) == 0) return;
+
+    setParent $parent;
+
+    int $newVal = `optionMenuGrp -q -select xgmBrushFalloffTypeOMG` - 1; 
+    eval( $brushCmd + " -e -brushFalloffType " + $currentBrushFalloffTypes[$newVal] + " " + $tool );
+
+    if(`headsUpDisplay -ex xgmBrushVolumeHeadsUpDisplay`) {
+        if($currentBrushFalloffTypes[$newVal] == "volume")
+            headsUpDisplay -e -vis 1 xgmBrushVolumeHeadsUpDisplay;
+        else
+            headsUpDisplay -e -vis 0 xgmBrushVolumeHeadsUpDisplay;
+    }
+}
+
+//
+//    Description:
+//        Procedure to call when the preselection highlighting color is changed
+//
+//    Input Arguments:
+//        parent         Parent layout of the preselection highlighting color slider
+//                       Required so that UI object names can be successfully resolved.
+//        brushCmd       The command to be evaluated in the procedure.
+//        tool           Name of the instance of the tool that the command is applied on
+//
+//    Return Value:
+//        None.
+//
+global proc xgmPreSelHighlightColorChanged( string $parent, string $brushCmd, string $tool )
+{
+    setParent $parent;
+
+    float $c[] = `colorSliderGrp -q -rgb xgmPreSelHighlightColorCSG`;
+    
+    eval( $brushCmd + " -e -psr " + $c[0] +" " + $tool );
+    eval( $brushCmd + " -e -psg " + $c[1] +" " + $tool );
+    eval( $brushCmd + " -e -psb " + $c[2] +" " + $tool );
+}
+
+//
+//    Description:
+//        Procedure called when brush symmetry type is changed.
+//
+//    Input Arguments:
+//        parent         Parent layout of the preselection highlighting color slider
+//                       Required so that UI object names can be successfully resolved.
+//        brushCmd       Brush command to be used by the UI objects
+//        tool           Name of the instance of the tool that the command is applied on
+//
+//    Return Value:
+//        None.
+//
+global proc xgmBrushSymmetrySetSymmetryType (string $parent, string $brushCmd, string $tool)
+{
+	setParent $parent;
+    int $newVal = `optionMenuGrp -q -select xgmBrushSymmetryTypeOMG` - 1; 
+    eval( $brushCmd + " -e -brushSymmetryType " + $newVal + " " + $tool );
+}
+
+//
+//    Description:
+//        layout of common brush settings
+//
+//    Input Arguments:
+//        parent         Parent layout of the common brush settings layout.
+//                       Required so that UI object names can be successfully resolved.
+//        frameLayout    Name of the frame layout to be created for the common brush settings
+//        brushCmd       Brush command to be used by the UI objects
+//        tool           Name of the instance of the tool that the command is applied on
+//        customProc     Procedure to create the UI for the custom brush settings 
+//
+//    Return Value:
+//        None.
+//
+global proc xgmBrushSettingsProperties( string $parent, string $frameLayout, string $brushCmd, string $tool, string $customProc )
+{
+    setParent $parent;
+
+    frameLayout -collapsable true -collapse false -mh 5 -l (uiRes("m_xgmBrushProperties.kXgmBrushSettings")) $frameLayout;
+        string $brushSettingColLayout = `columnLayout -adj true -rs 5 xgmBrushSettingsColumnLayout`;
+
+            xgmBrushRadiusGroupProperties($brushSettingColLayout, $brushCmd, $tool);
+
+            floatSliderGrp -field true -pre 3
+                -min 0
+                -max 100
+                -fieldMaxValue 10000000
+                -label (uiRes("m_xgmBrushProperties.kXgmBrushStrength"))
+                -annotation (uiRes("m_xgmBrushProperties.kXgmBrushStrengthAnnotation"))
+                -cc ( $brushCmd + " -e -strength #1 " + $tool )
+                xgmBrushStrengthFSG;
+
+            separator -style "none" xgmBrushCollisionSEP;
+
+            checkBoxGrp
+                -label (uiRes("m_xgmBrushProperties.kEnableCollision"))
+                -numberOfCheckBoxes 1
+                -on1 ( $brushCmd + " -e -enableCollision 1 " + $tool)
+                -of1 ( $brushCmd + " -e -enableCollision 0 " + $tool)
+                xgmBrushCollisionGRP;
+
+            floatSliderGrp -field true -pre 3
+                -min 0.001
+                -max 10
+                -fieldMaxValue 10000000
+                -label (uiRes("m_xgmBrushProperties.kXgmBrushCollisionDistance"))
+                -annotation (uiRes("m_xgmBrushProperties.kXgmBrushCollisionDistanceAnnotation"))
+                -cc ( $brushCmd + " -e -collisionDistance #1 " + $tool )
+                xgmBrushCollisionDistanceFSG;
+
+            separator -style "none" xgmBrushCustomSEP;
+
+            checkBoxGrp -label (uiRes("m_xgmBrushProperties.kXgmBrushInvertFrozenEffect"))
+                -numberOfCheckBoxes 1
+                -on1 ( $brushCmd + " -e -freezeMode 0 " + $tool )
+                -of1 ( $brushCmd + " -e -freezeMode 1 " + $tool )
+                xgmBrushInvertFrozenEffectCBG;
+ 
+            // Custom Properties
+            if($customProc != "") 
+                eval($customProc);
+
+        setParent ..;
+    setParent ..;
+}
+
+// Update 2 filter backface angle UIs
+global proc xgmBrushFilterBackFaceAngleChanged( string $parent, string $brushCmd, string $tool )
+{
+    setParent $parent;
+
+    float $filterBackfaceStartAngle = eval( $brushCmd + " -q -fsa " + $tool );
+    floatSliderGrp -e -value $filterBackfaceStartAngle xgmBrushFilterBackfaceStartAngleFSG;
+
+    float $filterBackfaceEndAngle = eval( $brushCmd + " -q -fea " + $tool );
+    floatSliderGrp -e -value $filterBackfaceEndAngle xgmBrushFilterBackfaceEndAngleFSG;
+}
+
+//
+//    Description:
+//        layout of common brush falloff settings
+//
+//    Input Arguments:
+//        parent                    Parent layout of the common brush falloff layout.
+//                                  Required so that UI object names can be successfully resolved.
+//        frameLayout               Name of the frame layout to be created for the common brush falloff settings
+//        brushCmd                  Brush command to be used by the UI objects
+//        tool                      Name of the instance of the tool that the command is applied on
+//        customProc                Procedure to create the UI for the custom brush falloff settings 
+//        brushFalloffTypes         Brush falloff types might be different from brushes. 
+//                                  If the parameter is not initialized by the brush, default brush falloff type (Screen/Volume) will be used.
+//        brushFalloffTypesL10N     Localized brush falloff type names.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmBrushFalloffProperties( string $parent, 
+        string $frameLayout, 
+        string $brushCmd, 
+        string $tool, 
+        string $customProc, 
+        string $brushFalloffTypes,
+        string $brushFalloffTypesL10N[] )
+{
+    string $brushFalloffName = $tool + "BrushFalloff";
+    string $cmdFlag = "-brushFalloffCurve";
+    string $defaultFlag = "-defaultBrushFalloffCurve";
+
+    global string $gXgmDefaultBrushFalloffTypes;
+    global string $gXgmDefaultBrushFalloffTypesL10N[];
+    string $currentBrushFalloffTypes;
+    string $currentBrushFalloffTypesL10N[];
+    string $types[];
+
+    $currentBrushFalloffTypes = $brushFalloffTypes;
+    $currentBrushFalloffTypesL10N = $brushFalloffTypesL10N;
+    tokenize($currentBrushFalloffTypes, ",", $types);
+    if( $currentBrushFalloffTypes == "" || size($currentBrushFalloffTypesL10N) == 0 || size($types) != size($currentBrushFalloffTypesL10N) ) {
+        xgmInitDefaultBrushFalloffTypes();
+        $currentBrushFalloffTypes = $gXgmDefaultBrushFalloffTypes;
+        $currentBrushFalloffTypesL10N = $gXgmDefaultBrushFalloffTypesL10N;
+    }
+
+    global string $gXgmCurvePresets[];
+    xgmInitCurvePreset();
+
+    setParent $parent;
+
+    frameLayout -collapsable true -collapse true -mh 5 -l (uiRes("m_xgmBrushProperties.kXgmBrushFalloff")) $frameLayout;
+        string $falloffColumnLayout = `columnLayout -adj true -rs 5 xgmBrushFalloffColumnLayout`;
+
+            // Base Properties
+            optionMenuGrp -label (uiRes("m_xgmBrushProperties.kXgmBrushFalloffType"))
+                -cc ( "xgmBrushFalloffSetFalloffType( \"" + $falloffColumnLayout + "\", \"" + $brushCmd + "\", \"" +  $tool + "\", \"" +  $currentBrushFalloffTypes + "\")" )
+                xgmBrushFalloffTypeOMG;
+
+                for($item in $currentBrushFalloffTypesL10N) {
+                    menuItem -label $item;
+                }
+
+            xgmFalloffCurveGroupProperties( $falloffColumnLayout, $brushFalloffName, $brushCmd, $cmdFlag, $defaultFlag, $tool, $gXgmCurvePresets, 0 );
+
+            floatSliderGrp -field true -pre 3
+                -en 0
+                -min 0.01
+                -max 1
+                -label (uiRes("m_xgmBrushProperties.kXgmBrushVolumeSearchRadius"))
+                -cc ( $brushCmd + " -e -volumeSearchRadius #1 " + $tool )
+                xgmBrushVolumeSearchRadiusFSG;
+
+            floatSliderGrp -field true -pre 2
+                -en 0
+                -min -10
+                -max 10
+                -fieldMaxValue 10000000
+                -fieldMinValue -10000000
+                -label (uiRes("m_xgmBrushProperties.kXgmBrushVolumeCenterOffset"))
+                -cc ( $brushCmd + " -e -volumeCenterOffset #1 " + $tool )
+                xgmBrushVolumeCenterOffsetFSG;
+            
+            floatSliderGrp -field true -pre 2
+                -en 0
+                -label (uiRes("m_xgmBrushProperties.kXgmBrushOffsetHotkeyInterval"))
+                -cc ( $brushCmd + " -e -offsetHotkeyInterval #1 " + $tool )
+                xgmBrushOffsetHotkeyIntervalFSG;
+
+        setParent ..;
+
+        string $filterBackFaceColumnLayout = `columnLayout -adj true -rs 5 xgmBrushFilterBackFaceColumnLayout`;
+
+            separator -style "none" xgmBrushFilterBackFaceSeparator;
+            checkBoxGrp -label (uiRes("m_xgmBrushProperties.kXgmBrushFilterBackface"))
+                -numberOfCheckBoxes 1
+                -on1 ( $brushCmd + " -e -filterBackface 1 " + $tool )
+                -of1 ( $brushCmd + " -e -filterBackface 0 " + $tool )
+                xgmBrushFilterBackfaceGRP;
+
+            floatSliderGrp -field true -pre 3
+                -min 0
+                -max 180
+                -label (uiRes("m_xgmBrushProperties.kXgmBrushFilterBackfaceCutoffAngle"))
+                -cc ( $brushCmd + " -e -fea #1 " + $tool + "; xgmBrushFilterBackFaceAngleChanged " + $parent + " " + $brushCmd + " " + $tool + ";")
+                xgmBrushFilterBackfaceEndAngleFSG;
+
+            floatSliderGrp -field true -pre 3
+                -min 0
+                -max 180
+                -label (uiRes("m_xgmBrushProperties.kXgmBrushFilterBackfaceFalloffStartAngle"))
+                -cc ( $brushCmd + " -e -fsa #1 " + $tool + "; xgmBrushFilterBackFaceAngleChanged " + $parent + " " + $brushCmd + " " + $tool + ";")
+                xgmBrushFilterBackfaceStartAngleFSG;
+
+
+        setParent ..;
+
+        string $colorSettingColumnLayout = `columnLayout -adj true -rs 5 xgmBrushColorSettingColumnLayout`;
+
+            separator -style "none" xgmBrushColorSettingSeparator;
+
+            floatSliderGrp -field true -pre 3
+                -min 0
+                -max 1
+                -fieldMaxValue 1
+                -label (uiRes("m_xgmBrushProperties.kXgmBrushOverallColorIntensity"))
+                -cc ( $brushCmd + " -e -overallColorIntensity #1 " + $tool )
+                xgmBrushOverallColorIntensityFSG;
+
+            xgmFalloffColorGroupProperties( $colorSettingColumnLayout, $brushCmd, $tool );
+
+            // preselection hightlight
+            checkBoxGrp -label (uiRes("m_xgmBrushProperties.kXgmPreSelHighlightingEnable"))
+                -annotation (uiRes("m_xgmBrushProperties.kXgmPreSelHighlightingEnableAnnot"))
+                -on1 ( $brushCmd + " -e -ps 1 " + $tool )
+                -of1 ( $brushCmd + " -e -ps 0 " + $tool )
+                xgmPreSelHighlightingEnableCBG;
+
+            colorSliderGrp 
+                -label (uiRes("m_xgmBrushProperties.kXgmPreSelHighlightColorSlider")) 
+                -cc ( "xgmPreSelHighlightColorChanged( \"" + $parent + "\", \"" + $brushCmd + "\", \"" + $tool + "\")" )
+                xgmPreSelHighlightColorCSG;
+
+            // Custom Properties
+            if($customProc != "") 
+                eval($customProc);
+
+        setParent ..;
+    setParent ..;
+}
+
+//
+//    Description:
+//        layout of common "Root to Tip" falloff settings
+//
+//    Input Arguments:
+//        parent         Parent layout of the common "Root to Tip" falloff layout.
+//                       Required so that UI object names can be successfully resolved.
+//        frameLayout    Name of the frame layout to be created for the common "Root to Tip" falloff settings
+//        brushCmd       Brush command to be used by the UI objects
+//        tool           Name of the instance of the tool that the command is applied on
+//        customPresetCurves[]   preset curves of falloff
+//        customProc     Procedure to create the UI for the custom "Root to Tip" falloff settings 
+//
+//    Return Value:
+//        None.
+//
+
+global proc xgmRootToTipFalloffProperties( string $parent, string $frameLayout, string $brushCmd, string $tool, string $customPresetCurves[],  string $customProc )
+{
+    string $brushFalloffName = $tool + "RootToTipFalloff";
+    string $falloffColumnLayout = "xgmRootToTipFalloffColumnLayout";
+    string $cmdFlag = "-rootToTipCurve";
+    string $defaultFlag = "-defaultRootToTipCurve";
+
+    string $presetCurves[] = { "0, 0, 0.548, 0, 0.88, 0.422, 1, 1",
+                            "0, 0, 0.4, 0.2, 0.7, 0.5, 1, 1",
+                            "0, 0, 0.5, 0, 0.5, 1, 1, 1",
+                            "0, 0, 0.259, 0, 0.497, 1, 1, 1",
+                            "0, 0, 0.291, 0, 0.247, 1, 1, 1",
+                            "0, 0, 0.166, 0.555, 0.453, 1, 1, 1",
+                            "0, 0, 0.494, 0, 0.492, 0.492, 1, 0.5",
+                            "0, 1, 0.228, 1, 0.727, 1, 1, 1"
+                            };
+
+    setParent $parent;
+
+    frameLayout -collapsable true -collapse true -mh 5 -l (uiRes("m_xgmBrushProperties.kXgmRootToTipMagnitudeControl")) $frameLayout;
+        $falloffColumnLayout = `columnLayout -adj true -rs 5 $falloffColumnLayout`;
+
+            checkBoxGrp
+                -label (uiRes("m_xgmBrushProperties.kEnableRootToTipMagnitude"))
+                -numberOfCheckBoxes 1
+                -on1 ( $brushCmd + " -e -enableRootToTip 1 " + $tool)
+                -of1 ( $brushCmd + " -e -enableRootToTip 0 " + $tool)
+                xgmRootToTipToggleGRP;
+
+            if (size ($customPresetCurves) == 0 ){
+                xgmFalloffCurveGroupProperties( $falloffColumnLayout, $brushFalloffName, $brushCmd, $cmdFlag, $defaultFlag, $tool, $presetCurves, 0 );
+            }
+            else{
+                xgmFalloffCurveGroupProperties( $falloffColumnLayout, $brushFalloffName, $brushCmd, $cmdFlag, $defaultFlag, $tool, $customPresetCurves, 0 );
+            }
+
+            // Custom Properties
+            if($customProc != "") 
+                eval($customProc);
+
+        setParent ..;
+    setParent ..;
+}
+
+//
+//    Description:
+//        Procedure to call when the selection highlighting color is changed
+//
+//    Input Arguments:
+//        parent         Parent layout of the selection highlighting color slider
+//                       Required so that UI object names can be successfully resolved.
+//        brushCmd       The command to be evaluated in the procedure.
+//        tool           Name of the instance of the tool that the command is applied on
+//
+//    Return Value:
+//        None.
+//
+global proc xgmDispSelectionHighlightingColorChanged( string $parent, string $brushCmd, string $tool )
+{
+    setParent $parent;
+
+    float $c[] = `colorSliderGrp -q -rgb xgmDispSelectionHighlightingColorCSG`;
+    
+    eval( $brushCmd + " -e -shr " + $c[0] +" " + $tool );
+    eval( $brushCmd + " -e -shg " + $c[1] +" " + $tool );
+    eval( $brushCmd + " -e -shb " + $c[2] +" " + $tool );
+}
+
+//
+//    Description:
+//        Procedure to call when the preselection highlighting color is changed
+//
+//    Input Arguments:
+//        parent         Parent layout of the preselection highlighting color slider
+//                       Required so that UI object names can be successfully resolved.
+//        brushCmd       The command to be evaluated in the procedure.
+//        tool           Name of the instance of the tool that the command is applied on
+//
+//    Return Value:
+//        None.
+//
+global proc xgmDispPreSelHighlightColorChanged( string $parent, string $brushCmd, string $tool )
+{
+    setParent $parent;
+
+    float $c[] = `colorSliderGrp -q -rgb xgmDispPreSelHighlightColorCSG`;
+    
+    eval( $brushCmd + " -e -psr " + $c[0] +" " + $tool );
+    eval( $brushCmd + " -e -psg " + $c[1] +" " + $tool );
+    eval( $brushCmd + " -e -psb " + $c[2] +" " + $tool );
+}
+
+//
+//    Description:
+//        Procedure to call when the frozen color is changed
+//
+//    Input Arguments:
+//        parent         Parent layout of the frozen color slider
+//                       Required so that UI object names can be successfully resolved.
+//        brushCmd       The command to be evaluated in the procedure.
+//        tool           Name of the instance of the tool that the command is applied on
+//
+//    Return Value:
+//        None.
+//
+global proc xgmDispFrozenColorChanged( string $parent, string $brushCmd, string $tool )
+{
+    setParent $parent;
+
+    float $c[] = `colorSliderGrp -q -rgb xgmDispFrozenColorCSG`;
+    
+    eval( $brushCmd + " -e -sfr " + $c[0] +" " + $tool );
+    eval( $brushCmd + " -e -sfg " + $c[1] +" " + $tool );
+    eval( $brushCmd + " -e -sfb " + $c[2] +" " + $tool );
+}
+
+//
+//    Description:
+//        layout of common brush display settings
+//
+//    Input Arguments:
+//        parent         Parent layout of the common brush display settings layout.
+//                       Required so that UI object names can be successfully resolved.
+//        frameLayout    Name of the frame layout to be created for the common brush display settings
+//        brushCmd       Brush command to be used by the UI objects
+//        tool           Name of the instance of the tool that the command is applied on
+//        customProc     Procedure to create the UI for the custom brush settings 
+//
+//    Return Value:
+//        None.
+//
+global proc xgmBrushDisplaySettingsProperties( string $parent, string $frameLayout, string $brushCmd, string $tool, string $customProc )
+{
+    setParent $parent;
+
+    frameLayout -collapsable true -collapse true -mh 5 -l (uiRes("m_xgmBrushProperties.kXgmBrushDisplaySettings")) $frameLayout;
+        columnLayout -adj true -rs 5 xgmBrushDisplaySettingsColumnLayout;
+
+        // Overall intensity
+        // Invisible by default, visible as needed
+        floatSliderGrp -field true -pre 3
+                -visible 0
+                -min 0
+                -max 1
+                -fieldMaxValue 1
+                -label (uiRes("m_xgmBrushProperties.kXgmBrushOverallColorIntensity"))
+                -cc ( $brushCmd + " -e -overallColorIntensity #1 " + $tool )
+                xgmDispBrushOverallColorIntensityFSG;
+
+        // Selection highlight
+        // Invisible by default, visible as needed
+        checkBoxGrp -label (uiRes("m_xgmBrushProperties.kXgmBrushSelectionHighlightingEnable"))
+                -visible 0
+                -annotation (uiRes("m_xgmBrushProperties.kXgmBrushSelectionHighlightingEnableAnnot"))
+                -on1 ( $brushCmd + " -e -sh 1 " + $tool )
+                -of1 ( $brushCmd + " -e -sh 0 " + $tool )
+                xgmDispSelectionHighlightingEnableCBG;
+        colorSliderGrp -label (uiRes("m_xgmBrushProperties.kXgmBrushSelectionHighlightingColor")) 
+                -visible 0
+                -cc ( "xgmDispSelectionHighlightingColorChanged( \"" + $parent + "\", \"" + $brushCmd + "\", \"" + $tool + "\")" )
+                xgmDispSelectionHighlightingColorCSG;
+
+        // Preselection highlight
+        // Invisible by default, visible as needed
+        checkBoxGrp -label (uiRes("m_xgmBrushProperties.kXgmPreSelHighlightingEnable"))
+                -visible 0
+                -annotation (uiRes("m_xgmBrushProperties.kXgmPreSelHighlightingEnableAnnot"))
+                -on1 ( $brushCmd + " -e -ps 1 " + $tool )
+                -of1 ( $brushCmd + " -e -ps 0 " + $tool )
+                xgmDispPreSelHighlightingEnableCBG;
+        colorSliderGrp
+                -visible 0
+                -label (uiRes("m_xgmBrushProperties.kXgmPreSelHighlightColorSlider"))
+                -cc ( "xgmDispPreSelHighlightColorChanged( \"" + $parent + "\", \"" + $brushCmd + "\", \"" + $tool + "\")" )
+                xgmDispPreSelHighlightColorCSG;
+
+        // Invisible by default, visible as needed
+        separator -style "none"
+                -visible 0
+                xgmBrushDisplaySettingsSEP;
+
+        // Frozen
+        checkBoxGrp -label (uiRes("m_xgmBrushProperties.kXgmBrushShowFrozenEnable"))
+                -annotation (uiRes("m_xgmBrushProperties.kXgmBrushShowFrozenEnableAnnot"))
+                -on1 ( $brushCmd + " -e -sf 1 " + $tool )
+                -of1 ( $brushCmd + " -e -sf 0 " + $tool )
+                xgmDispShowFrozenEnableCBG;
+        colorSliderGrp -label (uiRes("m_xgmBrushProperties.kXgmBrushFrozenColor"))
+        -cc ( "xgmDispFrozenColorChanged( \"" + $parent + "\", \"" + $brushCmd + "\", \"" + $tool + "\")" )
+                xgmDispFrozenColorCSG;
+
+        // Custom Properties
+            if($customProc != "") 
+                eval($customProc);
+        setParent ..;
+    setParent ..;
+}
+
+//
+//    Description:
+//        layout of common brush symmetry settings
+//
+//    Input Arguments:
+//        parent         Parent layout of the common brush symmetry settings layout.
+//                       Required so that UI object names can be successfully resolved.
+//        frameLayout    Name of the frame layout to be created for the common brush symmetry settings
+//        brushCmd       Brush command to be used by the UI objects
+//        tool           Name of the instance of the tool that the command is applied on
+//        customProc     Procedure to create the UI for the custom brush settings 
+//
+//    Return Value:
+//        None.
+//
+global proc xgmBrushSymmetrySettingsProperties( string $parent, string $frameLayout, string $brushCmd, string $tool, string $customProc )
+{
+    setParent $parent;
+
+    frameLayout -collapsable true -collapse true -mh 5 -l (uiRes("m_xgmBrushProperties.kXgmBrushSymmetrySettings")) $frameLayout;
+        string $symLayout = `columnLayout -adj true -rs 5 xgmBrushSymmetrySettingsColumnLayout`;
+
+	        rowLayout -numberOfColumns 3 -adj 1 -cw 1 100 gmBrushSymmetryTypeRowLayout;
+				optionMenuGrp -label (uiRes("m_xgmBrushProperties.kXgmBrushSymmetryType"))
+					-cc ( "xgmBrushSymmetrySetSymmetryType( \"" + $symLayout + "\", \"" + $brushCmd + "\", \"" +  $tool + "\")" )
+					xgmBrushSymmetryTypeOMG;
+
+					menuItem -label (uiRes("m_xgmBrushProperties.kXgmBrushSymmetryTypeOff"));
+					menuItem -label (uiRes("m_xgmBrushProperties.kXgmBrushSymmetryTypeObjectX"));
+					menuItem -label (uiRes("m_xgmBrushProperties.kXgmBrushSymmetryTypeObjectY"));
+					menuItem -label (uiRes("m_xgmBrushProperties.kXgmBrushSymmetryTypeObjectZ"));
+					menuItem -label (uiRes("m_xgmBrushProperties.kXgmBrushSymmetryTypeWorldX"));
+					menuItem -label (uiRes("m_xgmBrushProperties.kXgmBrushSymmetryTypeWorldY"));
+					menuItem -label (uiRes("m_xgmBrushProperties.kXgmBrushSymmetryTypeWorldZ"));
+
+				button -width 70 -label (uiRes("m_xgmBrushProperties.kXgmBrushSymmetryReset"))
+					-annotation (uiRes("m_xgmBrushProperties.kXgmBrushSymmetryResetAnnotation"))
+					-command ( $brushCmd + " -e -brushSymmetryType 0 -brushSymmetryTolerance 0 " + $tool ) xgmBrushSymmetryTypeBTN;
+
+                text -l "" xgmBrushSymmetryEmptyTXT;
+			setParent ..;
+
+            floatSliderGrp -max 1000
+                -label (uiRes("m_xgmBrushProperties.kXgmBrushSymmetryTolerance"))
+                -annotation (uiRes("m_xgmBrushProperties.kXgmBrushSymmetryToleranceAnnotation"))
+                -cc ( $brushCmd + " -e -brushSymmetryTolerance #1 " + $tool )
+                xgmBrushSymmetryToleranceFSG;
+
+			// Custom Properties
+            if($customProc != "") 
+                eval($customProc);
+        setParent ..;
+    setParent ..;
+}
+

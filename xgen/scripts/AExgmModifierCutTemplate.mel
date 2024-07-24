@@ -1,0 +1,150 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+global proc AExgmModifierCutMinRemainLengthChange(string $attrName)
+{
+    float $dm = `getAttr $attrName`;
+
+    floatSliderGrp -e -value $dm xgModifierCutMinRemainLengthFsg;
+}
+
+global proc AExgmModifierCutMinRemainLengthSliderChange(string $attrName)
+{
+    float $dm = `floatSliderGrp -q -v xgModifierCutMinRemainLengthFsg`;
+
+    setAttr $attrName $dm;
+}
+
+global proc AExgmModifierCutMinRemainLengthNew(string $attrName)
+{
+    // Get node name
+    string $nodeName = `plugNode $attrName`;
+    
+    setUITemplate -pushTemplate attributeEditorTemplate;
+        floatSliderGrp -label (uiRes("m_AExgmModifierCutTemplate.kMinRemainLength"))
+            -field true
+            -minValue 0.0
+            -maxValue 1.0
+            -fieldMinValue 0.0
+            -fieldMaxValue 1000000.0
+            -value 1.0 
+            xgModifierCutMinRemainLengthFsg;
+	setUITemplate -popTemplate;
+    
+    AExgmModifierCutMinRemainLengthReplace($attrName);
+}
+
+global proc AExgmModifierCutMinRemainLengthReplace(string $attrName)
+{
+    // Get parent for script job use
+    string $parent = `setParent -q`;
+    string $setParentCmd = ("setParent " + $parent + ";");
+
+    floatSliderGrp -e
+        -cc ("AExgmModifierCutMinRemainLengthSliderChange " + $attrName)
+        xgModifierCutMinRemainLengthFsg;
+
+    scriptJob
+        -replacePrevious
+        -parent xgModifierCutMinRemainLengthFsg
+        -attributeChange $attrName
+        ($setParentCmd + "AExgmModifierCutMinRemainLengthChange " + $attrName);
+
+    AExgmModifierCutMinRemainLengthChange($attrName);
+}
+
+global proc AExgmCutModifierCutModeNew(string $cutModeAttr, string $amountAttr, string $percentAttr)
+{
+    setUITemplate -pushTemplate attributeEditorTemplate;
+
+	columnLayout -adjustableColumn true;
+
+        attrEnumOptionMenuGrp -label (uiRes("m_AExgmModifierCutTemplate.kCutMode"))
+            xgmCutModifierCutModeOption;
+        
+		attrFieldSliderGrp -label (uiRes("m_AExgmModifierCutTemplate.kAmount"))
+		                   -at $amountAttr 
+						   -dragCallback "AEdragCallback" 
+						   -forceAddMapButton true 
+						   -eb true 
+						   -ebi "xg3dPaint.png" 
+						   xgmCutModifierAmountFSG;
+
+		attrFieldSliderGrp -label (uiRes("m_AExgmModifierCutTemplate.kPercent"))
+		                   -at $percentAttr 
+						   -dragCallback "AEdragCallback" 
+						   -forceAddMapButton true 
+						   -eb true 
+						   -ebi "xg3dPaint.png" 
+						   xgmCutModifierPercentageFSG;
+
+	setParent ..;
+
+	setUITemplate -popTemplate;
+
+	AExgmCutModifierCutModeReplace($cutModeAttr, $amountAttr, $percentAttr);
+}
+
+global proc AExgmCutModifierCutModeReplace(string $cutModeAttr, string $amountAttr, string $percentAttr)
+{
+    string $setParentCmd = ("setParent " + `setParent -q` + ";");
+
+	attrEnumOptionMenuGrp -e -attribute $cutModeAttr xgmCutModifierCutModeOption;
+
+    attrFieldSliderGrp -e
+        -at $amountAttr
+        -ebc ($setParentCmd + "xgmAEFloatAttrPaintBtnClicked " + $amountAttr + " 1")
+        xgmCutModifierAmountFSG;
+
+    attrFieldSliderGrp -e
+        -at $percentAttr
+        -ebc ($setParentCmd + "xgmAEFloatAttrPaintBtnClicked " + $percentAttr + " 1")
+        xgmCutModifierPercentageFSG;
+    
+	scriptJob -parent xgmCutModifierCutModeOption -replacePrevious
+        -attributeChange $cutModeAttr ($setParentCmd + "AExgmModifierCutModeChange " + $cutModeAttr + ";");
+
+    AExgmModifierCutModeChange($cutModeAttr);
+}
+
+global proc AExgmModifierCutModeChange(string $cutModeAttr)
+{
+    int $cutMode = `getAttr $cutModeAttr`;
+
+	string $amountFSG = `attrFieldSliderGrp -q -fullPathName xgmCutModifierAmountFSG`;
+	string $percentFSG = `attrFieldSliderGrp -q -fullPathName xgmCutModifierPercentageFSG`;
+
+	attrFieldSliderGrp -e -enable ($cutMode==0) $amountFSG;
+	attrFieldSliderGrp -e -enable ($cutMode==1) $percentFSG;
+}
+
+global proc AExgmModifierCutTemplate(string $nodeName)
+{
+
+    editorTemplate -beginScrollLayout;
+        // Common Attributes
+        AExgmModifierBaseTemplate $nodeName;
+
+        // Cut modifier attributes
+        editorTemplate -beginLayout (uiRes("m_AExgmModifierCutTemplate.kCutModifier")) -collapse 0;
+
+            xgmCreateAEUiForFloatAttr "mask" (uiRes("m_AExgmModifierCutTemplate.kMask")) "xgmModifierCut";
+		    editorTemplate -callCustom "AExgmCutModifierCutModeNew" "AExgmCutModifierCutModeReplace" "cutMode" "amount" "percentage";
+            editorTemplate -callCustom "AExgmModifierCutMinRemainLengthNew" "AExgmModifierCutMinRemainLengthReplace" "minRemainLength";
+            editorTemplate -addControl -label (uiRes("m_AExgmModifierCutTemplate.kRedistributingCV")) "redistributingCV";
+
+        editorTemplate -endLayout;
+
+        // Inherited depend node attributes
+        AEdependNodeTemplate $nodeName;
+
+        // Additional dynamic attributes
+        editorTemplate -addExtraControls;
+
+    editorTemplate -endScrollLayout;
+}
+

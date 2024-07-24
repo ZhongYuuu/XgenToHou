@@ -1,0 +1,193 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+// ===========================================================================
+// Copyright 2015 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+
+
+//  Description:    defines behaviour and layout of xgmNoiseBrushContext
+//                    tool property sheet
+//
+
+global string $gXgmNoiseBrushLayout = "xgmNoiseBrush";
+global string $gXgmNoiseBrushCmd = "xgmNoiseBrushContext";
+global string $gXgmNoiseBrushToolName = "xgmNoiseBrushTool";
+
+global string $gXgmNoiseBrushSettingFrame = "xgmNoiseBrushSettingFrame";
+global string $gXgmNoiseBrushFalloffFrame = "xgmNoiseBrushFalloffFrame";
+global string $gXgmNoiseRootToTipFalloffFrame = "xgmNoiseRootToTipFalloffFrame";
+global string $gXgmNoiseDisplaySettingFrame = "xgmNoiseBrushDisplaySettingFrame";
+global string $gXgmNoiseSymmetrySettingFrame = "xgmNoiseBrushSymmetrySettingFrame";
+
+global string $gXgmNoiseBrushFalloffTypes;
+global string $gXgmNoiseBrushFalloffTypesL10N[];
+global int $gXgmNoiseSurfaceFalloffIndex;
+
+//
+//    Description:
+//        Initializes the noise brush falloff types
+//
+//    Input Arguments:
+//        None.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmInitNoiseBrushFalloffTypes()
+{
+    global string $gXgmNoiseBrushFalloffTypes;
+    global string $gXgmNoiseBrushFalloffTypesL10N[];
+    global int $gXgmNoiseSurfaceFalloffIndex;
+
+    if( $gXgmNoiseBrushFalloffTypes == "" || size($gXgmNoiseBrushFalloffTypesL10N) == 0 ) {
+        $gXgmNoiseBrushFalloffTypes = "screen,volume,surface";
+        $gXgmNoiseBrushFalloffTypesL10N  = { (uiRes("m_xgmNoiseBrushProperties.kXgmNoiseBrushFalloffTypeScreen")),
+                                              (uiRes("m_xgmNoiseBrushProperties.kXgmNoiseBrushFalloffTypeVolume")),
+                                              (uiRes("m_xgmNoiseBrushProperties.kXgmNoiseBrushFalloffTypeSurface"))};
+        $gXgmNoiseSurfaceFalloffIndex = size($gXgmNoiseBrushFalloffTypesL10N) - 1 ;
+    }
+}
+
+//
+//    Description:
+//        Creates the UI of the custom brush settings for the Noise brush
+//
+//    Input Arguments:
+//        None.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmNoiseBrushSettingsCustom()
+{
+    global string $gXgmNoiseBrushCmd;
+
+    string $curctx = `currentCtx`;
+
+	radioButtonGrp -label (uiRes("m_xgmNoiseBrushProperties.kXgmNoiseBrushBrushMode"))
+                -numberOfRadioButtons 2
+                -label1 (uiRes("m_xgmNoiseBrushProperties.kXgmNoiseBrushBrushModeGlobal"))
+                -label2 (uiRes("m_xgmNoiseBrushProperties.kXgmNoiseBrushBrushModeLocal"))
+                -on1 ( $gXgmNoiseBrushCmd + " -e -globalSelection 1 " + $curctx )
+                -on2 ( $gXgmNoiseBrushCmd + " -e -globalSelection 0 " + $curctx )
+                xgmNoiseBrushBrushModeRBG;
+
+    separator -style "none";
+	
+    floatSliderGrp -field true -pre 3
+                -min 0
+                -max 10
+                -label (uiRes("m_xgmNoiseBrushProperties.kXgmNoiseBrushFrequency"))
+                -cc ( $gXgmNoiseBrushCmd + " -e -frequency #1 " + $curctx )
+                xgmNoiseBrushFrequencyFSG;
+	
+    floatSliderGrp -field true -pre 3
+                -min 0
+                -max 1
+				-fmx 10
+                -label (uiRes("m_xgmNoiseBrushProperties.kXgmNoiseBrushMagnitude"))
+                -cc ( $gXgmNoiseBrushCmd + " -e -magnitude #1 " + $curctx )
+                xgmNoiseBrushMagnitudeFSG;
+	
+    floatSliderGrp -field true -pre 3
+                -min 0
+                -max 100
+                -label (uiRes("m_xgmNoiseBrushProperties.kXgmNoiseBrushCorrelation"))
+                -cc ( $gXgmNoiseBrushCmd + " -e -correlation #1 " + $curctx )
+                xgmNoiseBrushCorrelationFSG;
+
+    checkBoxGrp 
+                -label (uiRes("m_xgmNoiseBrushProperties.kXgmNoiseBrushPreserveLength"))
+                -numberOfCheckBoxes 1
+                -on1 ( $gXgmNoiseBrushCmd + " -e -preserveLength 1 " + $curctx)
+                -of1 ( $gXgmNoiseBrushCmd + " -e -preserveLength 0 " + $curctx)
+                xgmNoiseBrushLockLengthGRP;
+
+    rowLayout -numberOfColumns 1
+        -columnAttach 1 "left" 135
+        xgmBrushButtonsRow;
+        button -label (uiRes("m_xgmNoiseBrushProperties.kXgmBrushFlood"))
+            -command ($gXgmNoiseBrushCmd + " -e -flood " + $curctx )
+            -width 60
+            xgmBrushFloodButton;
+    setParent ..;
+
+}
+
+//
+//    Description:
+//        layout of Noise brush tool property sheet
+//
+//    Input Arguments:
+//        None.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmNoiseBrushProperties ()
+{
+    global string $gXgmNoiseBrushLayout;
+    global string $gXgmNoiseBrushCmd;
+    global string $gXgmNoiseBrushToolName;
+    global string $gXgmNoiseBrushSettingFrame;
+    global string $gXgmNoiseBrushFalloffFrame;
+    global string $gXgmNoiseRootToTipFalloffFrame;
+    global string $gXgmNoiseDisplaySettingFrame;
+    global string $gXgmNoiseSymmetrySettingFrame;
+    global string $gXgmNoiseBrushFalloffTypes;
+    global string $gXgmNoiseBrushFalloffTypesL10N[];
+
+	xgmInitNoiseBrushFalloffTypes();
+
+    string $parent = `toolPropertyWindow -q -location`;
+    setParent $parent;
+
+    setUITemplate -pushTemplate OptionsTemplate;
+
+    columnLayout $gXgmNoiseBrushLayout;
+
+    xgmBrushSettingsProperties( $gXgmNoiseBrushLayout, 
+                            $gXgmNoiseBrushSettingFrame, 
+                            $gXgmNoiseBrushCmd, 
+                            $gXgmNoiseBrushToolName, 
+                            "xgmNoiseBrushSettingsCustom" );
+
+    xgmBrushFalloffProperties( $gXgmNoiseBrushLayout, 
+                            $gXgmNoiseBrushFalloffFrame, 
+                            $gXgmNoiseBrushCmd, 
+                            $gXgmNoiseBrushToolName,
+                            "",
+                            $gXgmNoiseBrushFalloffTypes,
+                            $gXgmNoiseBrushFalloffTypesL10N ); 
+    string $temp[];
+    xgmRootToTipFalloffProperties( $gXgmNoiseBrushLayout, 
+                            $gXgmNoiseRootToTipFalloffFrame, 
+                            $gXgmNoiseBrushCmd, 
+                            $gXgmNoiseBrushToolName,
+                            $temp,
+                            "" );
+
+    xgmBrushDisplaySettingsProperties( $gXgmNoiseBrushLayout, 
+                            $gXgmNoiseDisplaySettingFrame,
+                            $gXgmNoiseBrushCmd, 
+                            $gXgmNoiseBrushToolName,
+                            "" );
+
+    xgmBrushSymmetrySettingsProperties( $gXgmNoiseBrushLayout, 
+                            $gXgmNoiseSymmetrySettingFrame,
+                            $gXgmNoiseBrushCmd, 
+                            $gXgmNoiseBrushToolName,
+                            "" );
+
+    setUITemplate -popTemplate;
+}
+

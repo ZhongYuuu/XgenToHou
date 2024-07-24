@@ -1,0 +1,25 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+
+
+global proc xgmCreateAEUiForFloat3Attr(string $attrName, string $label, string $nodeName)
+{
+    string $customCBStr   = "global proc AE" + $nodeName + $attrName + "New(string $attrName)\n{\n";
+            $customCBStr += "   attrFieldGrp -label \"" + $label + "\" -at $attrName -dragCallback \"AEdragCallback\" -forceAddMapButton true -eb true -ebi \"xg3dPaint.png\" " + $nodeName + $attrName + "FSG;\n";
+            $customCBStr += "   AE" + $nodeName + $attrName + "Replace($attrName);\n";
+            $customCBStr += "}\n";
+
+        $customCBStr += "global proc AE" + $nodeName + $attrName + "Replace(string $attrName)\n";
+        $customCBStr += "{\n";
+        $customCBStr += "   attrFieldGrp -e -at $attrName -ebc (\"xgmAEFloatAttrPaintBtnClicked \" + $attrName + \" 0\") " + $nodeName + $attrName + "FSG;\n";
+        $customCBStr += "}\n";
+    eval($customCBStr);
+
+    string $aeUICreateStr = "editorTemplate -callCustom \"AE" + $nodeName + $attrName + "New\" \"AE" + $nodeName + $attrName + "Replace\"" + "\"" + $attrName + "\"";
+    eval($aeUICreateStr);
+}

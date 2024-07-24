@@ -1,0 +1,216 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+
+global proc xgmSplineCacheDeleteSetOptionVars(int $reset)
+{
+    if ($reset || !`optionVar -exists xgmSplineCacheDeleteFiles`) {
+        optionVar -intValue xgmSplineCacheDeleteFiles 0;
+    }
+}
+
+global proc xgmSplineCacheDeleteOptionsSetup(string $parent, int $reset)
+{
+    //  Retrieve the option settings
+    //
+    xgmSplineCacheDeleteSetOptionVars($reset);
+
+    setParent $parent;
+
+    int $deleteFiles = `optionVar -q xgmSplineCacheDeleteFiles`;
+    if($deleteFiles) {
+        radioButtonGrp -e -select 1 deleteFilesCBG;
+    } else {
+        radioButtonGrp -e -select 1 keepFilesCBG;
+    }
+}
+
+global proc xgmSplineCacheDeleteSaveOptionVars(string $parent)
+{
+    setParent $parent;
+
+    optionVar -intValue xgmSplineCacheDeleteFiles 
+         `radioButtonGrp -q -sl deleteFilesCBG`;
+}
+
+global proc string xgmSplineCacheDeleteOptionsUI(string $parent)
+{
+    //  The argument is used as the parent for the options UI
+    //
+    setParent $parent;
+
+    //  Activate the default UI template so that the layout of this
+    //  option box is consistent with the layout of the rest of the
+    //  application.
+    //
+    setUITemplate -pushTemplate DefaultTemplate;
+
+    //  Turn on the wait cursor.
+    //
+    waitCursor -state 1;
+
+    // Create option box or file options contents.
+    //
+    string $optionLayout = `scrollLayout -childResizable 1`;
+    columnLayout -adjustableColumn true;
+
+        radioButtonGrp
+            -numberOfRadioButtons 1
+            -label  (uiRes("m_xgmSplineCacheDelete.kFilesOnDisk"))
+            -label1 (uiRes("m_xgmSplineCacheDelete.kDeleteFiles")) 
+            deleteFilesCBG;
+
+        radioButtonGrp
+            -numberOfRadioButtons 1
+            -shareCollection deleteFilesCBG
+            -label1 (uiRes("m_xgmSplineCacheDelete.kKeepFiles")) 
+            keepFilesCBG;
+
+        setParent ..;
+    setParent ..;
+
+    //  Turn off the wait cursor.
+    //
+    waitCursor -state 0;
+
+    // Deactivate the default UI template
+    //
+    setUITemplate -popTemplate;
+
+    //  Set the current values of the option box.
+    //
+    eval ("xgmSplineCacheDeleteOptionsSetup " + $parent + " 0");
+
+    return $optionLayout;
+}
+
+global proc xgmSplineCacheDeleteCacheNode(string $cacheNodes[], int $deleteFile)
+{
+    if(!size($cacheNodes))
+        return;
+
+    string $filePaths[];
+    if($deleteFile) {
+        for($cacheNode in $cacheNodes) {
+            string $fileAttr = $cacheNode + ".fileName";
+            $filePaths[size($filePaths)] = `getAttr $fileAttr`;
+        }
+    }
+    delete $cacheNodes;
+
+    for($filePath in $filePaths) {
+        if(`file -q -exists $filePath`) {
+             int $success = `sysFile -del $filePath`;
+             if(!$success)
+                error (uiRes("m_xgmSplineCacheDelete.kCacheFileNotDelete"));
+        }
+    }
+}
+
+global proc xgmSplineCacheDeleteCmd()
+{
+    int $deleteFiles = `optionVar -q xgmSplineCacheDeleteFiles`;
+
+    string $cacheNodes[] = `ls -sl -type xgmSplineCache`;
+    xgmSplineCacheDeleteCacheNode($cacheNodes, $deleteFiles);
+    
+    string $descNodes[] = `xgmSplineQuery -s -lsd`;
+    $cacheNodes = `xgmSplineCacheNodesInChain $descNodes 0`;
+    xgmSplineCacheDeleteCacheNode($cacheNodes, $deleteFiles);
+
+}
+
+global proc xgmSplineCacheDeleteOptionsCmd()
+{
+    //  Name of the command for this option box.
+    string $commandName = "xgmSplineCacheDelete";
+
+    //  STEP 1:  Get the option box.
+    //  ============================
+    //
+    //  The value returned is the name of the layout to be used as
+    //  the parent for the option box UI.
+    //
+    string $layout = getOptionBox();
+
+    //  STEP 2:  Pass the command name to the option box.
+    //  =================================================
+    //
+    //  Any default option box behaviour based on the command name is set
+    //  up with this call. For example, updating the 'Help' menu item with
+    //  the name of the command.
+    //
+    setOptionBoxCommandName($commandName);
+
+    //  STEP 3:  Create option box contents.
+    //  ====================================
+    //
+    string $parent = xgmSplineCacheDeleteOptionsUI($layout);
+
+    //  STEP 4:  Customize the buttons.
+    //  ===============================
+    //
+    //  Provide more descriptive labels for the buttons.
+    //  Disable those buttons that are not applicable to the option box.
+    //  Attach actions to those buttons that are applicable to the option box.
+
+    string $saveOptionCmd = "xgmSplineCacheDeleteSaveOptionVars " + $parent + ";";
+    string $deleteCmd = $saveOptionCmd + "xgmSplineCacheDeleteCmd;";
+
+    $saveOptionCmd += " hideOptionBox;";
+
+    // 'Delete' button
+    //
+    string $deleteBtn = getOptionBoxApplyBtn();
+    button -e -label (uiRes("m_xgmSplineCacheDelete.kXgmDeleteSplineCache"))
+           -command $deleteCmd
+           $deleteBtn;
+
+    // 'Save' button
+    //
+    string $saveBtn = getOptionBoxSaveBtn();
+    button -e
+           -command $saveOptionCmd
+           $saveBtn;
+
+    // 'Reset' button
+    //
+    string $resetBtn = getOptionBoxResetBtn();
+    button -e
+           -command ("xgmSplineCacheDeleteOptionsSetup " + $parent + " 1")
+           $resetBtn;
+
+    //  STEP 5:  Set the option box title.
+    //  ==================================
+    //
+    setOptionBoxTitle((uiRes("m_xgmSplineCacheDelete.kXgmDeleteCacheOptions")));
+
+    //  STEP 6:  Customize the 'Help' menu item text.
+    //  =============================================
+    //
+    setOptionBoxHelpTag($commandName);
+
+    //  Show the option box.
+    //  ====================
+    //
+    showOptionBox();
+}
+
+global proc xgmSplineCacheDeleteNodesAhead()
+{
+    string $cacheNodes[] = `ls -sl -type xgmSplineCache`;
+    if(!size($cacheNodes))
+        return;
+
+    string $nodesAhead[] = `listHistory -pruneDagObjects 1 $cacheNodes`;
+    if(size($nodesAhead)) {
+        $nodesAhead = `stringArrayRemove $cacheNodes $nodesAhead`;
+        if(size($nodesAhead)) {
+            delete $nodesAhead;
+        }
+    }
+}

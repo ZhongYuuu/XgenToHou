@@ -1,0 +1,127 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+// ===========================================================================
+// Copyright 2015 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+
+
+//
+//    Description:    initializes the custom smooth brush setting values
+//
+//    Input Arguments:
+//        parent    Parent layout of the custom smooth brush settings layout.
+//                  Required so that UI object names can be successfully resolved
+//        tool      this is the name of the instance of the tool
+//                    that the property sheet is modifying.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmSmoothBrushSettingsValues(string $parent, string $tool)
+{
+    global string $gXgmSmoothBrushCmd;
+
+    setParent $parent;
+
+    int $globalSel = eval ( $gXgmSmoothBrushCmd + " -q -globalSelection " + $tool );
+    if($globalSel) {
+        radioButtonGrp -e -select 1 xgmSmoothBrushBrushModeRBG;
+        float $orient = eval( $gXgmSmoothBrushCmd + " -q -orientationFactor " + $tool );
+        floatSliderGrp -e -visible 1 -value $orient xgmSmoothBrushOrientationFSG;
+    } else {
+        radioButtonGrp -e -select 2 xgmSmoothBrushBrushModeRBG;
+        floatSliderGrp -e -visible 0 xgmSmoothBrushOrientationFSG;
+    }
+
+    float $curvature = eval( $gXgmSmoothBrushCmd + " -q -curvatureFactor " + $tool );
+    floatSliderGrp -e -value $curvature xgmSmoothBrushCurvatureFSG;
+
+    int $preserveLength = eval( $gXgmSmoothBrushCmd + " -q -preserveLength " + $tool );
+    checkBoxGrp -e -value1 $preserveLength xgmSmoothBrushPreserveLengthGRP;
+
+}
+
+//
+//    Description:    initializes the custom smooth brush faloff values
+//
+//    Input Arguments:
+//        parent    Parent layout of the custom smooth brush settings layout.
+//                  Required so that UI object names can be successfully resolved
+//        tool      this is the name of the instance of the tool
+//                    that the property sheet is modifying.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmSmoothBrushFalloffValues(string $parent, string $tool)
+{
+    global string $gXgmSmoothBrushCmd;
+    global int $gXgmSmoothSurfaceFalloffIndex;
+
+    setParent $parent;
+
+    int $globalSel = eval ( $gXgmSmoothBrushCmd + " -q -globalSelection " + $tool );
+    string $menuItems[] = `optionMenuGrp -q -itemListLong xgmBrushFalloffTypeOMG`;
+    menuItem -e -en $globalSel $menuItems[$gXgmSmoothSurfaceFalloffIndex];
+
+    int $currentIndex = `optionMenuGrp -q -select xgmBrushFalloffTypeOMG` - 1;
+    if(!$globalSel && $currentIndex == $gXgmSmoothSurfaceFalloffIndex) {
+        optionMenuGrp -e -select 1 xgmBrushFalloffTypeOMG;
+        eval ( $gXgmSmoothBrushCmd + " -e -brushFalloffType screen " + $tool );
+    }
+}
+
+//
+//    Description:    initializes smoothBrushContext tool property sheet values
+//
+//    Input Arguments:
+//        tool      this is the name of the instance of the tool
+//                    that the property sheet is modifying.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmSmoothBrushValues(string $tool) 
+{
+    global string $gXgmSmoothBrushLayout;
+    global string $gXgmSmoothBrushCmd;
+    global string $gXgmSmoothBrushSettingFrame;
+    global string $gXgmSmoothBrushFalloffFrame;
+    global string $gXgmSmoothRootToTipFalloffFrame;
+    global string $gXgmSmoothBrushDisplaySettingFrame;
+    global string $gXgmSmoothBrushSymmetrySettingFrame;
+    global string $gXgmSmoothBrushFalloffTypes;
+
+    string $parent = `toolPropertyWindow -q -location`;
+    setParent $parent;
+
+    frameLayout -e -en true $gXgmSmoothBrushSettingFrame;
+    frameLayout -e -en true $gXgmSmoothBrushFalloffFrame;
+    frameLayout -e -en true $gXgmSmoothRootToTipFalloffFrame;
+    frameLayout -e -en true $gXgmSmoothBrushDisplaySettingFrame;
+
+    string $settingsCustom = "xgmSmoothBrushSettingsValues( \"" + $gXgmSmoothBrushLayout + "\", \"" + $tool + "\")";
+    string $falloffCustom = "xgmSmoothBrushFalloffValues( \"" + $gXgmSmoothBrushLayout + "\", \"" + $tool + "\")";
+    xgmBrushSettingsValues( $gXgmSmoothBrushSettingFrame, $gXgmSmoothBrushCmd, $tool, $settingsCustom );
+    xgmBrushFalloffValues( $gXgmSmoothBrushFalloffFrame, $gXgmSmoothBrushCmd, $tool, $falloffCustom, $gXgmSmoothBrushFalloffTypes );
+    xgmRootToTipFalloffValues( $gXgmSmoothRootToTipFalloffFrame, $gXgmSmoothBrushCmd, $tool, "" );
+    xgmBrushDisplaySettingsValues( $gXgmSmoothBrushDisplaySettingFrame, $gXgmSmoothBrushCmd, $tool, "" );
+    xgmBrushSymmetrySettingsValues( $gXgmSmoothBrushSymmetrySettingFrame, $gXgmSmoothBrushCmd, $tool, "" );
+
+    string $help = "SmoothBrushTool";
+    toolPropertySetCommon $tool "xgmSmoothBrushTool.xpm" $help;
+
+    toolPropertySelect $gXgmSmoothBrushLayout;
+
+    string $nameField = `toolPropertyWindow -query -field`;
+    text -edit -label (uiRes("m_xgmSmoothBrushValues.kSmoothBrushToolName")) $nameField;
+}

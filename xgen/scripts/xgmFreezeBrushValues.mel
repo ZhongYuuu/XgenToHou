@@ -1,0 +1,128 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+// ===========================================================================
+// Copyright 2015 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+
+//    Description:    initializes tool property sheet - brush settings values
+//
+//    Input Arguments:
+//        parent         Parent layout of the common brush settings layout.
+//                       Required so that UI object names can be successfully resolved
+//        brushCmd       Brush command to be used by the UI objects
+//        tool           Name of the instance of the tool that the command is applied on
+
+//    Return Value:
+//        None.
+//
+global proc xgmFreezeBrushSettingsValues( string $parent, string $brushCmd, string $tool )
+{
+    global int $gXgmFreezeSurfaceFalloffIndex;
+
+    setParent $parent;
+
+    float $radius = eval( $brushCmd + " -q -radius " + $tool );
+    floatSliderGrp -e -value $radius xgmBrushSizeFSG;
+
+    int $useGlobalRadius = 1 - eval( $brushCmd + " -q -useGlobalRadius " + $tool ); 
+    iconTextCheckBox -e -value $useGlobalRadius xgmBrushPinITCB;
+
+    float $strength = eval( $brushCmd + " -q -strength " + $tool );
+    floatSliderGrp -e -value $strength xgmBrushStrengthFSG;
+
+    int $unfreeze = eval( $brushCmd + " -q -unfreeze " + $tool );
+    checkBoxGrp -e -value1 $unfreeze xgmFreezeBrushUnfreezeCBG;
+
+    int $globalSel = eval ( $brushCmd + " -q -globalSelection " + $tool );
+    if($globalSel) {
+        radioButtonGrp -e -select 1 xgmFreezeBrushBrushModeRBG;
+    } else {
+        radioButtonGrp -e -select 2 xgmFreezeBrushBrushModeRBG;
+    }
+
+    int $op = eval( $brushCmd + " -q -operation " + $tool ) + 1;
+    optionMenuGrp -e -select $op xgmFreezeBrushOperationOMG;
+}
+
+//
+//    Description:    initializes the custom freeze brush faloff values
+//
+//    Input Arguments:
+//        parent    Parent layout of the custom freeze brush settings layout.
+//                  Required so that UI object names can be successfully resolved
+//        tool      this is the name of the instance of the tool
+//                    that the property sheet is modifying.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmFreezeBrushFalloffValues(string $parent, string $tool)
+{
+    global string $gXgmFreezeBrushCmd;
+    global int $gXgmFreezeSurfaceFalloffIndex;
+
+    setParent $parent;
+
+    int $globalSel = eval ( $gXgmFreezeBrushCmd + " -q -globalSelection " + $tool );
+    string $menuItems[] = `optionMenuGrp -q -itemListLong xgmBrushFalloffTypeOMG`;
+    menuItem -e -en $globalSel $menuItems[$gXgmFreezeSurfaceFalloffIndex];
+
+    int $currentIndex = `optionMenuGrp -q -select xgmBrushFalloffTypeOMG` - 1;
+    if(!$globalSel && $currentIndex == $gXgmFreezeSurfaceFalloffIndex) {
+        optionMenuGrp -e -select 1 xgmBrushFalloffTypeOMG;
+        eval ( $gXgmFreezeBrushCmd + " -e -brushFalloffType screen " + $tool );
+    }
+}
+
+//
+//    Description:    initializes freezeBrushContext tool property sheet values
+//
+//    Input Arguments:
+//        tool      this is the name of the instance of the tool
+//                    that the property sheet is modifying.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmFreezeBrushValues(string $tool) 
+{
+    global string $gXgmFreezeBrushLayout;
+    global string $gXgmFreezeBrushCmd;
+    global string $gXgmFreezeBrushSettingFrame;
+    global string $gXgmFreezeBrushFalloffFrame;
+    global string $gXgmFreezeBrushDisplaySettingFrame;
+    global string $gXgmFreezeBrushSymmetrySettingFrame;
+    global string $gXgmFreezeBrushFalloffTypes;
+
+    string $parent = `toolPropertyWindow -q -location`;
+    setParent $parent;
+
+    frameLayout -e -en true $gXgmFreezeBrushSettingFrame;
+    frameLayout -e -en true $gXgmFreezeBrushFalloffFrame;
+    frameLayout -e -en true $gXgmFreezeBrushDisplaySettingFrame;
+
+    xgmFreezeBrushSettingsValues( $gXgmFreezeBrushSettingFrame, $gXgmFreezeBrushCmd, $tool);
+
+    string $falloffCustom = "xgmFreezeBrushFalloffValues( \"" + $gXgmFreezeBrushLayout + "\", \"" + $tool + "\")";
+    xgmBrushFalloffValues( $gXgmFreezeBrushFalloffFrame, $gXgmFreezeBrushCmd, $tool, $falloffCustom, $gXgmFreezeBrushFalloffTypes );
+
+    xgmBrushDisplaySettingsValues( $gXgmFreezeBrushDisplaySettingFrame, $gXgmFreezeBrushCmd, $tool, "");
+    xgmBrushSymmetrySettingsValues( $gXgmFreezeBrushSymmetrySettingFrame, $gXgmFreezeBrushCmd, $tool, "");
+
+    string $help = "FreezeBrushTool";
+    toolPropertySetCommon $tool "xgmFreezeBrushTool.xpm" $help;
+
+    toolPropertySelect $gXgmFreezeBrushLayout;
+
+    string $nameField = `toolPropertyWindow -query -field`;
+    text -edit -label (uiRes("m_xgmFreezeBrushValues.kFreezeBrushToolName")) $nameField;
+}

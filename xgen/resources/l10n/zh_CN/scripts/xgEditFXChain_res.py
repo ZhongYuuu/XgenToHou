@@ -1,0 +1,53 @@
+import maya
+
+maya.stringTable['y_xgenm_ui_dialogs_xgEditFXChain.kAddAnn'] = u'添加选定的模块。'
+maya.stringTable['y_xgenm_ui_dialogs_xgEditFXChain.kAddModifierWindow'] = u'添加修改器窗口'
+maya.stringTable['y_xgenm_ui_dialogs_xgEditFXChain.kAnimWires'] = u'动画线条'
+maya.stringTable['y_xgenm_ui_dialogs_xgEditFXChain.kApplyNetForce'] = u'应用净力'
+maya.stringTable['y_xgenm_ui_dialogs_xgEditFXChain.kAvailableModules'] = u'可用的模块'
+maya.stringTable['y_xgenm_ui_dialogs_xgEditFXChain.kBlockAnim'] = u'块动画'
+maya.stringTable['y_xgenm_ui_dialogs_xgEditFXChain.kCancel'] = u'取消'
+maya.stringTable['y_xgenm_ui_dialogs_xgEditFXChain.kCancelAnn'] = u'取消操作。'
+maya.stringTable['y_xgenm_ui_dialogs_xgEditFXChain.kClumping'] = u'成束'
+maya.stringTable['y_xgenm_ui_dialogs_xgEditFXChain.kCoil'] = u'圈'
+maya.stringTable['y_xgenm_ui_dialogs_xgEditFXChain.kCollision'] = u'碰撞'
+maya.stringTable['y_xgenm_ui_dialogs_xgEditFXChain.kControlwires'] = u'控制线条'
+maya.stringTable['y_xgenm_ui_dialogs_xgEditFXChain.kCurrentModules'] = u'当前模块'
+maya.stringTable['y_xgenm_ui_dialogs_xgEditFXChain.kCut'] = u'切割'
+maya.stringTable['y_xgenm_ui_dialogs_xgEditFXChain.kDebug'] = u'调试'
+maya.stringTable['y_xgenm_ui_dialogs_xgEditFXChain.kDirectionalForce'] = u'定向力'
+maya.stringTable['y_xgenm_ui_dialogs_xgEditFXChain.kDone'] = u'完成'
+maya.stringTable['y_xgenm_ui_dialogs_xgEditFXChain.kDoneAnn'] = u'添加选定的模块。'
+maya.stringTable['y_xgenm_ui_dialogs_xgEditFXChain.kDownAnn'] = u'向下移动选定的模块。'
+maya.stringTable['y_xgenm_ui_dialogs_xgEditFXChain.kDownAnn2'] = u'向下移动选定的模块。'
+maya.stringTable['y_xgenm_ui_dialogs_xgEditFXChain.kEditModifierStack'] = u'编辑修改器堆栈'
+maya.stringTable['y_xgenm_ui_dialogs_xgEditFXChain.kForce'] = u'力'
+maya.stringTable['y_xgenm_ui_dialogs_xgEditFXChain.kGroomBake'] = u'梳理烘焙'
+maya.stringTable['y_xgenm_ui_dialogs_xgEditFXChain.kMeshcut'] = u'网格切割'
+maya.stringTable['y_xgenm_ui_dialogs_xgEditFXChain.kNoDescriptionEditorOpenSoNoCurrentDescription1'] = u'没有打开任何描述编辑器，因此没有当前描述。'
+maya.stringTable['y_xgenm_ui_dialogs_xgEditFXChain.kNoDescriptionEditorOpenSoNoCurrentDescription2'] = u'没有打开任何描述编辑器，因此没有当前描述。'
+maya.stringTable['y_xgenm_ui_dialogs_xgEditFXChain.kNoDescriptionEditorOpenSoNoCurrentDescription3'] = u'没有打开任何描述编辑器，因此没有当前描述。'
+maya.stringTable['y_xgenm_ui_dialogs_xgEditFXChain.kNoise'] = u'噪波'
+maya.stringTable['y_xgenm_ui_dialogs_xgEditFXChain.kOk'] = u'确定'
+maya.stringTable['y_xgenm_ui_dialogs_xgEditFXChain.kOk2'] = u'确定'
+maya.stringTable['y_xgenm_ui_dialogs_xgEditFXChain.kOkAnn'] = u'添加选定的模块。'
+maya.stringTable['y_xgenm_ui_dialogs_xgEditFXChain.kOkAnn2'] = u'已完成重排序。'
+maya.stringTable['y_xgenm_ui_dialogs_xgEditFXChain.kParticle'] = u'粒子'
+maya.stringTable['y_xgenm_ui_dialogs_xgEditFXChain.kPlaneAnim'] = u'平面动画'
+maya.stringTable['y_xgenm_ui_dialogs_xgEditFXChain.kPlaneForce'] = u'平面力'
+maya.stringTable['y_xgenm_ui_dialogs_xgEditFXChain.kPolylineForce'] = u'多段线力'
+maya.stringTable['y_xgenm_ui_dialogs_xgEditFXChain.kPreserveClumps'] = u'保留束'
+maya.stringTable['y_xgenm_ui_dialogs_xgEditFXChain.kRemoveAnn'] = u'移除选定的模块。'
+maya.stringTable['y_xgenm_ui_dialogs_xgEditFXChain.kRemoveAnn2'] = u'移除选定的模块。'
+maya.stringTable['y_xgenm_ui_dialogs_xgEditFXChain.kSnapshot'] = u'快照'
+maya.stringTable['y_xgenm_ui_dialogs_xgEditFXChain.kSphereForce'] = u'球体力'
+maya.stringTable['y_xgenm_ui_dialogs_xgEditFXChain.kUpAnn'] = u'向上移动选定的模块。'
+maya.stringTable['y_xgenm_ui_dialogs_xgEditFXChain.kUpAnn2'] = u'向上移动选定的模块。'
+maya.stringTable['y_xgenm_ui_dialogs_xgEditFXChain.kWind'] = u'风'
+# ===========================================================================
+# Copyright 2021 Autodesk, Inc. All rights reserved.
+#
+# Use of this software is subject to the terms of the Autodesk license
+# agreement provided at the time of installation or download, or which
+# otherwise accompanies this software in either electronic or hard copy form.
+# ===========================================================================

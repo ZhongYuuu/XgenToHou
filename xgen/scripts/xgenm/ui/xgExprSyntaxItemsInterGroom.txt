@@ -1,0 +1,11 @@
+rand<br>float rand([float min, float max] [,float seed])<br>Generates a random number.  With no parameters, the number generated is between<br>0 and 1.  Optionally, two parameters can be passed in to give a range for the<br>random number. In either case a seed value can be given that will ensure that<br>the number returned is random, but predictable (always "x" when passed "y").
+$u<br>The u parameters of the underlying face.
+$v<br>The v parameters of the underlying face.
+$cWidth<br>The final, computed width of the current primitive
+$faceId<br>The current face id.
+$P<br>The surface point at which the primitive is being evaluated.
+$N<br>The surface normal at which the primitive is being evaluated.
+$U<br>The surface U at which the primitive is being evaluated.
+$V<br>The surface V at which the primitive is being evaluated.
+PI<br>The ratio of the circumference of a circle to its diameter (3.14159265358979323846).
+E<br>The base of natural logarithms (2.7182818284590452354).

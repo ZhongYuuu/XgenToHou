@@ -1,0 +1,87 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+// ===========================================================================
+// Copyright 2015 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+
+
+//
+//    Description:    initializes the custom Part brush setting values
+//
+//    Input Arguments:
+//        parent    Parent layout of the custom Part brush settings layout.
+//                  Required so that UI object names can be successfully resolved
+//        tool      this is the name of the instance of the tool
+//                    that the property sheet is modifying.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmPartBrushSettingsValues(string $parent, string $tool)
+{
+    global string $gXgmPartBrushCmd;
+
+    setParent $parent;
+
+    int $alongStroke = eval ( $gXgmPartBrushCmd + " -q -alongStroke " + $tool );
+    if($alongStroke) {
+        radioButtonGrp -e -select 1 xgmPartBrushAxisModeRBG;
+    } else {
+        radioButtonGrp -e -select 2 xgmPartBrushAxisModeRBG;
+    }
+}
+
+
+//
+//    Description:    initializes PartBrushContext tool property sheet values
+//
+//    Input Arguments:
+//        tool      this is the name of the instance of the tool
+//                    that the property sheet is modifying.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmPartBrushValues(string $tool) 
+{
+    global string $gXgmPartBrushLayout;
+    global string $gXgmPartBrushCmd;
+    global string $gXgmPartBrushSettingFrame;
+    global string $gXgmPartBrushFalloffFrame;
+    global string $gXgmPartRootToTipFalloffFrame;
+    global string $gXgmPartDisplaySettingFrame;
+    global string $gXgmPartSymmetrySettingFrame;
+    global string $gXgmPartBrushFalloffTypes;
+
+    string $parent = `toolPropertyWindow -q -location`;
+    setParent $parent;
+
+    frameLayout -e -en true $gXgmPartBrushSettingFrame;
+    frameLayout -e -en true $gXgmPartBrushFalloffFrame;
+    frameLayout -e -en true $gXgmPartRootToTipFalloffFrame;
+    frameLayout -e -en true $gXgmPartDisplaySettingFrame;
+
+    string $settingsCustom = "xgmPartBrushSettingsValues( \"" + $gXgmPartBrushLayout + "\", \"" + $tool + "\")";
+    xgmBrushSettingsValues( $gXgmPartBrushSettingFrame, $gXgmPartBrushCmd, $tool, $settingsCustom );
+    xgmBrushFalloffValues( $gXgmPartBrushFalloffFrame, $gXgmPartBrushCmd, $tool, "", $gXgmPartBrushFalloffTypes );
+    xgmRootToTipFalloffValues( $gXgmPartRootToTipFalloffFrame, $gXgmPartBrushCmd, $tool, "" );
+    xgmBrushDisplaySettingsValues( $gXgmPartDisplaySettingFrame, $gXgmPartBrushCmd, $tool, "" );
+    xgmBrushSymmetrySettingsValues( $gXgmPartSymmetrySettingFrame, $gXgmPartBrushCmd, $tool, "" );
+
+    string $help = "PartBrushTool";
+    toolPropertySetCommon $tool "xgmPartBrushTool.xpm" $help;
+
+    toolPropertySelect $gXgmPartBrushLayout;
+
+    string $nameField = `toolPropertyWindow -query -field`;
+    text -edit -label (uiRes("m_xgmPartBrushValues.kPartBrushToolName")) $nameField;
+}

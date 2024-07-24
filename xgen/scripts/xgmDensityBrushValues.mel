@@ -1,0 +1,121 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+// Copyright 2015 Autodesk, Inc. All rights reserved. 
+//
+// Use of this software is subject to the terms of the Autodesk 
+// license agreement provided at the time of installation or download, 
+// or which otherwise accompanies this software in either electronic 
+// or hard copy form.
+
+
+//	Description:	initializes xgmDensityBrushContext tool property sheet values
+//
+//	Input Arguments:
+//		toolName  - this is the name of the instance of the tool
+//					that the property sheet is modifying.
+//
+//	Return Value:
+//		None.
+//
+
+
+global proc xgmDensityBrushValues(string $toolName) 
+{
+	string $parent = `toolPropertyWindow -q -location`;
+	setParent $parent;
+    
+	xgmDensityBrushOptionValues($toolName);
+
+	string $help = "DensityBrushTool";
+	toolPropertySetCommon $toolName "xgDensityBrushTool.xpm" $help;
+
+	toolPropertySelect "xgmDensityBrush";
+	
+	string $nameField = `toolPropertyWindow -query -field`;
+    text -edit -label (uiRes("m_xgmDensityBrushValues.kDensityBrushToolName")) $nameField;
+}
+
+
+global proc xgmDensityBrushOptionValues(string $toolName)
+{
+	setParent xgmDensityBrushFrame;
+
+	int $paintOp = eval("xgmDensityBrushContext -q -po " + $toolName);
+	optionMenuGrp -e -select $paintOp xgmDensityBrushOperationOMG;
+
+    if ($paintOp == 2)
+    {
+        floatSliderGrp -e -enable 1 maxDensityFsg;
+    }
+    else
+    {
+        floatSliderGrp -e -enable 0 maxDensityFsg;
+    }
+
+    int $notSmoothOp = ($paintOp != 4);
+    floatSliderGrp -e -enable $notSmoothOp densityFsg;
+
+    // brush size
+	//
+    xgmBrushRadiusGroupValues("xgmDensityBrushFrame", "xgmDensityBrushContext", $toolName);
+
+	// density
+	//
+	$value = eval("xgmDensityBrushContext -q -density " + $toolName);
+	floatSliderGrp -e -value $value densityFsg;
+	
+	// max density
+	//
+	$value = eval("xgmDensityBrushContext -q -maxDensity " + $toolName);
+	floatSliderGrp -e -value $value maxDensityFsg;
+	
+	// strength
+	//
+	$value = eval("xgmDensityBrushContext -q -strength " + $toolName);
+	floatSliderGrp -e -value $value brushStrengthFsg;
+	
+	int $enableInterp = $paintOp != 3;
+	// interpolate
+	//
+	int $interpolate = eval("xgmDensityBrushContext -q -interpolate " + $toolName);
+	if ($interpolate) {
+		checkBoxGrp -e -value1 1 -enable $enableInterp interpolateSelGrp;
+	}
+	else {
+		checkBoxGrp -e -value1 0 -enable $enableInterp interpolateSelGrp;
+	}
+
+	// interpolate from
+	//
+	int $interpFrom = eval("xgmDensityBrushContext -q -interpolateFrom " + $toolName);
+	optionMenuGrp -e -enable ($enableInterp && $interpolate==1) -select $interpFrom xgmDensityBrushInterpolateFromOMG;
+
+	// interpolation smoothness
+    //
+    $value = eval("xgmDensityBrushContext -q -interpSmoothness " + $toolName);
+	floatSliderGrp -e -enable ($enableInterp && $interpolate==1) -value $value xgmDensityBrushInterpSmoothnessFsg;
+    
+    // initial length
+    //
+    $value = eval("xgmDensityBrushContext -q -initLength " + $toolName);
+	floatSliderGrp -e -enable ($interpolate==0 && $paintOp!=3) -value $value initLengthFsg;
+	
+	setParent xgmFalloffFrame;
+	
+	xgmFalloffCurveGroupValues( "xgmFalloffFrame", "xgmDensityBrushContext", "-brushFalloffCurve", $toolName, 1 );
+
+	setParent xgmFloodFrame;
+
+	// flood mode
+    int $floodMode = eval("xgmDensityBrushContext -q -floodMode " + $toolName);
+	radioButtonGrp -e -select $floodMode floodRbg;
+
+    global string $gXgmDensityBrushSymmetrySettingFrame;
+    xgmBrushSymmetrySettingsValues( $gXgmDensityBrushSymmetrySettingFrame, "xgmDensityBrushContext", `currentCtx`, "");
+}
+

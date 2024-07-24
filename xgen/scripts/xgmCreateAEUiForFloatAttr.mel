@@ -1,0 +1,350 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+
+proc xgmCreateMayaShapeAttr(string $meshShape, string $attrName)
+{
+    
+    string $shapeAttrName = $meshShape + "." + $attrName;
+
+    if( ! `objExists $shapeAttrName` )
+    {
+        addAttr -longName $attrName -attributeType "float3" $meshShape;
+        addAttr -longName ($attrName+"X") -attributeType "float" -parent $attrName $meshShape;
+        addAttr -longName ($attrName+"Y") -attributeType "float" -parent $attrName $meshShape;
+        addAttr -longName ($attrName+"Z") -attributeType "float" -parent $attrName $meshShape;
+        
+        setAttr ($shapeAttrName+"X") 1.0;
+        setAttr ($shapeAttrName+"Y") 1.0;
+        setAttr ($shapeAttrName+"Z") 1.0;
+    }
+}
+
+proc string xgmCreateFileTextureNode( )
+//    Description:
+//        Creates and returns a file texture node
+// 
+{
+    // Create a new texture and placement nodes.
+    string $texture  = `shadingNode -asTexture file`;
+    string $place2d  = `shadingNode -asUtility place2dTexture`;
+    
+    // Connect them together
+    fileTexturePlacementConnect( $texture, $place2d );
+
+    // we need to make the connection the the filter ourselves.
+    connectAttr ($place2d + ".outUV") ($texture + ".uv");
+    connectAttr ($place2d + ".outUvFilterSize") ($texture + ".uvFilterSize");
+
+    // Return a newly created file texture node.
+    return $texture;
+}
+
+
+proc xgmPaint3dAttr(string $meshShape, string $attrName, string $config, string $xgenAttr, string $fileNode, int $isRegionMap)
+{
+    string $nodeName = `plugNode $xgenAttr`;
+    string $plugAttrName = `plugAttr $xgenAttr`;
+    int $childNum[] = `attributeQuery -node $nodeName -numberOfChildren $plugAttrName`;
+    int $isColor = (size($childNum) > 0 && $childNum[0] == 3);
+
+    // get config values
+    int $resolution;
+    float $startColor[];
+    string $uvSet;
+    string $imageFormat;
+    string $texFile;
+    if (size($config) > 0)
+    {
+        string $token[];
+        int $tokenNum = `tokenize $config "|" $token`;
+        if ($tokenNum == 6)
+        {
+            $resolution = (int)$token[2];
+            if ($token[3] == "1") //Based on attribute
+            {
+                if ($isColor)
+                {
+                    $startColor = `getAttr $xgenAttr`;
+                }
+                else
+                {
+                    float $attrVal = `getAttr $xgenAttr`;
+                    if ($attrVal < 0.0 ) $attrVal = 0.0;
+                    if ($attrVal > 1.0 ) $attrVal = 1.0;
+                    $startColor[0] = $attrVal;
+                    $startColor[1] = $attrVal;
+                    $startColor[2] = $attrVal;
+                }
+            }
+            else if ($token[3] == "2") //White
+            {
+                $startColor[0] = 1.0;
+                $startColor[1] = 1.0;
+                $startColor[2] = 1.0;
+            }
+            else if ($token[3] == "3") //Black
+            {
+                $startColor[0] = 0.0;
+                $startColor[1] = 0.0;
+                $startColor[2] = 0.0;
+            }
+            else //Gray
+            {
+                $startColor[0] = 0.3;
+                $startColor[1] = 0.3;
+                $startColor[2] = 0.3;
+            }
+            $uvSet = $token[4];
+            $imageFormat = $token[5];
+
+            // remove file if existed
+            $texFile = $token[1];
+            if (`filetest -e $texFile`)
+                sysFile -delete $texFile;
+        }
+    }
+    else
+    {
+        // set image format according to texture file
+        string $fileAttr = $fileNode + ".ftn";
+        string $filename = `getAttr $fileAttr`;
+        string $fileExt;
+        if (size($filename) > 0)
+            $fileExt = `fileExtension($filename)`;
+        if (size($fileExt) > 0)
+        {
+            if ($fileExt == "iff")
+                $imageFormat = "maya";
+            else if ($fileExt == "pic")
+                $imageFormat = "si";
+            else
+                $imageFormat = $fileExt;
+        }
+    }
+
+    xgmCreateMayaShapeAttr $meshShape $attrName;
+    select -r $meshShape;
+    
+    string $xgmCurPaintCtx;
+    if ($isColor)
+        $xgmCurPaintCtx = "xgmColorAttrPaintCtx";
+    else
+        $xgmCurPaintCtx = "xgmFloatAttrPaintCtx";
+
+    if (! `art3dPaintCtx -ex $xgmCurPaintCtx`)
+        art3dPaintCtx -i1 "art3dPaint.png" $xgmCurPaintCtx;
+
+    setToolTo $xgmCurPaintCtx;
+
+    art3dPaintCtx -edit -shapeattr true $xgmCurPaintCtx;
+    art3dPaintCtx -edit -painttxtattr $attrName $xgmCurPaintCtx;
+    art3dPaintCtx -edit -soloAsDiffuse true $xgmCurPaintCtx;
+    art3dPaintCtx -edit -saveonstroke true  $xgmCurPaintCtx;
+
+    if ($isColor){
+        if ($isRegionMap)
+            art3dPaintCtx -e -opacity 1.0 -alphablendmode "Constant" -mappressure "Radius" $xgmCurPaintCtx;
+        else
+            art3dPaintCtx -e -opacity 1.0 -alphablendmode "Default" -mappressure "Opacity" $xgmCurPaintCtx;
+    }
+
+    if (size($config) > 0)
+    {
+        art3dPaintCtx -edit -alwaysKeepFile false  $xgmCurPaintCtx;
+        art3dPaintCtx -edit -fty $resolution -ftx $resolution -fsy $resolution -fsx $resolution $xgmCurPaintCtx;
+        art3dPaintCtx -e -fileformat $imageFormat $xgmCurPaintCtx;
+    }
+    if (size($imageFormat) > 0)
+    {
+        art3dPaintCtx -e -fileformat $imageFormat $xgmCurPaintCtx;
+    }
+
+    if (size($config) == 0)
+        art3dPaintCtx -edit -alwaysKeepFile true  $xgmCurPaintCtx;
+
+    art3dPaintAssignFileTextures $attrName;
+    art3dPaintCtx -edit -assigntxt $xgmCurPaintCtx;
+
+    setToolTo $xgmCurPaintCtx;
+    if (size($config) > 0)
+    {
+        art3dPaintCtx -e -rgbflood $startColor[0] $startColor[1] $startColor[2] $xgmCurPaintCtx;
+        art3dPaintCtx -e -pot  Paint  $xgmCurPaintCtx;
+        art3dPaintCtx -e -floodall $xgmCurPaintCtx;
+    }
+    
+    art3dPaintCtx -e -savetexture $xgmCurPaintCtx;
+
+    if (size($config) > 0 && size($texFile) > 0)
+    {
+        // set the texture file for file node            
+        string $fileAttr = $fileNode + ".fileTextureName";
+        string $curFile = `getAttr $fileAttr`;
+        // if the specified texture path is non-existent, assign to file node here
+        if (size($curFile) > 0 && $curFile != $texFile)
+        {
+            sysFile -rename $texFile $curFile;
+            setAttr -type "string" $fileAttr $texFile;
+            art3dPaintCtx -edit -alwaysKeepFile true  $xgmCurPaintCtx;
+        }
+    }
+}
+
+global proc xgmAEFloatAttrPaintBtnClicked(string $attrName, int $isRegionMap)
+{
+    // if attribute is locked, do nothing
+    if (`connectionInfo -isLocked $attrName`)
+    {
+        return;
+    }
+
+    int $popupCreateMapWin = 0;
+    string $inNodeName;
+    
+    // if attribute does not connect to a file node, warning
+    if (`connectionInfo -isDestination $attrName`)
+    {
+        string $inAttr = `connectionInfo -sourceFromDestination $attrName`;
+        $inNodeName = `plugNode $inAttr`;
+        // check if the input node is a file node
+        if (`nodeType $inNodeName` != "file")
+        {
+            warning (uiRes("m_xgmCreateAEUiForFloatAttr.kNotFileNode"));
+            return;
+        }
+        else
+        {
+            // check if the texture file is empty
+            string $fileAttr = $inNodeName + ".fileTextureName";
+            string $fileTextureName = `getAttr $fileAttr`;
+            if (size($fileTextureName) == 0)
+            {
+                $popupCreateMapWin = 1;
+            }
+        }
+    }
+    else
+    {
+        $popupCreateMapWin = 1;
+    }
+
+    string $nodeName = `plugNode $attrName`;
+    string $meshes[] = `xgmSplineQuery -listBoundMeshes $nodeName`;
+    if (size($meshes) == 0)
+    {
+        warning (uiRes("m_xgmCreateAEUiForFloatAttr.kNoMesh"));
+        return;
+    }
+
+    string $config;
+    // pop up "Create Map Options" dialog
+    if ($popupCreateMapWin == 1)
+    {
+        string $uvSets[] = `polyUVSet -q -allUVSets $meshes[0]`;
+        if (size($uvSets) == 0)
+        {
+            warning (uiRes("m_xgmCreateAEUiForFloatAttr.kNoUVSet"))
+            polyUVSet -create $meshes[0];
+        }
+        
+        // pop up the "Create Map Options" window
+        string $title = (uiRes("m_xgmCreateAEUiForFloatAttr.kCreateMapOptions"));
+        string $res = `layoutDialog -title $title -ui("xgmCreateMapOptionsWin(\"" + $attrName + "\", \"" + $meshes[0] + "\")")`;
+        string $dismiss = "dismiss";
+        if ($res == $dismiss)
+        {
+            return;
+        }
+        $config = $res;
+    }
+
+
+    // art3dPaintCtx need to paint a shape attribute.
+    // create a attribute on shape node, connect the texture node to the shape attribute and
+    // XGen attribute.
+    
+    // create file node if the file node is not ready
+    string $mapName = `plugAttr $attrName`;
+    string $shapeAttrName = $nodeName + "_" + $mapName; //`substitute "\\." $attrName "_"`;
+    $shapeAttrName = `substituteAllString  $shapeAttrName ":" "_ns_"`;    // remove namespace
+    xgmCreateMayaShapeAttr($meshes[0], $shapeAttrName);
+
+    if (size($inNodeName) == 0)
+    {
+        $inNodeName = xgmCreateFileTextureNode();
+        // rename
+        if (size($config) > 0)
+        {
+            string $token[];
+            int $tokenNum = `tokenize $config "|" $token`;
+            if ($tokenNum > 0)
+                $inNodeName = `rename $inNodeName $token[0]`;
+        }
+
+        int $attrChildNum[] = `attributeQuery -node $nodeName -numberOfChildren $mapName`;
+        if (size($attrChildNum) > 0 && $attrChildNum[0] == 3)
+            connectAttr ($inNodeName + ".outColor") $attrName;
+        else
+            connectAttr ($inNodeName + ".outColorR") $attrName;
+    }
+    
+    string $paintShapeAttr = $meshes[0] + "." + $shapeAttrName;
+    if (!`isConnected ($inNodeName + ".outColor") $paintShapeAttr`)
+    {
+        // connect texture node to mesh
+        connectAttr -f ($inNodeName + ".outColor") $paintShapeAttr;
+    }
+
+    // paint the shape attribute
+    xgmPaint3dAttr($meshes[0], $shapeAttrName, $config, $attrName, $inNodeName, $isRegionMap);
+}
+
+global proc xgmCreateAEUiForFloatAttr(string $attrName, string $label, string $nodeName)
+{
+    string $customCBStr = "global proc AE" + $nodeName + $attrName + "New(string $attrName)\n{\n";
+            $customCBStr += "attrFieldSliderGrp -label \"" + $label + "\" -at $attrName -dragCallback \"AEdragCallback\" -forceAddMapButton true -eb true -ebi \"xg3dPaint.png\" " + $nodeName + $attrName + "FSG;\n";
+            $customCBStr +="AE" + $nodeName + $attrName + "Replace($attrName);\n";
+            $customCBStr +="}\n";
+
+        $customCBStr +="global proc AE" + $nodeName + $attrName + "Replace(string $attrName)\n";
+        $customCBStr +="{\n";
+        $customCBStr +="attrFieldSliderGrp -e -columnWidth 1 145 -columnWidth 2 70 -at $attrName -ebc (\"xgmAEFloatAttrPaintBtnClicked \" + $attrName + \" 0\") " + $nodeName + $attrName + "FSG;\n";
+        $customCBStr +="}\n";
+    eval($customCBStr);
+
+    string $aeUICreateStr = "editorTemplate -callCustom \"AE" + $nodeName + $attrName + "New\" \"AE" + $nodeName + $attrName + "Replace\"" + "\"" + $attrName + "\"";
+    eval($aeUICreateStr);
+}
+
+global proc xgmCreateAEUiWithFieldForFloatAttr(string $attrName,
+        string $label,
+        string $nodeName,
+        float $minValue,
+        float $maxValue,
+        float $fieldMinValue,
+        float $fieldMaxValue)
+{
+    string $customCBStr = "global proc AE" + $nodeName + $attrName + "New(string $attrName)\n{\n";
+            $customCBStr += "attrFieldSliderGrp -label \"" + $label + 
+                            "\" -at $attrName -dragCallback \"AEdragCallback\" -forceAddMapButton true -eb true -ebi \"xg3dPaint.png\" " + 
+                            " -minValue " + $minValue + " -maxValue " + $maxValue + 
+                            " -fieldMinValue " + $fieldMinValue + " -fieldMaxValue " + $fieldMaxValue + " " +
+                            $nodeName + $attrName + "FSG;\n";
+            $customCBStr +="AE" + $nodeName + $attrName + "Replace($attrName);\n";
+            $customCBStr +="}\n";
+
+        $customCBStr +="global proc AE" + $nodeName + $attrName + "Replace(string $attrName)\n";
+        $customCBStr +="{\n";
+        $customCBStr +="attrFieldSliderGrp -e -columnWidth 1 145 -columnWidth 2 70 -at $attrName -ebc (\"xgmAEFloatAttrPaintBtnClicked \" + $attrName + \" 0\") " + $nodeName + $attrName + "FSG;\n";
+        $customCBStr +="}\n";
+    eval($customCBStr);
+
+    string $aeUICreateStr = "editorTemplate -callCustom \"AE" + $nodeName + $attrName + "New\" \"AE" + $nodeName + $attrName + "Replace\"" + "\"" + $attrName + "\"";
+    eval($aeUICreateStr);
+}
+

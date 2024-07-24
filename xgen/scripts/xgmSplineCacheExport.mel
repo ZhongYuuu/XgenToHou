@@ -1,0 +1,541 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+
+
+global proc xgmSplineCacheExportSetOptionVars(int $reset)
+{
+    if ($reset || !`optionVar -exists xgmSplineCacheExportTimeRanges`) {
+        optionVar -intValue xgmSplineCacheExportTimeRanges 3;
+    }
+
+    if ($reset || !`optionVar -exists xgmSplineCacheExportStarts`) {
+        optionVar -floatValue xgmSplineCacheExportStarts 1;
+    }
+
+    if ($reset || !`optionVar -exists xgmSplineCacheExportEnds`) {
+        optionVar -floatValue xgmSplineCacheExportEnds 120;
+    }
+
+    if ($reset || !`optionVar -exists xgmSplineCacheExportStep`) {
+        optionVar -floatValue xgmSplineCacheExportStep 1;
+    }
+
+    if ($reset || !`optionVar -exists xgmSplineCacheExportEnableFrameRelativeSamples`) {
+        optionVar -intValue xgmSplineCacheExportEnableFrameRelativeSamples 0;
+    }
+
+    if ($reset || !`optionVar -exists xgmSplineCacheExportLowFrameRelativeSamples`) {
+        optionVar -floatValue xgmSplineCacheExportLowFrameRelativeSamples -0.2;
+    }
+
+    if ($reset || !`optionVar -exists xgmSplineCacheExportHighFrameRelativeSamples`) {
+        optionVar -floatValue xgmSplineCacheExportHighFrameRelativeSamples 0.2;
+    }
+
+    if ($reset || !`optionVar -exists xgmSplineCacheExportEnablePreRoll`) {
+        optionVar -intValue xgmSplineCacheExportEnablePreRoll 0;
+    }
+
+    if ($reset || !`optionVar -exists xgmSplineCacheExportPreRollStartFrame`) {
+        optionVar -floatValue xgmSplineCacheExportPreRollStartFrame 0;
+    }
+
+    if ($reset || !`optionVar -exists xgmSplineCacheExportPreRollStep`) {
+        optionVar -floatValue xgmSplineCacheExportPreRollStep 1;
+    }
+
+    if ($reset || !`optionVar -exists xgmSplineCacheExportMultipleTransforms`) {
+        optionVar -intValue xgmSplineCacheExportMultipleTransforms 0;
+    }
+
+    if ($reset || !`optionVar -exists xgmSplineCacheExportWriteFinalWidth`) {
+        optionVar -intValue xgmSplineCacheExportWriteFinalWidth 0;
+    }
+}
+
+global proc xgmSplineCacheExportOptionsSetup(string $parent, int $reset)
+{
+    //  Retrieve the option settings
+    //
+    xgmSplineCacheExportSetOptionVars($reset);
+
+    setParent $parent;
+
+    int $startEndEnable = 0;
+
+    float $startFrame = `playbackOptions -q -min`;
+    float $endFrame = `playbackOptions -q -max`;
+
+    int $cacheTimeRange = `optionVar -q xgmSplineCacheExportTimeRanges`;
+    switch ($cacheTimeRange) {
+        case 1:
+                radioButtonGrp -e -select 1 rangeCurrentFrame;
+                $startFrame = `currentTime -q`;
+                $endFrame = $startFrame;
+                break;
+        case 2:
+                radioButtonGrp -e -select 1 rangeRenderSettings;
+                $startFrame = `getAttr defaultRenderGlobals.startFrame`;
+                $endFrame = `getAttr defaultRenderGlobals.endFrame`;
+                break;
+        case 3:
+                radioButtonGrp -e -select 1 rangeTimeSlider;
+                break;
+        case 4:
+                radioButtonGrp -e -select 1 rangeStartEnd;
+
+                $startFrame = `floatFieldGrp -q -value1 startEnd`;
+                $endFrame = `floatFieldGrp -q -value2 startEnd`;
+
+                $startEndEnable = 1;
+                break;
+        default:
+               radioButtonGrp -e -select 1 rangeTimeSlider;
+               break;
+    }
+
+    floatFieldGrp -e
+        -en $startEndEnable
+        -value1 $startFrame
+        -value2 $endFrame
+        startEnd;
+
+    floatFieldGrp -e
+        -value1 `optionVar -q xgmSplineCacheExportStep`
+        evaluateEvery;
+
+    int $frsEnabled = `optionVar -q xgmSplineCacheExportEnableFrameRelativeSamples`;
+    checkBoxGrp   -e
+        -value1 $frsEnabled
+        enableFrameRelativeSample;
+    floatFieldGrp -e
+        -value1 `optionVar -q xgmSplineCacheExportLowFrameRelativeSamples`
+        -enable $frsEnabled
+        lowFrameRelativeSample;
+    floatFieldGrp -e 
+        -value1 `optionVar -q xgmSplineCacheExportHighFrameRelativeSamples`
+        -enable $frsEnabled
+        highFrameRelativeSample;
+
+    int $preRollEnabled = `optionVar -q xgmSplineCacheExportEnablePreRoll`;
+    checkBoxGrp   -e
+        -value1 $preRollEnabled
+        enablePreRoll;
+    floatFieldGrp -e
+        -value1 `optionVar -q xgmSplineCacheExportPreRollStartFrame`
+        -enable $preRollEnabled
+        preRollStartFrame;
+    floatFieldGrp -e 
+        -value1 `optionVar -q xgmSplineCacheExportPreRollStep`
+        -enable $preRollEnabled
+        preRollStep;
+
+    int $multipleXForm = `optionVar -q xgmSplineCacheExportMultipleTransforms`;
+    checkBoxGrp   -e
+        -value1 $multipleXForm
+        writeMultipleTransforms;
+
+    int $finalWidth = `optionVar -q xgmSplineCacheExportWriteFinalWidth`;
+    checkBoxGrp   -e
+        -value1 $finalWidth
+        writeFinalWidth;
+}
+
+global proc xgmSplineCacheExportSaveOptionVars(string $parent)
+{
+    setParent $parent;
+
+    int $frangRange = 3;
+    if (`radioButtonGrp -q -select rangeCurrentFrame`) {
+        $frangRange = 1;
+    } else if (`radioButtonGrp -q -select rangeRenderSettings`) {
+        $frangRange = 2;
+    } else if (`radioButtonGrp -q -select rangeTimeSlider`) {
+        $frangRange = 3;
+    } else if (`radioButtonGrp -q -select rangeStartEnd`) {
+        $frangRange = 4;
+    }
+    optionVar -intValue xgmSplineCacheExportTimeRanges $frangRange;
+
+    optionVar -floatValue xgmSplineCacheExportStarts `floatFieldGrp -q -value1 startEnd`;
+    optionVar -floatValue xgmSplineCacheExportEnds `floatFieldGrp -q -value2 startEnd`;
+    optionVar -floatValue xgmSplineCacheExportStep `floatFieldGrp -q -value1 evaluateEvery`;
+
+    optionVar -intValue xgmSplineCacheExportEnableFrameRelativeSamples
+        `checkBoxGrp -q -value1 enableFrameRelativeSample`;
+
+    optionVar -floatValue xgmSplineCacheExportLowFrameRelativeSamples
+        `floatFieldGrp -q -value1 lowFrameRelativeSample`;
+
+    optionVar -floatValue xgmSplineCacheExportHighFrameRelativeSamples
+        `floatFieldGrp -q -value1 highFrameRelativeSample`;
+
+    optionVar -intValue xgmSplineCacheExportEnablePreRoll
+        `checkBoxGrp -q -value1 enablePreRoll`;
+
+    optionVar -floatValue xgmSplineCacheExportPreRollStartFrame
+        `floatFieldGrp -q -value1 preRollStartFrame`;
+
+    optionVar -floatValue xgmSplineCacheExportPreRollStep
+        `floatFieldGrp -q -value1 preRollStep`;
+
+    optionVar -intValue xgmSplineCacheExportMultipleTransforms
+        `checkBoxGrp -q -value1 writeMultipleTransforms`;
+
+    optionVar -intValue xgmSplineCacheExportWriteFinalWidth
+        `checkBoxGrp -q -value1 writeFinalWidth`;
+}
+
+global proc XgmSplineCacheTimeRangeChanged(string $parent)
+{
+    setParent $parent;
+
+    int $startEndEnable = 0;
+    float $startFrame = `floatFieldGrp -q -value1 startEnd`;
+    float $endFrame = `floatFieldGrp -q -value2 startEnd`;
+    if (`radioButtonGrp -q -select rangeRenderSettings`) {
+        $startFrame = `getAttr defaultRenderGlobals.startFrame`;
+        $endFrame = `getAttr defaultRenderGlobals.endFrame`;
+    } else if (`radioButtonGrp -q -select rangeTimeSlider`) {
+        $startFrame = `playbackOptions -q -min`;
+        $endFrame = `playbackOptions -q -max`;
+    } else if (`radioButtonGrp -q -select rangeCurrentFrame`) {
+        $startFrame = `currentTime -q`;
+        $endFrame = $startFrame;
+    } else {
+        $startEndEnable = 1;
+    }
+
+    floatFieldGrp -e -enable $startEndEnable 
+        -value1 $startFrame
+        -value2 $endFrame
+        startEnd;
+}
+
+global proc xgmSplineCacheEnableFrameRelativeSample(string $parent)
+{
+    setParent $parent;
+
+    // Enable or disable Low/High fields
+    int $en = `checkBoxGrp -q -value1 enableFrameRelativeSample`;
+    floatFieldGrp -e -enable $en lowFrameRelativeSample;
+    floatFieldGrp -e -enable $en highFrameRelativeSample;
+
+}
+
+global proc xgmSplineCachePreRollChanged(string $parent)
+{
+    setParent $parent;
+
+    // enable/disable preRollStartFrame
+    //
+    int $en = `checkBoxGrp -q -value1 enablePreRoll`;
+    floatFieldGrp -e -enable $en preRollStartFrame;
+    floatFieldGrp -e -enable $en preRollStep;
+}
+
+global proc string xgmSplineCacheExportOptionsUI(string $parent)
+{
+    //  The argument is used as the parent for the options UI
+    //
+    setParent $parent;
+
+    //  Activate the default UI template so that the layout of this
+    //  option box is consistent with the layout of the rest of the
+    //  application.
+    //
+    setUITemplate -pushTemplate DefaultTemplate;
+
+    //  Turn on the wait cursor.
+    //
+    waitCursor -state 1;
+
+    // Create option box or file options contents.
+    //
+    string $optionLayout = `scrollLayout -childResizable 1`;
+    columnLayout -adjustableColumn true;
+
+        float $secondLevelIndent = 190;
+
+        frameLayout -label (uiRes("m_xgmSplineCacheExport.kGeneralOptions")) -collapse 0;
+            columnLayout;
+                radioButtonGrp
+                        -numberOfRadioButtons 1
+                        -label (uiRes("m_xgmSplineCacheExport.kCacheTimeRange")) 
+                        -label1 (uiRes("m_xgmSplineCacheExport.kCurrentFrame"))
+                        -onCommand1 ("XgmSplineCacheTimeRangeChanged " + $optionLayout)
+                        rangeCurrentFrame;
+                radioButtonGrp
+                        -numberOfRadioButtons 1
+                        -label1 (uiRes("m_xgmSplineCacheExport.kRenderSettings"))
+                        -shareCollection rangeCurrentFrame
+                        -onCommand1 ("XgmSplineCacheTimeRangeChanged " + $optionLayout)
+                        rangeRenderSettings;
+                radioButtonGrp
+                        -numberOfRadioButtons 1
+                        -label1 (uiRes("m_xgmSplineCacheExport.kTimeSlider")) 
+                        -shareCollection rangeCurrentFrame
+                        -onCommand1 ("XgmSplineCacheTimeRangeChanged " + $optionLayout)
+                        rangeTimeSlider;
+                radioButtonGrp
+                        -numberOfRadioButtons 1
+                        -label1 (uiRes("m_xgmSplineCacheExport.kStartEnd")) 
+                        -shareCollection rangeCurrentFrame
+                        -onCommand1 ("XgmSplineCacheTimeRangeChanged " + $optionLayout)
+                        rangeStartEnd;
+                floatFieldGrp
+                        -numberOfFields 2
+                        -label (uiRes("m_xgmSplineCacheExport.kStartEnd2"))
+                        startEnd;
+                floatFieldGrp
+                        -numberOfFields 1
+                        -label (uiRes("m_xgmSplineCacheExport.kStep")) 
+                        evaluateEvery;
+
+                separator -height 10 -style "none";
+
+                checkBoxGrp
+                        -numberOfCheckBoxes 1
+                        -label (uiRes("m_xgmSplineCacheExport.kFrameRelativeSample"))
+                        -changeCommand1 ("xgmSplineCacheEnableFrameRelativeSample " + $optionLayout)
+                        enableFrameRelativeSample;
+                floatFieldGrp
+                        -numberOfFields 1
+                        -label (uiRes("m_xgmSplineCacheExport.kLowFrameRelativeSample"))
+                        -columnWidth 1 $secondLevelIndent
+                        lowFrameRelativeSample;
+                floatFieldGrp
+                        -numberOfFields 1
+                        -label (uiRes("m_xgmSplineCacheExport.kHighFrameRelativeSample"))
+                        -columnWidth 1 $secondLevelIndent
+                        highFrameRelativeSample;
+
+                separator -height 10 -style "none";
+
+                checkBoxGrp
+                        -numberOfCheckBoxes 1
+                        -label (uiRes("m_xgmSplineCacheExport.kPreRoll")) 
+                        -changeCommand1 ("xgmSplineCachePreRollChanged " + $optionLayout)
+                        enablePreRoll;
+                floatFieldGrp
+                        -numberOfFields 1
+                        -label (uiRes("m_xgmSplineCacheExport.kPreRollStart"))
+                        -columnWidth 1 $secondLevelIndent
+                        preRollStartFrame;
+                floatFieldGrp
+                        -numberOfFields 1
+                        -label (uiRes("m_xgmSplineCacheExport.kPreRollStep"))
+                        -columnWidth 1 $secondLevelIndent
+                        preRollStep;
+            setParent ..;
+        setParent ..;
+
+        frameLayout -label (uiRes("m_xgmSplineCacheExport.kAdvancedOptions")) -collapse 0;
+            columnLayout;
+                checkBoxGrp
+                        -numberOfCheckBoxes 1
+                        -label (uiRes("m_xgmSplineCacheExport.kMultipleTransforms"))
+                        writeMultipleTransforms;
+                checkBoxGrp
+                        -numberOfCheckBoxes 1
+                        -label (uiRes("m_xgmSplineCacheExport.kWriteFinalWidth"))
+                        writeFinalWidth;
+
+            setParent ..;
+        setParent ..;
+
+    //  Turn off the wait cursor.
+    //
+    waitCursor -state 0;
+
+    // Deactivate the default UI template
+    //
+    setUITemplate -popTemplate;
+
+    //  Set the current values of the option box.
+    //
+    eval ("xgmSplineCacheExportOptionsSetup " + $parent + " 0");
+
+    return $optionLayout;
+}
+
+global proc xgmSplineCacheExportCmd(string $flag)
+{
+    string $filter = (uiRes("m_xgmSplineCacheExport.kAlembic")) + " (*.abc);;"
+                    + (uiRes("m_xgmSplineCacheExport.kAllFiles")) + " (*.*)";
+    string $okCaption = (uiRes("m_xgmSplineCacheExport.kXgmSplineCacheExportDialogOK"));
+    string $caption = (uiRes("m_xgmSplineCacheExport.kXgmSplineCacheExportDialog"));
+    if($flag == "-create" || $flag == "-cr") {
+        $okCaption =  (uiRes("m_xgmSplineCacheExport.kXgmSplineCacheCreateDialogOK"));
+        $caption = (uiRes("m_xgmSplineCacheExport.kXgmSplineCacheCreateDialog"));
+    } if($flag == "-replace" || $flag == "-rp") {
+        $okCaption =  (uiRes("m_xgmSplineCacheExport.kXgmSplineCacheReplaceDialogOK"));
+        $caption = (uiRes("m_xgmSplineCacheExport.kXgmSplineCacheReplaceDialog"));
+    }
+    string $files[] = `fileDialog2 -fileMode 0
+                    -fileFilter $filter
+                    -okCaption $okCaption
+                    -caption $caption
+                    -optionsUICreate "xgmSplineCacheExportOptionsUI"
+                    -optionsUICommit "xgmSplineCacheExportSaveOptionVars"`;
+    if(size($files) == 0) 
+        return;  
+
+    float $startFrame = `optionVar -q xgmSplineCacheExportStarts`;
+    float $endFrame = `optionVar -q xgmSplineCacheExportEnds`;
+    float $step = `optionVar -q xgmSplineCacheExportStep`;
+
+    int   $relativeSample = `optionVar -q xgmSplineCacheExportEnableFrameRelativeSamples`;
+    float $sampleLow = `optionVar -q xgmSplineCacheExportLowFrameRelativeSamples`;
+    float $sampleHight = `optionVar -q xgmSplineCacheExportHighFrameRelativeSamples`;
+
+    int   $preRoll = `optionVar -q xgmSplineCacheExportEnablePreRoll`;
+    int   $preRollStart = `optionVar -q xgmSplineCacheExportPreRollStartFrame`;
+    int   $preRollStep = `optionVar -q xgmSplineCacheExportPreRollStep`;
+
+    int   $multiXForm = `optionVar -q xgmSplineCacheExportMultipleTransforms`;
+    int   $finalWidth = `optionVar -q xgmSplineCacheExportWriteFinalWidth`;
+
+    string $jobCommand = (" -file \"" +  $files[0] + "\"");
+    $jobCommand += " -df ogawa";
+    $jobCommand += " -fr " + $startFrame + " " + $endFrame;
+    $jobCommand += " -step " + $step;
+
+    if($relativeSample)
+    {
+        $jobCommand += " -frs " + $sampleLow;
+        $jobCommand += " -frs " + $sampleHight;
+    }
+
+    if($preRoll)
+    {
+        $jobCommand += " -pr";
+        $jobCommand += " -pfs " + $preRollStart;
+        $jobCommand += " -ps " + $preRollStep;
+    }
+
+    if($multiXForm)
+    {
+        $jobCommand += " -mxf";
+    }
+
+    if($finalWidth)
+    {
+        $jobCommand += " -wfw";
+    }
+
+    string $objs[] = `ls -sl`;
+    for($obj in $objs)
+    {
+        $jobCommand += " -obj " + $obj;
+    }
+    xgmSplineCache $flag -j $jobCommand;
+}
+
+global proc xgmSplineCacheExportOptionsCmd(string $flag)
+{
+    //  Name of the command for this option box.
+    
+    string $suffix;
+    switch($flag)
+    {
+        case "-export": 
+            $suffix = "Export";
+            break;
+        case "-create":
+            $suffix = "Create";
+            break;
+        case "-replace":
+            $suffix = "Replace";
+            break;
+        default:
+            break;
+    }
+    
+    string $commandName = "xgmSplineCache" + $suffix;
+
+    string $applyBtnLabel  = (uiRes("m_xgmSplineCacheExport.kXgmSplineCacheExportApplyButton"));
+    string $optionBoxTitle = (uiRes("m_xgmSplineCacheExport.kXgmSplineCacheExportOptionBoxTitle"));
+    if($flag == "-create" || $flag == "-cr") {
+        $applyBtnLabel     = (uiRes("m_xgmSplineCacheExport.kXgmSplineCacheCreateApplyButton"));
+        $optionBoxTitle    = (uiRes("m_xgmSplineCacheExport.kXgmSplineCacheCreateOptionBoxTitle"));
+    } if($flag == "-replace" || $flag == "-rp") {
+        $applyBtnLabel     = (uiRes("m_xgmSplineCacheExport.kXgmSplineCacheReplaceApplyButton"));
+        $optionBoxTitle    = (uiRes("m_xgmSplineCacheExport.kXgmSplineCacheReplaceOptionBoxTitle"));
+    }
+
+    //  STEP 1:  Get the option box.
+    //  ============================
+    //
+    //  The value returned is the name of the layout to be used as
+    //  the parent for the option box UI.
+    //
+    string $layout = getOptionBox();
+
+    //  STEP 2:  Pass the command name to the option box.
+    //  =================================================
+    //
+    //  Any default option box behaviour based on the command name is set
+    //  up with this call. For example, updating the 'Help' menu item with
+    //  the name of the command.
+    //
+    setOptionBoxCommandName($commandName);
+
+    //  STEP 3:  Create option box contents.
+    //  ====================================
+    //
+    string $parent = xgmSplineCacheExportOptionsUI($layout);
+
+    //  STEP 4:  Customize the buttons.
+    //  ===============================
+    //
+    //  Provide more descriptive labels for the buttons.
+    //  Disable those buttons that are not applicable to the option box.
+    //  Attach actions to those buttons that are applicable to the option box.
+
+    string $saveOptionCmd = "xgmSplineCacheExportSaveOptionVars " + $parent + ";";
+    string $exportCmd = $saveOptionCmd + "xgmSplineCacheExportCmd " + $flag + ";";
+    
+    $saveOptionCmd += " hideOptionBox;";
+
+    // 'Export'/'Create'/'Replace' button
+    //
+    string $exportBtn = getOptionBoxApplyBtn();
+    button -e -label $applyBtnLabel
+           -command $exportCmd
+           $exportBtn;
+
+    // 'Save' button
+    //
+    string $saveBtn = getOptionBoxSaveBtn();
+    button -e
+           -command $saveOptionCmd
+           $saveBtn;
+
+    // 'Reset' button
+    //
+    string $resetBtn = getOptionBoxResetBtn();
+    button -e
+           -command ("xgmSplineCacheExportOptionsSetup " + $parent + " 1")
+           $resetBtn;
+
+    //  STEP 5:  Set the option box title.
+    //  ==================================
+    //
+    setOptionBoxTitle($optionBoxTitle);
+
+    //  STEP 6:  Customize the 'Help' menu item text.
+    //  =============================================
+    //
+    setOptionBoxHelpTag($commandName);
+
+    //  Show the option box.
+    //  ====================
+    //
+    showOptionBox();
+}

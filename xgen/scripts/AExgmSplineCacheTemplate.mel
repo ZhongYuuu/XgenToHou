@@ -1,0 +1,189 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+
+global proc AExgmSplineCacheFileReload( string $fileNameAttr )
+{
+    // Dirty the fileAame attribute to trigger the reload
+    setAttr $fileNameAttr -type "string" `getAttr $fileNameAttr`;
+}
+
+// This is the procedure to open a file browser to choose a cache file
+//
+global proc AExgmSplineCacheFileBrowser( string $fileNameAttr )
+{
+    // prepare filter and starting dir for file dialog
+    string $filter = (uiRes("m_AExgmSplineCacheTemplate.kAlembic")) + " (*.abc);;"
+                      + (uiRes("m_AExgmSplineCacheTemplate.kAllFiles")) + " (*.*)";
+
+    // choose a file to import
+    string $result[] = `fileDialog2
+            -returnFilter 1
+            -fileFilter $filter
+            -dialogStyle 2
+            -caption (uiRes("m_AExgmSplineCacheTemplate.kAssignCacheFile"))
+            -fileMode 1
+            `;
+    if (size($result) == 0 || size($result[0]) == 0) {
+        // cancelled
+        return;
+    }
+
+    // set the file name attribute of the cache node
+    setAttr $fileNameAttr -type "string" $result[0];
+
+    // reset the active description
+    string $nodeName = `plugNode $fileNameAttr`;
+    setAttr ($nodeName + ".activeDescription") -type "string" "";
+
+    // This will force an update to display the effects
+    // of the new cachefile.
+    //
+    currentTime `currentTime -q`;
+}
+
+// The following two procedures generate the UI for file name field
+//
+global proc AExgmSplineCacheFileNameNew ( string $fileNameAttr )
+{
+    setUITemplate -pushTemplate attributeEditorTemplate;
+
+    columnLayout -adjustableColumn true;
+
+        rowLayout -numberOfColumns 4;
+            text -label (uiRes("m_AExgmSplineCacheTemplate.kAbcFile")) fileNameText;
+            textField fileNameField;
+            symbolButton -image "xgBrowse.png" browser;
+            symbolButton -image "refresh.png" -annotation (uiRes("m_AExgmSplineCacheTemplate.kReload")) reloadButton;
+        setParent ..;
+    setParent ..;
+
+    setUITemplate -popTemplate;
+
+    AExgmSplineCacheFileNameReplace( $fileNameAttr );
+}
+
+global proc AExgmSplineCacheFileNameReplace ( string $fileNameAttr )
+{
+    string $fileName = `getAttr $fileNameAttr`;
+    string $nodeName = `plugNode $fileNameAttr`;
+
+    // file name attribute
+    //
+    connectControl -fileName fileNameField $fileNameAttr;
+    button -e -c ("AExgmSplineCacheFileBrowser " + $fileNameAttr) browser;
+    button -e -c ("AExgmSplineCacheFileReload " + $fileNameAttr) reloadButton;
+}
+
+global proc AExgmSplineCacheDescsOptionChange( string $activeAttr )
+{
+    int $index = `optionMenuGrp -q -select xgmSplineCacheLoadedDataOption` - 1;
+    string $items[] =`optionMenuGrp -q -itemListLong xgmSplineCacheLoadedDataOption`;
+    string $descName = `menuItem -q -label $items[$index]`;
+    setAttr $activeAttr -type "string" $descName;
+}
+
+global proc AExgmSplineCacheDescsFillMenu( string $descsAttr, string $activeAttr)
+{
+    string $menuItems[] = `optionMenuGrp -q -itemListLong xgmSplineCacheLoadedDataOption`;
+    string $menuName = `optionMenuGrp -q -fullPathName xgmSplineCacheLoadedDataOption`;
+    string $descNames[] = `getAttr $descsAttr`;
+    string $activeDesc = `getAttr $activeAttr`;
+
+    // remove old menu items
+    if (size($menuItems) > 0)
+    {
+        string $deleteCommand = "deleteUI";
+        for ($menuItem in $menuItems){
+            $deleteCommand += (" " + $menuItem); 
+        }
+        eval($deleteCommand);
+    }
+
+    // fill menu items
+    int $index = 1;
+    int $select = 1;
+    for ($descName in $descNames)
+    {
+        menuItem -parent ($menuName + "|OptionMenu") -label $descName;
+
+        if($descName == $activeDesc)
+            $select = $index;
+
+        $index++;
+    }
+
+    int $num = `optionMenuGrp -q -numberOfItems $menuName`;
+    if($select <= $num)
+        optionMenuGrp -e -select $select $menuName;
+
+}
+
+global proc AExgmSplineCacheDescsNew ( string $descsAttr, string $activeAttr )
+{
+    setUITemplate -pushTemplate attributeEditorTemplate;
+
+    columnLayout -adjustableColumn true;
+
+        optionMenuGrp -label (uiRes("m_AExgmSplineCacheTemplate.kXGenSplineCacheLoadedData"))
+                   xgmSplineCacheLoadedDataOption;
+
+    setParent ..;
+
+    setUITemplate -popTemplate;
+
+    AExgmSplineCacheDescsReplace( $descsAttr, $activeAttr );
+}
+
+
+global proc AExgmSplineCacheDescsReplace ( string $descsAttr, string $activeAttr )
+{
+    string $parent = `setParent -q`;
+    string $setParentCmd = ("setParent " + $parent + ";");
+
+    optionMenuGrp -e
+        -changeCommand ($setParentCmd + "AExgmSplineCacheDescsOptionChange " + $activeAttr)
+        xgmSplineCacheLoadedDataOption;
+
+    scriptJob -parent xgmSplineCacheLoadedDataOption -replacePrevious
+        -attributeChange $descsAttr ($setParentCmd + "AExgmSplineCacheDescsFillMenu " + $descsAttr + " " + $activeAttr);
+
+    scriptJob -parent xgmSplineCacheLoadedDataOption
+        -attributeChange $activeAttr ($setParentCmd + "AExgmSplineCacheDescsFillMenu " + $descsAttr + " " + $activeAttr);
+
+    AExgmSplineCacheDescsFillMenu($descsAttr, $activeAttr);
+}
+
+global proc AExgmSplineCacheTemplate(string $nodeName)
+{
+    editorTemplate -beginScrollLayout;
+        // Common Attributes
+        AExgmModifierBaseTemplate $nodeName;
+
+        editorTemplate -beginLayout (uiRes("m_AExgmSplineCacheTemplate.kXGenSplineCache")) -collapse 0;
+            editorTemplate -callCustom AExgmSplineCacheFileNameNew AExgmSplineCacheFileNameReplace "fileName";
+            editorTemplate -callCustom AExgmSplineCacheDescsNew AExgmSplineCacheDescsReplace "descriptions" "activeDescription";
+            editorTemplate -addControl "startFrame";
+            editorTemplate -addControl "endFrame";
+            editorTemplate -addControl "time";
+            editorTemplate -addControl "speed";
+            editorTemplate -addControl "offset";
+            editorTemplate -addControl "cycleType";
+        editorTemplate -endLayout;
+
+        AEdependNodeTemplate $nodeName ;
+
+        // Dynamic Attributes
+        editorTemplate -addExtraControls;
+
+    editorTemplate -endScrollLayout;
+
+    editorTemplate -suppress "width";
+    editorTemplate -suppress "widthTaper";
+    editorTemplate -suppress "widthTaperStart";
+    editorTemplate -suppress "widthRamp";
+}

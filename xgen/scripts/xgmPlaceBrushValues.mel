@@ -1,0 +1,88 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+// Copyright 2016 Autodesk, Inc. All rights reserved. 
+//
+// Use of this software is subject to the terms of the Autodesk 
+// license agreement provided at the time of installation or download, 
+// or which otherwise accompanies this software in either electronic 
+// or hard copy form.
+
+
+//	Description:	initializes xgmPlaceBrushContext tool property sheet values
+//
+//	Input Arguments:
+//		toolName  - this is the name of the instance of the tool
+//					that the property sheet is modifying.
+//
+//	Return Value:
+//		None.
+//
+
+
+global proc xgmPlaceBrushValues(string $toolName) 
+{
+    global string $gXgmPlaceSymmetrySettingFrame;
+	string $parent = `toolPropertyWindow -q -location`;
+	setParent $parent;
+    
+	xgmPlaceBrushOptionValues($toolName);
+    xgmBrushSymmetrySettingsValues( $gXgmPlaceSymmetrySettingFrame, "xgmPlaceBrushContext", $toolName, "" );
+
+	string $help = "PlaceBrushTool";
+	toolPropertySetCommon $toolName "xgPlaceBrushTool.xpm" $help;
+
+	toolPropertySelect "xgmPlaceBrush";
+	
+	string $nameField = `toolPropertyWindow -query -field`;
+    text -edit -label (uiRes("m_xgmPlaceBrushValues.kPlaceBrushToolName")) $nameField;
+}
+
+
+global proc xgmPlaceBrushOptionValues(string $toolName)
+{
+	setParent xgmPlaceBrushFrame;
+
+    // brush mode
+    int $opMode = eval("xgmPlaceBrushContext -q -opMode " + $toolName);
+    if ($opMode == 1) {
+		checkBoxGrp -e -value1 0 opModeSelGrp;
+	}
+	else {
+		checkBoxGrp -e -value1 1 opModeSelGrp;
+	}
+
+    // brush size
+	//
+    xgmBrushRadiusGroupValues("xgmPlaceBrushFrame", "xgmPlaceBrushContext", $toolName);
+	
+	// interpolate
+	//
+	int $interpolate = eval("xgmPlaceBrushContext -q -interpolate " + $toolName);
+	if ($interpolate) {
+		checkBoxGrp -e -value1 1 interpolateSelGrp;
+	}
+	else {
+		checkBoxGrp -e -value1 0 interpolateSelGrp;
+	}
+
+	// interpolate from
+	//
+	int $interpFrom = eval("xgmPlaceBrushContext -q -interpolateFrom " + $toolName);
+	optionMenuGrp -e -enable ($interpolate==1) -select $interpFrom xgmPlaceBrushInterpolateFromOMG;
+
+	// interpolation smoothness
+    //
+    $value = eval("xgmPlaceBrushContext -q -interpSmoothness " + $toolName);
+	floatSliderGrp -e -enable ($interpolate==1) -value $value xgmPlaceBrushInterpSmoothnessFsg;
+
+    // initial length
+    //
+    $value = eval("xgmPlaceBrushContext -q -initLength " + $toolName);
+	floatSliderGrp -e -enable ($interpolate==0) -value $value initLengthFsg;
+}
+

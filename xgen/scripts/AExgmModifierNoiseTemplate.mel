@@ -1,0 +1,122 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+
+// Local helper for naming the control
+proc string getControlName(string $attr, string $type)
+{
+    string $tokens[];
+    tokenize($attr, ".", $tokens);
+    string $attrName = $tokens[1];
+    return ("xgmModifier_" + $attrName + "_" + $type + "_Control");
+}
+
+global proc AExgmModifierNoiseBakeOptionsRebake(string $liveAttr)
+{
+    int $liveAttrValue = `getAttr $liveAttr`;
+    if ($liveAttrValue == 0){
+        setAttr $liveAttr 1;
+        refresh -f;
+        setAttr $liveAttr 0;
+    }
+}
+
+global proc AExgmModifierNoiseBakeOptionsReplace(string $liveAttr)
+{
+    string $liveRadioCtrl  = getControlName($liveAttr, "Radio");
+    string $liveButtonCtrl = getControlName($liveAttr, "Button");
+
+    int $liveAttrValue = `getAttr $liveAttr`;
+    int $radioGrpSelectIdx = $liveAttrValue?1:2;
+    radioButtonGrp -edit
+        -select $radioGrpSelectIdx
+        -on1 ("setAttr " + $liveAttr + " 1")
+        -on2 ("setAttr " + $liveAttr + " 0")
+        $liveRadioCtrl
+        ;
+
+    button -edit
+        -c ("AExgmModifierNoiseBakeOptionsRebake(\"" + $liveAttr + "\")")
+        $liveButtonCtrl
+        ;
+}
+
+global proc AExgmModifierNoiseBakeOptionsNew(string $liveAttr)
+{
+    string $liveRadioCtrl  = getControlName($liveAttr, "Radio");
+    string $liveButtonCtrl = getControlName($liveAttr, "Button");
+
+    setUITemplate -pst attributeEditorTemplate;
+
+    string $form = `formLayout -numberOfDivisions 100`;
+
+        radioButtonGrp -numberOfRadioButtons 2
+            -label  (uiRes("m_AExgmModifierNoiseTemplate.kMode"))
+            -label1 (uiRes("m_AExgmModifierNoiseTemplate.kLive"))
+            -label2 (uiRes("m_AExgmModifierNoiseTemplate.kBaked"))
+            -columnAlign3 "right" "left" "left"
+            -cw3 20 50 50
+            $liveRadioCtrl
+            ;
+
+        button -label (uiRes("m_AExgmModifierNoiseTemplate.kBakeNoiseButton"))
+            -w 100
+            -h 20
+            $liveButtonCtrl
+            ;
+
+        formLayout -edit
+            -attachForm $liveRadioCtrl "top"  5
+            -attachForm $liveRadioCtrl "left" 5
+            -attachNone $liveRadioCtrl "bottom"
+            -attachNone $liveRadioCtrl "right"
+
+            -attachControl $liveButtonCtrl "top" 5 $liveRadioCtrl
+            -attachForm $liveButtonCtrl "left" 156
+            -attachForm $liveButtonCtrl "bottom" 5
+            -attachNone $liveButtonCtrl "right"
+        $form;
+
+    setParent ..;
+
+    setUITemplate -ppt;
+
+    AExgmModifierNoiseBakeOptionsReplace($liveAttr);
+}
+
+global proc AExgmModifierNoiseTemplate(string $nodeName)
+{
+    editorTemplate -beginScrollLayout;
+        // Common Attributes
+        AExgmModifierBaseTemplate $nodeName;
+
+        editorTemplate -beginLayout (uiRes("m_AExgmModifierNoiseTemplate.kNoiseModifier")) -collapse 0;
+            xgmCreateAEUiForFloatAttr "mask"           (uiRes("m_AExgmModifierNoiseTemplate.kMask"))                      "xgmModifierNoise";
+            xgmCreateAEUiForFloatAttr "frequency"      (uiRes("m_AExgmModifierNoiseTemplate.kFrequency"))            "xgmModifierNoise";
+            xgmCreateAEUiForFloatAttr "magnitude"      (uiRes("m_AExgmModifierNoiseTemplate.kMagnitude"))            "xgmModifierNoise";
+            xgmCreateAEUiForFloatAttr "correlation"    (uiRes("m_AExgmModifierNoiseTemplate.kCorrelation"))        "xgmModifierNoise";
+            xgmCreateAEUiForFloatAttr "preserveLength" (uiRes("m_AExgmModifierNoiseTemplate.kPreserveLength")) "xgmModifierNoise";
+
+            // magnitude scale ramp UI
+            AEaddRampControl ($nodeName+".magnitudeScale");
+
+        editorTemplate -endLayout;
+
+        editorTemplate -beginLayout (uiRes("m_AExgmModifierNoiseTemplate.kBakeOptions")) -collapse 0;
+
+            editorTemplate -callCustom "AExgmModifierNoiseBakeOptionsNew"
+                "AExgmModifierNoiseBakeOptionsReplace" "live";
+
+        editorTemplate -endLayout;
+
+        AEdependNodeTemplate $nodeName ;
+
+        // Dynamic Attributes
+        editorTemplate -addExtraControls;
+
+    editorTemplate -endScrollLayout;
+}

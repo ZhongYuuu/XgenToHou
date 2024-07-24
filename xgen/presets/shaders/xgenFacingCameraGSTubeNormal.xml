@@ -1,0 +1,91 @@
+<!--
+Copyright 2015 Autodesk, Inc. All rights reserved.
+
+Use of this software is subject to the terms of the Autodesk
+license agreement provided at the time of installation or download,
+or which otherwise accompanies this software in either electronic
+or hard copy form.
+-->
+<fragment uiName="xgenFacingCameraGSTubeNormal" name="xgenFacingCameraGSTubeNormal" type="plumbing" class="ShadeFragment" version="1.0" feature_level="0" >
+    <description>
+        <![CDATA[
+XGen wide spline tube shading pixel shader]]>
+    </description>
+    <properties>
+        <float3   name="Nw"                     semantic="NORMAL"     flags="varyingInputParam" />
+        <float3   name="Vw"                     semantic="TEXTURE"    flags="varyingInputParam" />
+        <float3   name="Pw"                     semantic="TEXTURE"    flags="varyingInputParam" />
+        <float3   name="mayaTangentIn"          semantic="TANGENT"    flags="varyingInputParam" />
+        <float2   name="wCoord"                 semantic="TEXCOORD1"  flags="varyingInputParam" />
+        <float4x4 name="worldInverseTranspose"  semantic="worldinversetranspose" />
+        <undefined name="GPUStage" semantic="GPUStage" />
+    </properties>
+    <values>
+    </values>
+    <outputs>
+        <float3 name="Nw" />
+    </outputs>
+    <implementation>
+        <implementation render="OGSRenderer" language="Cg" lang_version="2.100000" >
+            <function_name val="xgenFacingCameraGSTubeNormal" />
+            <source>
+                <![CDATA[
+float3 xgenFacingCameraGSTubeNormal(float3 Nw, float3 Vw, float3 Pw, float3 Tw, float2 wCoord, float4x4 worldInverseTranspose)
+{
+    const float M_PI = 3.1415926535897931f; 
+
+    float cosu = cos(wCoord.x * M_PI);
+    float sinu = sin(wCoord.x * M_PI);
+
+    float3 rightVector = normalize(mul(worldInverseTranspose, float4(Tw, 0.0f)).xyz);
+    float3 leftVector  = -rightVector;
+    float3 frontVector = normalize(Nw);
+
+    return normalize(leftVector * cosu + frontVector * sinu);
+}
+                ]]>
+            </source>
+        </implementation>
+        <implementation render="OGSRenderer" language="GLSL" lang_version="3.000000" >
+            <function_name val="xgenFacingCameraGSTubeNormal" />
+            <source>
+                <![CDATA[
+vec3 xgenFacingCameraGSTubeNormal(vec3 Nw, vec3 Vw, vec3 Pw, vec3 Tw, vec2 wCoord, mat4 worldInverseTranspose)
+{
+    const float M_PI = 3.1415926535897931f; 
+
+    float cosu = cos(wCoord.x * M_PI);
+    float sinu = sin(wCoord.x * M_PI);
+
+    vec3 rightVector = normalize(mul(worldInverseTranspose, vec4(Tw, 0.0f)).xyz);
+    vec3 leftVector  = -rightVector;
+    vec3 frontVector = normalize(Nw);
+
+    return normalize(leftVector * cosu + frontVector * sinu);
+}
+                ]]>
+            </source>
+        </implementation>
+        <implementation render="OGSRenderer" language="HLSL" lang_version="11.000000" >
+            <function_name val="xgenFacingCameraGSTubeNormal" />
+            <source>
+                <![CDATA[
+float3 xgenFacingCameraGSTubeNormal(float3 Nw, float3 Vw, float3 Pw, float3 Tw, float2 wCoord, float4x4 worldInverseTranspose)
+{
+    const float M_PI = 3.1415926535897931f; 
+
+    float cosu = cos(wCoord.x * M_PI);
+    float sinu = sin(wCoord.x * M_PI);
+
+    float3 rightVector = normalize(mul(float4(Tw, 0.0f), worldInverseTranspose).xyz);
+    float3 leftVector  = -rightVector;
+    float3 frontVector = normalize(Nw);
+
+    return normalize(leftVector * cosu + frontVector * sinu);
+}
+                ]]>
+            </source>
+        </implementation>
+    </implementation>
+</fragment>
+

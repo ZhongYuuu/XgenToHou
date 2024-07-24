@@ -1,0 +1,544 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+
+
+// Function to get selected curve plugs
+global proc string[] XgmCurveToSplineGetSelectedCurvePlugs()
+{
+    string $declQueryCurveCmd =
+    "def XgmCurveToSplineQuerySelectedCurves():\n" +
+    "    import maya.OpenMaya as om\n" +
+    "    sl = om.MSelectionList()\n" +
+    "    om.MGlobal.getActiveSelectionList(sl)\n" +
+    "    result = []\n" +
+    "    it = om.MItSelectionList(sl)\n" +
+    "    while not it.isDone():\n" +
+    "        try:\n" +
+    "            path = om.MDagPath()\n" +
+    "            it.getDagPath(path)\n" +
+    "            pathArray = om.MDagPathArray()\n" +
+    "            path.getAllPathsBelow(pathArray)\n" +
+    "            for i in range(0, pathArray.length()):\n" +
+    "                if pathArray[i].hasFn(om.MFn.kNurbsCurve):\n" +
+    "                    if not om.MFnDagNode(pathArray[i]).findPlug(\"intermediateObject\").asBool():\n" +
+    "                        attr = '%s.worldSpace[%d]' % (pathArray[i].fullPathName(), pathArray[i].instanceNumber())\n" +
+    "                        result.append(attr)\n" +
+    "        except:\n" +
+    "            node = om.MObject() \n" +
+    "            it.getDependNode(node) \n" +
+    "            if node.hasFn(om.MFn.kSet):\n" +
+    "                setFn = om.MFnSet(node)\n" +
+    "                setsl = om.MSelectionList()\n" +
+    "                setFn.getMembers(setsl, True)\n" +
+    "                setIt = om.MItSelectionList(setsl)\n" +
+    "                while not setIt.isDone():\n" +
+    "                    try:\n" +
+    "                        path = om.MDagPath()\n" +
+    "                        setIt.getDagPath(path)\n" +
+    "                        pathArray = om.MDagPathArray()\n" +
+    "                        path.getAllPathsBelow(pathArray)\n" +
+    "                        for i in range(0, pathArray.length()):\n" +
+    "                            if pathArray[i].hasFn(om.MFn.kNurbsCurve):\n" +
+    "                                if not om.MFnDagNode(pathArray[i]).findPlug(\"intermediateObject\").asBool():\n" +
+    "                                    attr = '%s.worldSpace[%d]' % (pathArray[i].fullPathName(), pathArray[i].instanceNumber())\n" +
+    "                                    result.append(attr)\n" +
+    "                    except:\n" +
+    "                        pass\n" +
+    "                    setIt.next()\n" +
+    "        it.next()\n" +
+    "    return result;\n"
+    ;
+    string $executeQueryCurveCmd = "XgmCurveToSplineQuerySelectedCurves()";
+
+    python($declQueryCurveCmd);
+    string $curveAttrs[] = `python($executeQueryCurveCmd)`;
+
+    for($p=0;$p<size($curveAttrs);++$p)
+    {
+        string $tmpStrs[];
+        tokenize $curveAttrs[$p] "|" $tmpStrs;
+        $curveAttrs[$p] = $tmpStrs[`size($tmpStrs)`-1];
+    }
+
+    string $shorterList[] = stringArrayRemoveDuplicates($curveAttrs);
+    return $shorterList;
+}
+
+
+// Check to see if these 2 plugs is connected
+global proc int XgmCurveToSplineCheckConnected(string $srcPlug, string $dstPlug)
+{
+    string $connections[] = `listConnections -p 1 -c 1 $srcPlug`;
+    int $c_size = `size($connections)`;
+    if ($c_size < 2)
+        return 0;
+
+    for ($p=1;$p<$c_size;$p+=2)
+    {
+        if (`startsWith $connections[$p] $dstPlug`)
+            return 1;
+    }
+
+    return 0;
+}
+
+// Find next available plug index
+global proc int XgmCurveToSplineFindAvailablePlugIndex(string $attr_inputCurves, int $startCheckIdx)
+{
+    string $connections[] = `listConnections -c 1 $attr_inputCurves`;
+    int $p = $startCheckIdx;
+    while(1){
+        string $plug = ($attr_inputCurves + "[" + $p + "]");
+        if (stringArrayFind($plug, 0, $connections) < 0)
+        {
+            return $p;
+        }
+        $p++;
+    }
+    return -1;
+}
+
+
+
+// Click add curve button
+global proc AExgmCurveToSplineInputCurves_addCurve(string $attr_inputCurves)
+{
+    //print (_NOL10N("add curve for attr '") + $attr_inputCurves + "'\n");
+
+    string $curvePlugs[] = XgmCurveToSplineGetSelectedCurvePlugs();
+    int $plugCount = `size($curvePlugs)`;
+    int $lastAvailablePlugIdx = 0;
+    for($p=0;$p<$plugCount;++$p){
+        //print ("Processing    " + $curvePlugs[$p] + "...");
+        if (XgmCurveToSplineCheckConnected($curvePlugs[$p], $attr_inputCurves) == 1){
+            //print "skipped!\n";
+            continue;
+        }
+        $lastAvailablePlugIdx = XgmCurveToSplineFindAvailablePlugIndex($attr_inputCurves, $lastAvailablePlugIdx);
+        //print ("ok!  " + $lastAvailablePlugIdx +"\n");
+        connectAttr $curvePlugs[$p] ($attr_inputCurves + "[" + $lastAvailablePlugIdx + "]");
+    }
+
+    AExgmCurveToSplineInputCurves_updateTextTable($attr_inputCurves);
+}
+
+// Click remove curve button
+global proc AExgmCurveToSplineInputCurves_removeCurve(string $attr_inputCurves)
+{
+    //print (_NOL10N("remove curve for attr '") + $attr_inputCurves + "'\n");
+
+    int $selectedRows[] = `scriptTable -q -selectedRows ui_inputCurve_scriptTable`;
+    if (size($selectedRows) == 0)
+        return;
+
+    for($s=0;$s<size($selectedRows);++$s){
+        string $input[] = `scriptTable -ci $selectedRows[$s] 1 -q -cv ui_inputCurve_scriptTable`;
+        if (`size($input)` == 1){
+            string $dstAttr = `substitute "inputCurves" $attr_inputCurves $input[0]`;
+            string $srcAttr[] = `listConnections -p 1 $dstAttr`;
+            if (`size($srcAttr)` == 1){
+                disconnectAttr $srcAttr[0] $dstAttr ;
+            }
+        }
+    }
+
+    AExgmCurveToSplineInputCurves_updateTextTable($attr_inputCurves);
+}
+
+// Update curve connection to text list
+global proc AExgmCurveToSplineInputCurves_updateTextTable(string $attr_inputCurves)
+{
+    //print (_NOL10N("update text table for attr '") + $attr_inputCurves + "'\n");
+
+    // Clear current list
+    int $rowNum = `scriptTable -q -rows ui_inputCurve_scriptTable`;
+    for ($i=$rowNum-1; $i>0; $i--)
+    {
+        scriptTable -e -deleteRow $i ui_inputCurve_scriptTable;
+    }
+
+    // Rebuild new list
+
+    // Get current connection information
+    string $connections[] = `listConnections -p 0 -c 1 $attr_inputCurves`;
+    for($r=0;$r<size($connections);++$r){
+        string $m = `match "inputCurves\[[0-9]+\]" $connections[$r]`;
+        if (strcmp($m, "")){
+            $connections[$r] = $m;
+        }
+    }
+
+    // Unselect all items in the table to make sure below inserting work correctly
+    scriptTable -e -selectedRows {} ui_inputCurve_scriptTable;
+
+    int $rows = size($connections)/2;
+    for($r=0;$r<$rows;++$r)
+    {
+        scriptTable -e -insertRow ($r+1) ui_inputCurve_scriptTable;
+        scriptTable -e -cellIndex ($r+1) 1 -cellValue  $connections[$r*2]   ui_inputCurve_scriptTable;
+        scriptTable -e -cellIndex ($r+1) 2 -cellValue  $connections[$r*2+1] ui_inputCurve_scriptTable;
+    }
+}
+
+global proc AExgmCurveToSplineInputCurvesReplace(string $attr_inputCurves)
+{
+    // Add button command
+    button -edit
+        -c ("AExgmCurveToSplineInputCurves_addCurve(\"" + $attr_inputCurves + "\")")
+        ui_inputCurve_button_add;
+
+    // Remove button command
+    button -edit
+        -c ("AExgmCurveToSplineInputCurves_removeCurve(\"" + $attr_inputCurves + "\")")
+        ui_inputCurve_button_remove;
+
+    // Update text list
+    AExgmCurveToSplineInputCurves_updateTextTable($attr_inputCurves);
+
+    // Attach scriptJob to track attribute change
+    // Get parent for script job use
+    string $parent = `setParent -q`;
+    string $setParentCmd = ("setParent " + $parent + ";");
+    scriptJob
+        -replacePrevious
+        -parent ui_inputCurve_scriptTable
+        -attributeChange $attr_inputCurves
+        ($setParentCmd + "AExgmCurveToSplineInputCurves_updateTextTable " + $attr_inputCurves);
+
+    AExgmCurveToSplineInputCurves_updateTextTable($attr_inputCurves);
+}
+
+global proc int AExgmCurveToSplineInputCurvesCellEditAccept(int $row, int $column, string $value){
+    return 1;
+}
+
+global proc AExgmCurveToSplineInputCurvesNew(string $attr_inputCurves)
+{
+    setUITemplate -pst attributeEditorTemplate;
+
+    // Form layout
+    string $form = `formLayout -numberOfDivisions 100`;
+
+    int $button_w = 138;
+    int $button_h = 25;
+    int $table_w  = 382;
+    int $table_c1_w = 100;
+    int $table_c2_w = $table_w - $table_c1_w - 16;
+
+    // Button - "Add Selected Curve"
+    button
+        -label (uiRes("m_AExgmCurveToSplineTemplate.kButtonAddCurve"))
+        -w $button_w
+        -h $button_h
+        ui_inputCurve_button_add;
+
+    // Button - "Remove Item"
+    button
+        -label (uiRes("m_AExgmCurveToSplineTemplate.kButtonRemoveCurve"))
+        -w $button_w
+        -h $button_h
+        ui_inputCurve_button_remove;
+
+    // A 2 column table
+    scriptTable
+        -editable 0
+        -columns 2
+        -w $table_w
+        -cw 1 $table_c1_w
+        -cw 2 $table_c2_w
+        -selectionBehavior 1
+        -cellChangedCmd AExgmCurveToSplineInputCurvesCellEditAccept
+        -label 1 (uiRes("m_AExgmCurveToSplineTemplate.kInputCurvePlugs"))
+        -label 2 (uiRes("m_AExgmCurveToSplineTemplate.kCurves"))
+        ui_inputCurve_scriptTable;
+
+    // Layout the UIs
+    formLayout -edit
+        -attachForm     ui_inputCurve_button_add "top"  5
+        -attachForm     ui_inputCurve_button_add "left" 5
+        -attachNone     ui_inputCurve_button_add "bottom"
+        -attachNone     ui_inputCurve_button_add "right"
+
+        -attachForm     ui_inputCurve_button_remove "top"  5
+        -attachControl  ui_inputCurve_button_remove "left" 5 ui_inputCurve_button_add
+        -attachNone     ui_inputCurve_button_remove "bottom"
+        -attachNone     ui_inputCurve_button_remove "right"
+
+        -attachControl  ui_inputCurve_scriptTable "top"  5 ui_inputCurve_button_add
+        -attachForm     ui_inputCurve_scriptTable "left" 5
+        -attachForm     ui_inputCurve_scriptTable "bottom" 5
+        -attachNone     ui_inputCurve_scriptTable "right"
+    $form;
+
+
+    setParent ..;
+    setUITemplate -ppt;
+    AExgmCurveToSplineInputCurvesReplace($attr_inputCurves);
+}
+
+
+global proc AExgmCurveToSplineInputFromMayaCheckerboxChange( string $useMayaCurve )
+{
+    int $useMaya = `checkBoxGrp -q -v1 xgmCurveToSplineInputFromOptions`;
+    setAttr $useMayaCurve $useMaya;
+}
+
+global proc AExgmCurveToSplineInputFromAbcCheckerboxChange( string $useAbcCurve )
+{
+    int $useAbc = `checkBoxGrp -q -v2 xgmCurveToSplineInputFromOptions`;
+    setAttr $useAbcCurve $useAbc;
+}
+
+global proc AExgmCurveToSplineInputFromMayaAttrChange ( string $useMayaCurve )
+{
+    int $useMaya = `getAttr $useMayaCurve`;
+    checkBoxGrp -e -v1 $useMaya xgmCurveToSplineInputFromOptions;
+}
+
+global proc AExgmCurveToSplineInputFromAbcAttrChange ( string $useAbcCurve )
+{
+    int $useAbc = `getAttr $useAbcCurve`;
+    checkBoxGrp -e -v2 $useAbc xgmCurveToSplineInputFromOptions;
+}
+
+global proc AExgmCurveToSplineInputFromNew ( string $useMayaCurve, string $useAbcCurve )
+{
+    setUITemplate -pushTemplate attributeEditorTemplate;
+
+    columnLayout -adjustableColumn true;
+
+        checkBoxGrp -label (uiRes("m_AExgmCurveToSplineTemplate.kInputFrom")) -vr -ncb 2 -adj off -cw2 100 240
+            -label1 (uiRes("m_AExgmCurveToSplineTemplate.kInputFromCurves"))
+            -label2 (uiRes("m_AExgmCurveToSplineTemplate.kInputFromCache"))
+            xgmCurveToSplineInputFromOptions;
+    setParent ..;
+
+    setUITemplate -popTemplate;
+
+    AExgmCurveToSplineInputFromReplace($useMayaCurve, $useAbcCurve);
+}
+
+global proc AExgmCurveToSplineInputFromReplace ( string $useMayaCurve, string $useAbcCurve )
+{
+    string $parent = `setParent -q`;
+    string $setParentCmd = ("setParent " + $parent + ";");
+
+    int $useMaya = `getAttr $useMayaCurve`;
+    int $useAbc = `getAttr $useAbcCurve`;
+
+    checkBoxGrp -e
+        -v1 $useMaya
+        -v2 $useAbc
+        -cc1 ($setParentCmd + "AExgmCurveToSplineInputFromMayaCheckerboxChange " + $useMayaCurve + ";")
+        -cc2 ($setParentCmd + "AExgmCurveToSplineInputFromAbcCheckerboxChange " + $useAbcCurve + ";")
+        xgmCurveToSplineInputFromOptions;
+
+    scriptJob
+        -replacePrevious
+        -parent xgmCurveToSplineInputFromOptions
+        -attributeChange $useMayaCurve
+        ($setParentCmd + "AExgmCurveToSplineInputFromMayaAttrChange " + $useMayaCurve);
+
+    scriptJob
+        -parent xgmCurveToSplineInputFromOptions
+        -attributeChange $useAbcCurve
+        ($setParentCmd + "AExgmCurveToSplineInputFromAbcAttrChange " + $useAbcCurve);
+
+}
+
+global proc AExgmCurveToSplineInputCacheFileReload( string $fileNameAttr )
+{
+    // Dirty the fileAame attribute to trigger the reload
+    setAttr $fileNameAttr -type "string" `getAttr $fileNameAttr`;
+}
+
+// This is the procedure to open a file browser to choose a cache file
+//
+global proc AExgmCurveToSplineInputCacheFileBrowser( string $fileNameAttr )
+{
+    // prepare filter and starting dir for file dialog
+    string $filter = (uiRes("m_AExgmCurveToSplineTemplate.kAlembic")) + " (*.abc);;"
+                      + (uiRes("m_AExgmCurveToSplineTemplate.kAllFiles")) + " (*.*)";
+
+    // choose a file to import
+    string $result[] = `fileDialog2
+            -returnFilter 1
+            -fileFilter $filter
+            -dialogStyle 2
+            -caption (uiRes("m_AExgmCurveToSplineTemplate.kAssignCacheFile"))
+            -fileMode 1
+            `;
+    if (size($result) == 0 || size($result[0]) == 0) {
+        // cancelled
+        return;
+    }
+
+    // set the file name attribute of the cache node
+    setAttr $fileNameAttr -type "string" $result[0];
+
+    // reset the active description
+    string $nodeName = `plugNode $fileNameAttr`;
+    setAttr ($nodeName + ".activeData") -type "string" "";
+
+    // This will force an update to display the effects
+    // of the new cachefile.
+    //
+    currentTime `currentTime -q`;
+}
+
+global proc AExgmCurveToSplineInputCacheFileNameNew ( string $fileNameAttr )
+{
+    setUITemplate -pushTemplate attributeEditorTemplate;
+
+    columnLayout -adjustableColumn true;
+
+        rowLayout -numberOfColumns 4;
+            text -label (uiRes("m_AExgmCurveToSplineTemplate.kAbcFile")) fileNameText;
+            textField fileNameField;
+            symbolButton -image "xgBrowse.png" browser;
+            symbolButton -image "refresh.png" -annotation (uiRes("m_AExgmCurveToSplineTemplate.kReload")) reloadButton;
+        setParent ..;
+    setParent ..;
+
+    setUITemplate -popTemplate;
+
+    AExgmCurveToSplineInputCacheFileNameReplace( $fileNameAttr );
+}
+
+global proc AExgmCurveToSplineInputCacheFileNameReplace ( string $fileNameAttr )
+{
+    string $fileName = `getAttr $fileNameAttr`;
+    string $nodeName = `plugNode $fileNameAttr`;
+
+    // file name attribute
+    //
+    connectControl -fileName fileNameField $fileNameAttr;
+    button -e -c ("AExgmCurveToSplineInputCacheFileBrowser " + $fileNameAttr) browser;
+    button -e -c ("AExgmCurveToSplineInputCacheFileReload " + $fileNameAttr) reloadButton;
+}
+
+global proc AExgmCurveToSplineInputCacheLoadedDataChange( string $activeAttr )
+{
+    int $index = `optionMenuGrp -q -select xgmCurveToSplineInputCacheLoadedDataOption` - 1;
+    string $items[] =`optionMenuGrp -q -itemListLong xgmCurveToSplineInputCacheLoadedDataOption`;
+    string $descName = `menuItem -q -label $items[$index]`;
+    setAttr $activeAttr -type "string" $descName;
+}
+
+global proc AExgmCurveToSplineInputCacheLoadedDataMenu( string $loadedAttr, string $activeAttr )
+{
+    string $menuItems[] = `optionMenuGrp -q -itemListLong xgmCurveToSplineInputCacheLoadedDataOption`;
+    string $optionMenuName = `optionMenuGrp -q -fullPathName xgmCurveToSplineInputCacheLoadedDataOption`;
+    string $descNames[] = `getAttr $loadedAttr`;
+    string $activeDesc = `getAttr $activeAttr`;
+
+    // remove old menu items
+    if (size($menuItems) > 0)
+    {
+        string $deleteCommand = "deleteUI";
+        for ($menuItem in $menuItems){
+            $deleteCommand += (" " + $menuItem); 
+        }
+        eval($deleteCommand);
+    }
+
+    // fill menu items
+    int $index = 1;
+    int $select = 1;
+    for ($descName in $descNames)
+    {
+        menuItem -parent ($optionMenuName + "|OptionMenu") -label $descName;
+
+        if($descName == $activeDesc)
+            $select = $index;
+
+        $index++;
+    }
+
+    int $num = `optionMenuGrp -q -numberOfItems $optionMenuName`;
+    if($select <= $num)
+        optionMenuGrp -e -select $select $optionMenuName;
+
+}
+
+global proc AExgmCurveToSplineInputCacheLoadedDataNew ( string $loadedAttr, string $activeAttr )
+{
+    setUITemplate -pushTemplate attributeEditorTemplate;
+
+    columnLayout -adjustableColumn true;
+
+        optionMenuGrp -label (uiRes("m_AExgmCurveToSplineTemplate.kLoadedData"))
+                   xgmCurveToSplineInputCacheLoadedDataOption;
+
+    setParent ..;
+
+    setUITemplate -popTemplate;
+
+    AExgmCurveToSplineInputCacheLoadedDataReplace( $loadedAttr, $activeAttr );
+}
+
+
+global proc AExgmCurveToSplineInputCacheLoadedDataReplace ( string $loadedAttr, string $activeAttr )
+{
+    string $parent = `setParent -q`;
+    string $setParentCmd = ("setParent " + $parent + ";");
+
+    optionMenuGrp -e
+        -changeCommand ($setParentCmd + "AExgmCurveToSplineInputCacheLoadedDataChange " + $activeAttr)
+        xgmCurveToSplineInputCacheLoadedDataOption;
+
+    scriptJob -parent xgmCurveToSplineInputCacheLoadedDataOption -replacePrevious
+        -attributeChange $loadedAttr ($setParentCmd + "AExgmCurveToSplineInputCacheLoadedDataMenu " + $loadedAttr + " " + $activeAttr);
+
+    AExgmCurveToSplineInputCacheLoadedDataMenu($loadedAttr, $activeAttr);
+}
+
+global proc AExgmCurveToSplineTemplate(string $nodeName)
+{
+    editorTemplate -beginScrollLayout;
+        // Common Attributes
+        AExgmModifierBaseTemplate $nodeName;
+
+        editorTemplate -beginLayout (uiRes("m_AExgmCurveToSplineTemplate.kCurveToSplineModifier")) -collapse 0;
+
+            editorTemplate -addControl "alignToNormal";
+
+            editorTemplate -callCustom "AExgmCurveToSplineInputFromNew"
+                    "AExgmCurveToSplineInputFromReplace" "useMayaCurve" "useAlembicCurve";
+
+            // "Input Curves"
+            editorTemplate -beginLayout (uiRes("m_AExgmCurveToSplineTemplate.kInputCurves")) -collapse 0;
+                editorTemplate -callCustom "AExgmCurveToSplineInputCurvesNew"
+                    "AExgmCurveToSplineInputCurvesReplace" "inputCurves";
+            editorTemplate -endLayout;
+
+            editorTemplate -beginLayout (uiRes("m_AExgmCurveToSplineTemplate.kInputCache")) -collapse 0;
+                editorTemplate -callCustom "AExgmCurveToSplineInputCacheFileNameNew"
+                    "AExgmCurveToSplineInputCacheFileNameReplace" "fileName";
+                editorTemplate -callCustom "AExgmCurveToSplineInputCacheLoadedDataNew"
+                    "AExgmCurveToSplineInputCacheLoadedDataReplace" "loadedData" "activeData";
+                editorTemplate -addControl "startFrame";
+                editorTemplate -addControl "endFrame";
+                editorTemplate -addControl "time";
+                editorTemplate -addControl "speed";
+                editorTemplate -addControl "offset";
+                editorTemplate -addControl "cycleType";
+            editorTemplate -endLayout;
+
+        editorTemplate -endLayout;
+
+        AEdependNodeTemplate $nodeName ;
+
+        // Dynamic Attributes
+        editorTemplate -addExtraControls;
+
+    editorTemplate -endScrollLayout;
+
+    // Suppress attributes
+    editorTemplate -suppress "inMeshData";
+}

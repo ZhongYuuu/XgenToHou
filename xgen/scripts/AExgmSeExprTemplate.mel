@@ -1,0 +1,48 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+// =======================================================================
+// Copyright 2016 Autodesk, Inc. All rights reserved.
+//
+// This computer source code and related instructions and comments are the
+// unpublished confidential  and proprietary information of Autodesk, Inc.
+// and are protected under applicable copyright and trade secret law. They 
+// may not be disclosed to, copied  or used by any third party without the 
+// prior written consent of Autodesk, Inc.
+// =======================================================================
+
+global proc AExgmSeExprEditorNew(string $nodeAttr)
+{
+    button -label (uiRes("m_AExgmSeExprTemplate.kXgmSeExprEditor")) OpenEditorButton;
+    AExgmSeExprEditorReplace($nodeAttr);
+}
+
+global proc AExgmSeExprEditorOpen(string $nodeAttr)
+{
+    python("xgui.ae.XgmSeExprShowEditor(\"" + $nodeAttr + "\")");
+} 
+
+global proc AExgmSeExprEditorReplace(string $nodeAttr)
+{
+    button -e -command ("AExgmSeExprEditorOpen(\"" + $nodeAttr + "\")") OpenEditorButton;
+}
+
+global proc AExgmSeExprTemplate(string $nodeName)
+{
+    editorTemplate -beginScrollLayout;
+    
+        editorTemplate -beginLayout (uiRes("m_AExgmSeExprTemplate.kXgmSeExprNode")) -collapse 0;
+            editorTemplate -addControl "expression";
+            editorTemplate -callCustom "AExgmSeExprEditorNew" "AExgmSeExprEditorReplace" "expression";
+        editorTemplate -endLayout;
+
+        AEdependNodeTemplate $nodeName;
+
+        editorTemplate -addExtraControls; 
+
+    editorTemplate -endScrollLayout;
+}

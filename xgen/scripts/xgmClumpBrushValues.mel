@@ -1,0 +1,97 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+// ===========================================================================
+// Copyright 2015 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+
+
+//
+//    Description:    initializes the custom Clump brush setting values
+//
+//    Input Arguments:
+//        parent    Parent layout of the custom Clump brush settings layout.
+//                  Required so that UI object names can be successfully resolved
+//        tool      this is the name of the instance of the tool
+//                    that the property sheet is modifying.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmClumpBrushSettingsValues(string $parent, string $tool)
+{
+    global string $gXgmClumpBrushCmd;
+
+    setParent $parent;
+
+    int $lockSel = eval ( $gXgmClumpBrushCmd + " -q -lockSelection " + $tool );
+    if($lockSel) {
+        radioButtonGrp -e -select 1 xgmClumpBrushSelectionModeRBG;
+    } else {
+        radioButtonGrp -e -select 2 xgmClumpBrushSelectionModeRBG;
+    }
+
+    //int $globalSel = eval ( $gXgmClumpBrushCmd + " -q -globalSelection " + $tool );
+
+
+    float $intensity = eval( $gXgmClumpBrushCmd + " -q -intensityFactor " + $tool );
+    floatSliderGrp -e -value $intensity xgmClumpBrushIntensityFSG;
+
+    int $preserveLength = eval( $gXgmClumpBrushCmd + " -q -preserveLength " + $tool );
+    checkBoxGrp -e -value1 $preserveLength xgmClumpBrushPreserveLengthGRP;
+
+}
+
+
+//
+//    Description:    initializes ClumpBrushContext tool property sheet values
+//
+//    Input Arguments:
+//        tool      this is the name of the instance of the tool
+//                    that the property sheet is modifying.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmClumpBrushValues(string $tool) 
+{
+    global string $gXgmClumpBrushLayout;
+    global string $gXgmClumpBrushCmd;
+    global string $gXgmClumpBrushSettingFrame;
+    global string $gXgmClumpBrushFalloffFrame;
+    global string $gXgmClumpRootToTipFalloffFrame;
+    global string $gXgmClumpDisplaySettingFrame;
+    global string $gXgmClumpSymmetrySettingFrame;
+    global string $gXgmClumpBrushFalloffTypes;
+
+    string $parent = `toolPropertyWindow -q -location`;
+    setParent $parent;
+
+    frameLayout -e -en true $gXgmClumpBrushSettingFrame;
+    frameLayout -e -en true $gXgmClumpBrushFalloffFrame;
+    frameLayout -e -en true $gXgmClumpRootToTipFalloffFrame;
+    frameLayout -e -en true $gXgmClumpDisplaySettingFrame;
+
+    string $settingsCustom = "xgmClumpBrushSettingsValues( \"" + $gXgmClumpBrushLayout + "\", \"" + $tool + "\")";
+    xgmBrushSettingsValues( $gXgmClumpBrushSettingFrame, $gXgmClumpBrushCmd, $tool, $settingsCustom );
+    xgmBrushFalloffValues( $gXgmClumpBrushFalloffFrame, $gXgmClumpBrushCmd, $tool, "", $gXgmClumpBrushFalloffTypes );
+    xgmRootToTipFalloffValues( $gXgmClumpRootToTipFalloffFrame, $gXgmClumpBrushCmd, $tool, "" );
+    xgmBrushDisplaySettingsValues( $gXgmClumpDisplaySettingFrame, $gXgmClumpBrushCmd, $tool, "" );
+    xgmBrushSymmetrySettingsValues( $gXgmClumpSymmetrySettingFrame, $gXgmClumpBrushCmd, $tool, "" );
+
+    string $help = "ClumpBrushTool";
+    toolPropertySetCommon $tool "xgmClumpBrushTool.xpm" $help;
+
+    toolPropertySelect $gXgmClumpBrushLayout;
+
+    string $nameField = `toolPropertyWindow -query -field`;
+    text -edit -label (uiRes("m_xgmClumpBrushValues.kClumpBrushToolName")) $nameField;
+}

@@ -1,0 +1,17 @@
+import maya
+
+maya.stringTable['y_xgenm_ui_fxmodules_xgPolylineForceFXModuleTab.kCvs1'] = u'Cvs 1'
+maya.stringTable['y_xgenm_ui_fxmodules_xgPolylineForceFXModuleTab.kCvs2'] = u'Cvs 2'
+maya.stringTable['y_xgenm_ui_fxmodules_xgPolylineForceFXModuleTab.kCvs3'] = u'Cvs 3'
+maya.stringTable['y_xgenm_ui_fxmodules_xgPolylineForceFXModuleTab.kCvs4'] = u'Cvs 4'
+maya.stringTable['y_xgenm_ui_fxmodules_xgPolylineForceFXModuleTab.kCvsFourAnn'] = u'Polyline control points 4. (expression: vector)'
+maya.stringTable['y_xgenm_ui_fxmodules_xgPolylineForceFXModuleTab.kCvsOneAnn'] = u'Polyline control points 1. (expression: vector)'
+maya.stringTable['y_xgenm_ui_fxmodules_xgPolylineForceFXModuleTab.kCvsThreeAnn'] = u'Polyline control points 3. (expression: vector)'
+maya.stringTable['y_xgenm_ui_fxmodules_xgPolylineForceFXModuleTab.kCvsTwoAnn'] = u'Polyline control points 2. (expression: vector)'
+maya.stringTable['y_xgenm_ui_fxmodules_xgPolylineForceFXModuleTab.kFalloff'] = u'Falloff'
+maya.stringTable['y_xgenm_ui_fxmodules_xgPolylineForceFXModuleTab.kFalloffAnn'] = u'Power of force attenuation. (expression: float)'
+maya.stringTable['y_xgenm_ui_fxmodules_xgPolylineForceFXModuleTab.kMagnitude'] = u'Magnitude'
+maya.stringTable['y_xgenm_ui_fxmodules_xgPolylineForceFXModuleTab.kMagnitudeAnn'] = u'Force magnitude. (expression: float)'
+maya.stringTable['y_xgenm_ui_fxmodules_xgPolylineForceFXModuleTab.kPolylineForceModifier'] = u'Polyline Force Modifier'
+maya.stringTable['y_xgenm_ui_fxmodules_xgPolylineForceFXModuleTab.kRadii'] = u'Radii'
+maya.stringTable['y_xgenm_ui_fxmodules_xgPolylineForceFXModuleTab.kRadiiAnn'] = u'Radius of influence. (expression: float)'

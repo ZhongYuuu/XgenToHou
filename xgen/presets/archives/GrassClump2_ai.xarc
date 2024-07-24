@@ -1,0 +1,8 @@
+#ArchiveGroup 0 name="GrassClump2_ai" description="No description." thumbnail="archives/GrassClump2.png" materials="archives/materials/GrassClump2_ai.ma" color=[1,0,0]
+0 "archives/abc/GrassClump2_ai.abc" material=GrassClump2_ai:paintfx_archives:grassClump2ShaderSG objects=|paintfx_archives:grassClump2MeshGroup|paintfx_archives:grassClump2Main
+3 "archives/ass/GrassClump2_ai_Main.ass.gz" material=GrassClump2_ai:paintfx_archives:grassClump2ShaderSG objects=|paintfx_archives:grassClump2MeshGroup|paintfx_archives:grassClump2Main
+1 "archives/abc/GrassClump2_ai_med.abc" material=GrassClump2_ai:paintfx_archives:grassClump2ShaderSG objects=|paintfx_archives:grassClump2MeshGroup|paintfx_archives:grassClump2Main
+4 "archives/ass/GrassClump2_ai_Main_med.ass.gz" material=GrassClump2_ai:paintfx_archives:grassClump2ShaderSG objects=|paintfx_archives:grassClump2MeshGroup|paintfx_archives:grassClump2Main
+2 "archives/abc/GrassClump2_ai_lo.abc" material=GrassClump2_ai:paintfx_archives:grassClump2ShaderSG objects=|paintfx_archives:grassClump2MeshGroup|paintfx_archives:grassClump2Main
+5 "archives/ass/GrassClump2_ai_Main_lo.ass.gz" material=GrassClump2_ai:paintfx_archives:grassClump2ShaderSG objects=|paintfx_archives:grassClump2MeshGroup|paintfx_archives:grassClump2Main
+

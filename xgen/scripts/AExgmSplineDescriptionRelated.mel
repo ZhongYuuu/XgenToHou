@@ -1,0 +1,80 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+// =======================================================================
+// Copyright 2015 Autodesk, Inc. All rights reserved.
+//
+// This computer source code and related instructions and comments are the
+// unpublished confidential  and proprietary information of Autodesk, Inc.
+// and are protected under applicable copyright and trade secret law. They 
+// may not be disclosed to, copied  or used by any third party without the 
+// prior written consent of Autodesk, Inc.
+// =======================================================================
+
+global proc string[] AExgmSplineDescriptionRelated(string $node)
+{
+    string $retval[];
+
+    // Make sure that the shape is first in the list
+    $retval[0] = $node;
+
+    // Get the default tabs for this node
+    string $relNodes[]    = `defaultNavigation -ren -d $node`;
+    string $preferredNode = `defaultNavigation -dwn -d $node`;
+
+    for ($relNode in $relNodes)
+    {
+        $retval[size($retval)] = $relNode;
+    }
+
+    // Get the connections to the xgmSplineDescription node
+    string $plugs[] = `listConnections -s false -sh true -d true $node`;
+
+    // Look for a connected shading engine - this is
+    // the jumping off point to get to the rendering nodes
+    // from a selected surface
+    for ($plug in $plugs)
+    {
+        string $nType = `nodeType $plug`;
+        if ($nType == "shadingEngine")
+        {
+            // Get the shader that's connected to this
+            // shading engine
+            string $mayaShaders[] =
+                    `listConnections ($plug + ".surfaceShader")`;
+            
+            string $customShaders[];
+            clear($customShaders);
+            string $customShadersArray[] = `callbacks -executeCallbacks -hook "allConnectedShaders" $plug`;
+            string $customShadersAsString;
+            for ($customShadersAsString in $customShadersArray)
+            {
+                string $tokens[];
+                tokenize($customShadersAsString, ":", $tokens);
+                appendStringArray($customShaders, $tokens, size($tokens));
+            }
+            
+            // If the connection is null, then there is no
+            // shading group attached to this node - simply
+            // return the node itself.
+            int $mayaSize = size($mayaShaders);
+            int $customShadersSize = size($customShaders);
+            if ($mayaSize == 0 && $customShadersSize == 0) {
+                $retval[size($retval)] = $plug;
+            } else {
+                appendStringArray($retval, $mayaShaders, $mayaSize);
+                appendStringArray($retval, $customShaders, $customShadersSize);
+            }
+        }
+    }
+
+    if ($preferredNode == "")
+        $preferredNode = $node;
+    $retval[size($retval)] = $preferredNode;
+
+    return $retval;
+}

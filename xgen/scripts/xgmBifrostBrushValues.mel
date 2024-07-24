@@ -1,0 +1,81 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+// ===========================================================================
+// Copyright 2015 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+
+
+//
+//    Description:    initializes the custom bifrost brush setting values
+//
+//    Input Arguments:
+//        parent    Parent layout of the custom bifrost brush settings layout.
+//                  Required so that UI object names can be successfully resolved
+//        tool      this is the name of the instance of the tool
+//                    that the property sheet is modifying.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmBifrostBrushSettingsValues(string $parent, string $tool)
+{
+    global string $gXgmBifrostBrushCmd;
+
+    setParent $parent;
+
+    string $name = eval( $gXgmBifrostBrushCmd + " -q -bifrostBoard " + $tool );
+    textFieldGrp -e -text $name xgmBifrostBrushBifrostBoardName;
+}
+
+//
+//    Description:    initializes bifrostBrushContext tool property sheet values
+//
+//    Input Arguments:
+//        tool      this is the name of the instance of the tool
+//                    that the property sheet is modifying.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmBifrostBrushValues(string $tool) 
+{
+    global string $gXgmBifrostBrushLayout;
+    global string $gXgmBifrostBrushCmd;
+    global string $gXgmBifrostBrushSettingFrame;
+    global string $gXgmBifrostBrushFalloffFrame;
+    global string $gXgmBifrostRootToTipFalloffFrame;
+    global string $gXgmBifrostBrushDisplaySettingFrame;
+    global string $gXgmBifrostBrushSymmetrySettingFrame;
+
+    string $parent = `toolPropertyWindow -q -location`;
+    setParent $parent;
+
+    frameLayout -e -en true $gXgmBifrostBrushSettingFrame;
+    frameLayout -e -en true $gXgmBifrostBrushFalloffFrame;
+    frameLayout -e -en true $gXgmBifrostRootToTipFalloffFrame;
+    frameLayout -e -en true $gXgmBifrostBrushDisplaySettingFrame;
+
+    string $settingsCustom = "xgmBifrostBrushSettingsValues( \"" + $gXgmBifrostBrushLayout + "\", \"" + $tool + "\")";
+    xgmBrushSettingsValues( $gXgmBifrostBrushSettingFrame, $gXgmBifrostBrushCmd, $tool, $settingsCustom );
+    xgmBrushFalloffValues( $gXgmBifrostBrushFalloffFrame, $gXgmBifrostBrushCmd, $tool, "", "");
+    xgmRootToTipFalloffValues( $gXgmBifrostRootToTipFalloffFrame, $gXgmBifrostBrushCmd, $tool, "" );
+    xgmBrushDisplaySettingsValues( $gXgmBifrostBrushDisplaySettingFrame, $gXgmBifrostBrushCmd, $tool, "" );
+    xgmBrushSymmetrySettingsValues( $gXgmBifrostBrushSymmetrySettingFrame, $gXgmBifrostBrushCmd, $tool, "" );
+
+    string $help = "BifrostBrushTool";
+    toolPropertySetCommon $tool "xgmBifrostBrushTool.xpm" $help;
+
+    toolPropertySelect $gXgmBifrostBrushLayout;
+
+    string $nameField = `toolPropertyWindow -query -field`;
+    text -edit -label (uiRes("m_xgmBifrostBrushValues.kBifrostBrushToolName")) $nameField;
+}

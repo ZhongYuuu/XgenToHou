@@ -1,0 +1,248 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+// ===========================================================================
+// Copyright 2015 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+
+
+//  Description:    defines behavior and layout of xgmFreezeBrushContext
+//                    tool property sheet
+//
+
+global string $gXgmFreezeBrushLayout = "xgmFreezeBrush";
+global string $gXgmFreezeBrushCmd = "xgmFreezeBrushContext";
+global string $gXgmFreezeBrushToolName = "xgmFreezeBrushTool";
+
+global string $gXgmFreezeBrushSettingFrame = "xgmFreezeBrushSettingFrame";
+global string $gXgmFreezeBrushFalloffFrame = "xgmFreezeBrushFalloffFrame";
+global string $gXgmFreezeBrushDisplaySettingFrame = "xgmFreezeBrushDisplaySettingFrame";
+global string $gXgmFreezeBrushSymmetrySettingFrame = "xgmFreezeBrushSymmetrySettingFrame";
+
+global string $gXgmFreezeBrushFalloffTypes;
+global string $gXgmFreezeBrushFalloffTypesL10N[];
+global int $gXgmFreezeSurfaceFalloffIndex;
+
+
+//
+//    Description:
+//        Initializes the freeze brush falloff types
+//
+//    Input Arguments:
+//        None.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmInitFreezeBrushFalloffTypes()
+{
+    global string $gXgmFreezeBrushFalloffTypes;
+    global string $gXgmFreezeBrushFalloffTypesL10N[];
+    global int $gXgmFreezeSurfaceFalloffIndex;
+
+    if( $gXgmFreezeBrushFalloffTypes == "" || size($gXgmFreezeBrushFalloffTypesL10N) == 0 ) {
+        $gXgmFreezeBrushFalloffTypes = "screen,volume,surface";
+        $gXgmFreezeBrushFalloffTypesL10N  = { (uiRes("m_xgmFreezeBrushProperties.kXgmFreezeBrushFalloffTypeScreen")),
+                                              (uiRes("m_xgmFreezeBrushProperties.kXgmFreezeBrushFalloffTypeVolume")),
+                                              (uiRes("m_xgmFreezeBrushProperties.kXgmFreezeBrushFalloffTypeSurface"))};
+        $gXgmFreezeSurfaceFalloffIndex = size($gXgmFreezeBrushFalloffTypesL10N) - 1 ;
+    }
+}
+
+
+//
+//    Description:
+//        Script runs when the selection of the operation option menu is changed.
+//
+//    Input Arguments:
+//        parent         Parent layout of the operation option menu
+//        brushCmd       Brush command to be used by the UI objects
+//        tool           Name of the instance of the tool that the command is applied on
+//
+//    Return Value:
+//        None.
+//
+global proc xgmFreezeBrushOperationChanged( string $parent, string $brushCmd, string $tool )
+{
+    setParent $parent; 
+    int $op = `optionMenuGrp -q -select xgmFreezeBrushOperationOMG` - 1;
+    eval($brushCmd + " -e -operation " + $op + " " + $tool);
+}
+
+//
+//    Description:
+//        layout of common brush settings
+//
+//    Input Arguments:
+//        parent         Parent layout of the common brush settings layout.
+//                       Required so that UI object names can be successfully resolved.
+//        frameLayout    Name of the frame layout to be created for the common brush settings
+//        brushCmd       Brush command to be used by the UI objects
+//        tool           Name of the instance of the tool that the command is applied on
+//
+//    Return Value:
+//        None.
+//
+global proc xgmFreezeBrushSettingsProperties( string $parent, string $frameLayout, string $brushCmd, string $tool )
+{
+    global string $gXgmFreezeBrushFalloffTypes;
+    global string $gXgmFreezeBrushFalloffTypesL10N[];
+    xgmInitFreezeBrushFalloffTypes();
+
+    setParent $parent;
+
+    frameLayout -collapsable true -collapse false -mh 5 -l (uiRes("m_xgmFreezeBrushProperties.kXgmBrushSettings")) $frameLayout;
+        string $brushSettingColumnLayout = `columnLayout -adj true -rs 5 xgmBrushSettingsColumnLayout`;
+
+            // Base Properties
+            rowLayout -numberOfColumns 2 -columnWidth 1 50 -columnWidth 2 20 -adjustableColumn 1 -rowAttach 2 "top" 0 xgmBrushSettingsSizeLayout;
+                floatSliderGrp -field true -pre 3
+                    -min 0
+                    -max 1000
+                    -fieldMaxValue 10000000
+                    -label (uiRes("m_xgmFreezeBrushProperties.kXgmBrushSize"))
+                    -annotation (uiRes("m_xgmFreezeBrushProperties.kXgmBrushSizeAnnotation"))
+                    -cc ( $brushCmd + " -e -radius #1 " + $tool )
+                xgmBrushSizeFSG;
+
+                iconTextCheckBox -width 22 -height 22 -style "iconOnly" -image "nodeGrapherUnpinnedLarge.png" -selectionImage "nodeGrapherPinnedLarge.png" 
+                    -annotation (uiRes("m_xgmFreezeBrushProperties.kUseGlobalBrushSizeAnnotation"))
+                    -onCommand  ( $brushCmd + " -e -useGlobalRadius false " + $tool )
+                    -offCommand ( $brushCmd + " -e -useGlobalRadius true " + $tool )
+                xgmBrushPinITCB;
+
+            setParent ..;
+
+            floatSliderGrp -field true -pre 3
+                -min 0
+                -max 100
+                -fieldMaxValue 10000000
+                -label (uiRes("m_xgmFreezeBrushProperties.kXgmBrushStrength"))
+                -annotation (uiRes("m_xgmFreezeBrushProperties.kXgmBrushStrengthAnnotation"))
+                -cc ( $brushCmd + " -e -strength #1 " + $tool )
+                xgmBrushStrengthFSG;
+
+            separator -style "none";
+
+            checkBoxGrp -label (uiRes("m_xgmFreezeBrushProperties.kXgmFreezeBrushUnfreeze"))
+                -numberOfCheckBoxes 1
+                -on1 ( $brushCmd + " -e -unfreeze 1 " + $tool )
+                -of1 ( $brushCmd + " -e -unfreeze 0 " + $tool )
+                xgmFreezeBrushUnfreezeCBG;
+
+            radioButtonGrp -label (uiRes("m_xgmFreezeBrushProperties.kXgmFreezeBrushBrushMode"))
+                -numberOfRadioButtons 2
+                -label1 (uiRes("m_xgmFreezeBrushProperties.kXgmFreezeBrushBrushModeGlobal"))
+                -label2 (uiRes("m_xgmFreezeBrushProperties.kXgmFreezeBrushBrushModeLocal"))
+                -on1 ( $brushCmd + " -e -globalSelection 1 " + $tool )
+                -on2 ( $brushCmd + " -e -globalSelection 0 " + $tool )
+                xgmFreezeBrushBrushModeRBG;
+
+            optionMenuGrp -label (uiRes("m_xgmFreezeBrushProperties.kXgmFreezeBrushOperation"))
+                -cc ( "xgmFreezeBrushOperationChanged( \"" + $brushSettingColumnLayout + "\", \"" + $brushCmd + "\", \"" +  $tool + "\")" )
+                xgmFreezeBrushOperationOMG;
+
+                menuItem -label (uiRes("m_xgmFreezeBrushProperties.kXgmFreezeBrushOperationPaint"));
+                menuItem -label (uiRes("m_xgmFreezeBrushProperties.kXgmFreezeBrushOperationSmooth"));
+
+            separator -style "none";
+            string $buttonForm = `formLayout xgmFreezeBrushButtonsForm`;
+
+                string $buttonColumn = `columnLayout -columnWidth 150 -rowSpacing 5 xgmFreezeBrushButtonsColumn`;
+                    button -label (uiRes("m_xgmFreezeBrushProperties.kXgmFreezeBrushUnfreezeAll"))
+                        -command ($brushCmd + " -e -unfreezeAll " + $tool )
+                        xgmFreezeBrushUnfreezeAllButton;
+                    button -label (uiRes("m_xgmFreezeBrushProperties.kXgmFreezeBrushInvertFrozen"))
+                        -command ($brushCmd + " -e -invertFrozen " + $tool )
+                        xgmFreezeBrushInvertFrozenButton;
+                setParent ..;
+
+            formLayout -e
+                -attachForm     $buttonColumn "left"   130
+                $buttonForm;
+
+            setParent ..;
+
+        setParent ..;
+    setParent ..;
+}
+
+global proc xgmFreezeBrushDisableFalloffColorSettings ( string $parent )
+{
+    setParent $parent;
+    checkBoxGrp -e -vis 0 xgmFalloffColorEnableCBG;
+    rowLayout -e -vis 0 xgmFalloffColorRampRowLayout;
+    text -e -vis 0 xgmFalloffColorText;
+    gradientControlNoAttr -e -vis 0 xgmFalloffColorRamp;
+    colorSliderGrp -e -vis 0 xgmFalloffColorCSG;
+}
+
+//
+//    Description:
+//        layout of select brush tool property sheet
+//
+//    Input Arguments:
+//        None.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmFreezeBrushProperties ()
+{
+    global string $gXgmFreezeBrushLayout;
+    global string $gXgmFreezeBrushCmd;
+    global string $gXgmFreezeBrushToolName;
+    global string $gXgmFreezeBrushSettingFrame;
+    global string $gXgmFreezeBrushFalloffFrame;
+    global string $gXgmFreezeBrushDisplaySettingFrame;
+    global string $gXgmFreezeBrushSymmetrySettingFrame;
+
+    global string $gXgmFreezeBrushFalloffTypes;
+    global string $gXgmFreezeBrushFalloffTypesL10N[];
+
+    string $parent = `toolPropertyWindow -q -location`;
+    setParent $parent;
+
+    setUITemplate -pushTemplate OptionsTemplate;
+
+    columnLayout $gXgmFreezeBrushLayout;
+
+    xgmFreezeBrushSettingsProperties( $gXgmFreezeBrushLayout, 
+                            $gXgmFreezeBrushSettingFrame, 
+                            $gXgmFreezeBrushCmd, 
+                            $gXgmFreezeBrushToolName );
+
+    xgmBrushFalloffProperties( $gXgmFreezeBrushLayout, 
+                            $gXgmFreezeBrushFalloffFrame, 
+                            $gXgmFreezeBrushCmd, 
+                            $gXgmFreezeBrushToolName,
+                            "",
+                            $gXgmFreezeBrushFalloffTypes,
+                            $gXgmFreezeBrushFalloffTypesL10N ); 
+
+    // disable the falloff color setting part for freeze brush
+    xgmFreezeBrushDisableFalloffColorSettings($gXgmFreezeBrushFalloffFrame);
+
+    xgmBrushDisplaySettingsProperties( $gXgmFreezeBrushLayout, 
+                            $gXgmFreezeBrushDisplaySettingFrame,
+                            $gXgmFreezeBrushCmd, 
+                            $gXgmFreezeBrushToolName,
+                            "" );  
+
+    xgmBrushSymmetrySettingsProperties( $gXgmFreezeBrushLayout, 
+                            $gXgmFreezeBrushSymmetrySettingFrame,
+                            $gXgmFreezeBrushCmd, 
+                            $gXgmFreezeBrushToolName,
+                            "" );  
+
+    setUITemplate -popTemplate;
+}
+

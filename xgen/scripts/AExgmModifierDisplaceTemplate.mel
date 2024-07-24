@@ -1,0 +1,36 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+
+
+
+
+global proc AExgmModifierDisplacementTemplate(string $nodeName)
+{
+    editorTemplate -beginScrollLayout;
+        // Common Attributes
+        AExgmModifierBaseTemplate $nodeName;
+
+        editorTemplate -beginLayout (uiRes("m_AExgmModifierDisplaceTemplate.kDisplaceModifier")) -collapse 0;
+
+            xgmCreateAEUiForFloatAttr "displacement" (uiRes("m_AExgmModifierDisplaceTemplate.kDisplacement")) "xgmModifierDisplacement";
+            xgmCreateAEUiForFloat3Attr "vectorDisplacement" (uiRes("m_AExgmModifierDisplaceTemplate.kVectorDisplacement")) "xgmModifierDisplacement";
+            editorTemplate -addControl -label  (uiRes("m_AExgmModifierDisplaceTemplate.kDisplacementCoordsys")) "coordsys" ;
+            xgmCreateAEUiForFloatAttr "scale"  (uiRes("m_AExgmModifierDisplaceTemplate.kScale")) "xgmModifierDisplacement";
+            xgmCreateAEUiForFloatAttr "base"   (uiRes("m_AExgmModifierDisplaceTemplate.kBase")) "xgmModifierDisplacement";
+            xgmCreateAEUiForFloatAttr "offset" (uiRes("m_AExgmModifierDisplaceTemplate.kOffset")) "xgmModifierDisplacement";
+            xgmCreateAEUiForFloatAttr "bump"   (uiRes("m_AExgmModifierDisplaceTemplate.kBump")) "xgmModifierDisplacement";
+
+        editorTemplate -endLayout;
+
+        AEdependNodeTemplate $nodeName ;
+
+        // Dynamic Attributes
+        editorTemplate -addExtraControls;
+
+    editorTemplate -endScrollLayout;
+}

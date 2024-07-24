@@ -1,0 +1,130 @@
+<!--
+Copyright 2015 Autodesk, Inc. All rights reserved.
+
+Use of this software is subject to the terms of the Autodesk
+license agreement provided at the time of installation or download,
+or which otherwise accompanies this software in either electronic
+or hard copy form.
+-->
+<fragment uiName="xgenCPVRemapTint0" name="xgenCPVRemapTint0" type="plumbing" class="ShadeFragment" version="1.0" feature_level="0" >
+    <description>
+        <![CDATA[
+XGen remap float to CPV color (plumbing)]]>
+    </description>
+    <properties>
+        <float2   name="remapValueTuple" />
+        <float2   name="remapRange0" />
+        <float4   name="remapColor0" />
+        <float4   name="remapColor1" />
+        <float4   name="inputColor0" />
+    </properties>
+    <values>
+        <float2 name="remapRange0"     value="0.000000,1.000000" />
+        <float4 name="remapColor0"     value="0.000000,0.450000,0.900000,0.000000" />
+        <float4 name="remapColor1"     value="0.000000,0.000000,0.000000,0.000000" />
+    </values>
+    <outputs>
+        <float4 name="outColor0" />
+    </outputs>
+    <implementation>
+        <implementation render="OGSRenderer" language="Cg" lang_version="2.100000" >
+            <function_name val="xgenCPVRemapTint0" />
+            <source>
+                <![CDATA[
+float4 xgenCPVRemapTint0(float2 remapValueTuple, float2 remapRange0, float4 remapColor0, float4 remapColor1, float4 inputColor0) 
+{
+    float remapValue0 = remapValueTuple.x;
+    float remapValue1 = remapValueTuple.y;
+    float4 outColor = inputColor0;
+
+    if( remapValue0 >= remapRange0.x && remapValue0 <= remapRange0.y )
+    {
+        outColor = float4(lerp(outColor.rgb, remapColor0.rgb, remapColor0.a * (1.0f - remapValue0)), outColor.a);
+    }
+
+    int iRemapValue1 = int(remapValue1 * 255 + 0.5f);
+    bool isHidden = bool(iRemapValue1 & (0x1 << 1));
+    bool isSelected = bool(iRemapValue1 & (0x1 << 0));
+
+    if( isHidden )
+    {
+         discard;
+    }
+    else if( isSelected )
+    {
+         outColor = float4(lerp(outColor.rgb, remapColor1.rgb, remapColor1.a), outColor.a);
+    }
+    
+    return outColor;
+}
+                ]]>
+            </source>
+        </implementation>
+        <implementation render="OGSRenderer" language="GLSL" lang_version="3.000000" >
+            <function_name val="xgenCPVRemapTint0" />
+            <source>
+                <![CDATA[
+vec4 xgenCPVRemapTint0(vec2 remapValueTuple, vec2 remapRange0, vec4 remapColor0, vec4 remapColor1, vec4 inputColor0) 
+{
+    float remapValue0 = remapValueTuple.x;
+    float remapValue1 = remapValueTuple.y;
+    vec4 outColor = inputColor0;
+
+    if( remapValue0 >= remapRange0.x && remapValue0 <= remapRange0.y )
+    {
+        outColor = vec4(lerp(outColor.rgb, remapColor0.rgb, remapColor0.a * (1.0f - remapValue0)), outColor.a);
+    }
+
+    int iRemapValue1 = int(remapValue1 * 255 + 0.5f);
+    bool isHidden = bool(iRemapValue1 & (0x1 << 1));
+    bool isSelected = bool(iRemapValue1 & (0x1 << 0));
+
+    if( isHidden )
+    {
+         discard;
+    }
+    else if( isSelected )
+    {
+         outColor = vec4(lerp(outColor.rgb, remapColor1.rgb, remapColor1.a), outColor.a);
+    }
+
+    return outColor;
+} 
+                ]]>
+            </source>
+        </implementation>
+        <implementation render="OGSRenderer" language="HLSL" lang_version="11.000000" >
+            <function_name val="xgenCPVRemapTint0" />
+            <source>
+                <![CDATA[
+float4 xgenCPVRemapTint0(float2 remapValueTuple, float2 remapRange0, float4 remapColor0, float4 remapColor1, float4 inputColor0) 
+{
+    float remapValue0 = remapValueTuple.x;
+    float remapValue1 = remapValueTuple.y;
+    float4 outColor = inputColor0;
+
+    if( remapValue0 >= remapRange0.x && remapValue0 <= remapRange0.y )
+    {
+        outColor = float4(lerp(outColor.rgb, remapColor0.rgb, remapColor0.a * (1.0f - remapValue0)), outColor.a);
+    }
+
+    int iRemapValue1 = int(remapValue1 * 255 + 0.5f);
+    bool isHidden = bool(iRemapValue1 & (0x1 << 1));
+    bool isSelected = bool(iRemapValue1 & (0x1 << 0));
+
+    if( isHidden )
+    {
+         discard;
+    }
+    else if( isSelected )
+    {
+         outColor = float4(lerp(outColor.rgb, remapColor1.rgb, remapColor1.a), outColor.a);
+    }
+    
+    return outColor;
+} 
+                ]]>
+            </source>
+        </implementation>
+    </implementation>
+</fragment>

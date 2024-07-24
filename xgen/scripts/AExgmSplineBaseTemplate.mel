@@ -1,0 +1,410 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+// =======================================================================
+// Copyright 2015 Autodesk, Inc. All rights reserved.
+//
+// This computer source code and related instructions and comments are the
+// unpublished confidential  and proprietary information of Autodesk, Inc.
+// and are protected under applicable copyright and trade secret law. They 
+// may not be disclosed to, copied  or used by any third party without the 
+// prior written consent of Autodesk, Inc.
+// =======================================================================
+
+global int $gXgmSplineBaseIsCreatingDensityTable = 1;
+
+// Local helper for naming the control
+proc string getControlName(string $attr, string $type)
+{
+    string $tokens[];
+    tokenize($attr, ".", $tokens);
+    string $attrName = $tokens[1];
+    return ("xgmSplineBase_" + $attrName + "_" + $type + "_Control");
+}
+
+global proc int xgSplineBaseDensityGridCellChanged(int $row, int $column, string $value)
+{
+    global int $gXgmSplineBaseIsCreatingDensityTable;
+
+    if ($gXgmSplineBaseIsCreatingDensityTable)
+        return 1;
+
+    if ($column == 2)
+    {
+        if (size(strip($value)) != 1 || (int)$value < 1 || (int)$value > 5 )
+            return 0;
+
+        // node name
+        string $nodeName = `scriptTable -q -annotation xgSplineBaseDensityGridTable`;
+
+        string $curMeshName[] = `scriptTable -q -cellIndex $row 1 -cellValue xgSplineBaseDensityGridTable`;
+        string $boundMeshes[] = `listAttr -multi -string "boundMesh" $nodeName`;
+        for ($i=size($boundMeshes)-1; $i>=0; $i--)
+        {
+            string $boundMeshAttrName = $nodeName + "." + $boundMeshes[$i];
+            if (`connectionInfo -isDestination $boundMeshAttrName`)
+            {
+                string $srcAttr = `connectionInfo -sourceFromDestination $boundMeshAttrName`;
+                string $meshName = `plugNode $srcAttr`;
+                if ($meshName == $curMeshName[0])
+                {
+                    string $indexStr = `match "\[[0-9]*\]$" $boundMeshAttrName`;
+                    string $logicIndex = `match "[0-9*]" $indexStr`;
+                    string $resolutionAttr = $nodeName + ".resolution[" + $logicIndex + "]";
+                    int $val = (int)$value;
+                    setAttr $resolutionAttr $val;
+                }
+            }
+        }
+    }
+    else if ($column == 1)
+    {
+        return 0;
+    }
+
+    return 1;
+}
+
+// First creation of the attribute editor for an spline base node. 
+global proc AExgmSplineBaseDensityGridSettingsNew(string $attrName)
+{
+    //rowLayout -numberOfColumns 3 -adjustableColumn 2 -columnWidth 3 45 -rowAttach 1 "top" 0;
+    columnLayout -adjustableColumn 1;
+        //changed "Resolution" to "Subdivision Level"
+        string $subdLevelStr = (uiRes("m_AExgmSplineBaseTemplate.kSubdLevel"));
+        scriptTable -rows 2 -columns 2 -height 100
+            -label 1 (uiRes("m_AExgmSplineBaseTemplate.kBoundMesh")) -label 2 $subdLevelStr 
+            -cellChangedCmd xgSplineBaseDensityGridCellChanged
+            xgSplineBaseDensityGridTable;
+    setParent ..;
+
+    AExgmSplineBaseDensityGridSettingsReplace($attrName);
+}
+
+global proc AExgmSplineBaseDensityGridSettingsReplace(string $attrName)
+{
+    // Get parent for script job use
+    string $parent = `setParent -q`;
+    string $setParentCmd = ("setParent " + $parent + ";");
+    scriptJob
+        -replacePrevious
+        -parent xgSplineBaseDensityGridTable
+        -attributeChange $attrName
+        ($setParentCmd + "AExgmSplineBaseDensityDoGridSettingsChange " + $attrName);
+
+    AExgmSplineBaseDensityDoGridSettingsChange($attrName);
+}
+
+global proc AExgmSplineBaseDensityDoGridSettingsChange(string $attrName)
+{
+    global int $gXgmSplineBaseIsCreatingDensityTable;
+    
+    if (!`objExists $attrName`)    // undo case
+        return;
+        
+    string $nodeName = `plugNode $attrName`;
+
+    int $i;
+    // clear original rows
+    int $rowNum = `scriptTable -q -rows xgSplineBaseDensityGridTable`;
+    for ($i=$rowNum-1; $i>0; $i--)
+    {
+        scriptTable -e -deleteRow $i xgSplineBaseDensityGridTable;
+    }
+
+    $gXgmSplineBaseIsCreatingDensityTable = 1;
+
+    string $boundMeshes[] = `listAttr -multi -string "boundMesh" $nodeName`;
+    for ($i=size($boundMeshes)-1; $i>=0; $i--)
+    {
+        string $boundMeshAttrName = $nodeName + "." + $boundMeshes[$i];
+        if (`connectionInfo -isDestination $boundMeshAttrName`)
+        {
+            string $srcAttr = `connectionInfo -sourceFromDestination $boundMeshAttrName`;
+            string $meshName = `plugNode $srcAttr`;
+            scriptTable -e -insertRow 1 xgSplineBaseDensityGridTable;
+            scriptTable -e -cellIndex 1 1 -cellValue $meshName xgSplineBaseDensityGridTable;
+            string $indexStr = `match "\[[0-9]*\]$" $boundMeshAttrName`;
+            string $logicIndex = `match "[0-9*]" $indexStr`;
+            string $resolutionAttr = $nodeName + ".resolution[" + $logicIndex + "]";
+            int $resolution = `getAttr $resolutionAttr`;
+            scriptTable -e -cellIndex 1 2 -cellValue $resolution xgSplineBaseDensityGridTable;
+        }
+    }
+
+    $gXgmSplineBaseIsCreatingDensityTable = 0;
+
+    // store current node name to annotation
+    scriptTable -e -annotation $nodeName xgSplineBaseDensityGridTable;
+}
+
+// Rebuild button callback
+global proc AExgmSplineBaseCVRebuildCB(string $attr_cvCount)
+{
+    // Get node name
+    string $nodeName = `plugNode $attr_cvCount`;
+
+    // Get CV count
+    string $intCtrl_cvCount = getControlName($attr_cvCount, "intField");
+    int $cvCount = `intField -q -value $intCtrl_cvCount`;
+
+    // Form rebuild command line
+    xgmRebuildSplineDescription -cvCount $cvCount $nodeName;
+}
+
+// CV setting UIs
+global proc AExgmSplineBaseCVSettingNew(string $attr_cvCount)
+{
+    // Get UI names
+    string $intCtrl_cvCount     = getControlName($attr_cvCount,   "intField");
+
+    setUITemplate -pst attributeEditorTemplate;
+        rowLayout -numberOfColumns 3 -columnWidth 2 80 -columnAlign 2 "left" -columnAttach 2 "left" 0;
+            // CV count UIs
+            text -label (uiRes("m_AExgmSplineBaseTemplate.kCVCountLabel"));
+            intField -value 5 -min 4 $intCtrl_cvCount;
+            // Rebuild button
+            button -label (uiRes("m_AExgmSplineBaseTemplate.kCVRebuildButton"))
+                        xgmBaseNodeRebuildCVButton;
+        setParent ..;
+    setUITemplate -ppt;
+
+    AExgmSplineBaseCVSettingReplace($attr_cvCount);
+}
+
+global proc AExgmSplineBaseCVSettingReplaceCVCount(string $attr_cvCount)
+{
+    if (!`objExists $attr_cvCount`)    // undo case
+        return;
+
+    string $intCtrl_cvCount = getControlName($attr_cvCount, "intField");
+    int $cvCount = `getAttr $attr_cvCount`;
+    intField -e -v $cvCount $intCtrl_cvCount;
+}
+
+global proc AExgmSplineBaseCVSettingReplace(string $attr_cvCount)
+{
+    // Get parent for script job use, support for multiple AE tabs
+    string $parent = `setParent -q`;
+    string $setParentCmd = ("setParent " + $parent + ";");
+
+    // CV count UI
+    AExgmSplineBaseCVSettingReplaceCVCount($attr_cvCount);
+    string $intCtrl_cvCount = getControlName($attr_cvCount, "intField");
+    scriptJob
+        -replacePrevious
+        -parent $intCtrl_cvCount
+        -attributeChange $attr_cvCount
+        ($setParentCmd + "AExgmSplineBaseCVSettingReplaceCVCount " + $attr_cvCount);
+
+    // Rebuild button
+    button
+        -e
+        -c ("AExgmSplineBaseCVRebuildCB " + $attr_cvCount )
+        xgmBaseNodeRebuildCVButton;
+}
+
+global proc AExgmSplineBaseDensityMultiplierNew(string $attrName)
+{
+    // Get node name
+    string $nodeName = `plugNode $attrName`;
+    
+    setUITemplate -pst attributeEditorTemplate;
+        rowLayout -numberOfColumns 2 -columnWidth 2 120;
+            text -label "";
+            iconTextButton -flat 0 -style "iconAndTextHorizontal" -image "xgIG_density_24.png" -label ((uiRes("m_AExgmSplineBaseTemplate.kDensityBrush"))) xgmBaseNodePaintDensityButton;
+        setParent ..;
+        floatSliderGrp -label (uiRes("m_AExgmSplineBaseTemplate.kDensityMultiplier")) -field true
+            -minValue 0.0
+            -maxValue 100.0
+            -fieldMinValue 0.0
+            -fieldMaxValue 1000000.0
+            -value 1.0 
+            xgSplineBaseDensityMultiplierFsg;
+    setUITemplate -ppt;
+    
+    AExgmSplineBaseDensityMultiplierReplace($attrName);
+}
+
+global proc AExgmSplineBaseDensityMultiplierReplace(string $attrName)
+{
+    // Get parent for script job use
+    string $parent = `setParent -q`;
+    string $setParentCmd = ("setParent " + $parent + ";");
+
+    string $nodeName = `plugNode $attrName`;
+    iconTextButton  -e -c ("select " + $nodeName + "; XgmSetDensityBrushTool") xgmBaseNodePaintDensityButton;
+
+    string $fullPath = `floatSliderGrp -q -fpn xgSplineBaseDensityMultiplierFsg`;
+    string $cmd = "xgmSplineBaseDensityScaleChangeCmd -v `floatSliderGrp -q -value " + $fullPath + "` "
+                    + $nodeName; 
+    floatSliderGrp -e -changeCommand $cmd xgSplineBaseDensityMultiplierFsg;
+
+    scriptJob
+        -replacePrevious
+        -parent xgSplineBaseDensityMultiplierFsg
+        -attributeChange $attrName
+        ($setParentCmd + "AExgmSplineBaseDoDensityMultiplierChange " + $attrName);
+
+    AExgmSplineBaseDoDensityMultiplierChange($attrName);
+}
+
+global proc AExgmSplineBaseDoDensityMultiplierChange(string $attrName)
+{
+    // Get node name
+    string $nodeName = `plugNode $attrName`;
+    float $dm = `getAttr $attrName`;
+    
+    string $fullPath = `floatSliderGrp -q -fpn xgSplineBaseDensityMultiplierFsg`;
+    
+    floatSliderGrp -e -value $dm xgSplineBaseDensityMultiplierFsg;
+}
+
+global proc AExgmSplineBasePlaceNew(string $attrName)
+{
+    setUITemplate -pst attributeEditorTemplate;
+            rowLayout -numberOfColumns 2 -columnWidth 2 120;
+                text -label "";
+                iconTextButton -flat 0 -style "iconAndTextHorizontal" -image "xgIG_place_24.png" -label ((uiRes("m_AExgmSplineBaseTemplate.kPlaceBrush"))) xgmBaseNodePlaceButton;
+            setParent ..;
+    setUITemplate -ppt;
+
+    AExgmSplineBasePlaceReplace($attrName);
+}
+
+global proc AExgmSplineBasePlaceReplace(string $attrName)
+{
+    string $nodeName = `plugNode $attrName`;
+    iconTextButton -e -c ("select " + $nodeName + "; XgmSetPlaceBrushTool") xgmBaseNodePlaceButton;
+}
+
+global proc AExgmSplineBaseDoInterpolateChange(string $attr_interpolate)
+{
+    int $i = `getAttr $attr_interpolate`;
+    checkBox -e -value $i xgSplineBaseInterpolateSelGrp;
+    attrEnumOptionMenuGrp -e -enable ($i==1) xgSplineBaseInterpFromMenuGrp;
+    floatSliderGrp -e -enable ($i==1) xgSplineBaseInterpSmoothnessFsg;
+    floatSliderGrp -e -enable ($i==0) xgSplineBaseInitLengthFsg;
+}
+
+global proc AExgmSplineBaseDoInterpSmoothnessChange(string $attr_interpSmoothness)
+{
+    float $l = `getAttr $attr_interpSmoothness`;
+    floatSliderGrp -e -value $l xgSplineBaseInterpSmoothnessFsg;
+}
+
+global proc AExgmSplineBaseDoInitLengthChange(string $attr_initLength)
+{
+    float $l = `getAttr $attr_initLength`;
+    floatSliderGrp -e -value $l xgSplineBaseInitLengthFsg;
+}
+
+global proc AExgmSplineBaseInterpolateNew(string $attr_interpolate, string $attr_interpFrom, string $attr_initLength, string $attr_interpSmoothness)
+{
+    setUITemplate -pst attributeEditorTemplate;
+		rowLayout -numberOfColumns 2 ;
+            text -label "";
+			checkBox
+                -label (uiRes("m_AExgmSplineBaseTemplate.kInterpolate"))
+                xgSplineBaseInterpolateSelGrp;
+		setParent ..;
+
+        attrEnumOptionMenuGrp
+                -label (uiRes("m_AExgmSplineBaseTemplate.kInterpFrom"))
+                xgSplineBaseInterpFromMenuGrp;
+        floatSliderGrp -label (uiRes("m_AExgmSplineBaseTemplate.kInterpSmoothness")) -field true
+            -minValue 0.0
+            -maxValue 1.0
+            -fieldMinValue 0.0
+            -fieldMaxValue 1.0
+            -value 0.0 
+            xgSplineBaseInterpSmoothnessFsg;
+        floatSliderGrp -label (uiRes("m_AExgmSplineBaseTemplate.kInitialLength")) -field true
+            -min 0.001
+            -max 100
+            -value 1.0
+            xgSplineBaseInitLengthFsg;
+    setUITemplate -ppt;
+
+    AExgmSplineBaseInterpolateReplace($attr_interpolate, $attr_interpFrom, $attr_initLength, $attr_interpSmoothness);
+}
+
+global proc AExgmSplineBaseInterpolateReplace(string $attr_interpolate, string $attr_interpFrom, string $attr_initLength, string $attr_interpSmoothness)
+{
+    // Get parent for script job use
+    string $parent = `setParent -q`;
+    string $setParentCmd = ("setParent " + $parent + ";");
+    scriptJob
+        -replacePrevious
+        -parent xgSplineBaseInterpolateSelGrp
+        -attributeChange $attr_interpolate
+        ($setParentCmd + "AExgmSplineBaseDoInterpolateChange " + $attr_interpolate);
+    scriptJob
+        -replacePrevious
+        -parent xgSplineBaseInterpSmoothnessFsg
+        -attributeChange $attr_interpSmoothness
+        ($setParentCmd + "AExgmSplineBaseDoInterpSmoothnessChange " + $attr_interpSmoothness);
+    scriptJob
+        -replacePrevious
+        -parent xgSplineBaseInitLengthFsg
+        -attributeChange $attr_initLength
+        ($setParentCmd + "AExgmSplineBaseDoInitLengthChange " + $attr_initLength);
+
+    checkBox -e -cc ("setAttr " + $attr_interpolate + " `checkBox -q -value xgSplineBaseInterpolateSelGrp`;")
+                xgSplineBaseInterpolateSelGrp;
+    floatSliderGrp -e -cc ("setAttr " + $attr_interpSmoothness + " `floatSliderGrp -q -value xgSplineBaseInterpSmoothnessFsg`;")
+                xgSplineBaseInterpSmoothnessFsg;
+    floatSliderGrp -e -cc ("setAttr " + $attr_initLength + " `floatSliderGrp -q -value xgSplineBaseInitLengthFsg`;")
+                xgSplineBaseInitLengthFsg;
+
+    attrEnumOptionMenuGrp -e -attribute $attr_interpFrom xgSplineBaseInterpFromMenuGrp;
+
+    AExgmSplineBaseDoInterpolateChange($attr_interpolate);
+    AExgmSplineBaseDoInitLengthChange($attr_initLength);
+    AExgmSplineBaseDoInterpSmoothnessChange($attr_interpSmoothness);
+}
+
+global proc AExgmSplineBaseTemplate(string $nodeName)
+{
+    editorTemplate -beginScrollLayout;
+
+        editorTemplate -beginLayout (uiRes("m_AExgmSplineBaseTemplate.kGenerator")) -collapse false;
+            editorTemplate -callCustom "AExgmSplineBaseDensityMultiplierNew" "AExgmSplineBaseDensityMultiplierReplace" "densityMultiplier";
+            xgmCreateAEUiForFloatAttr "densityMask"    (uiRes("m_AExgmSplineBaseTemplate.kDensityMask"))   "xgmSplineBase";
+
+            editorTemplate -addSeparator;
+
+            editorTemplate -callCustom "AExgmSplineBaseInterpolateNew" "AExgmSplineBaseInterpolateReplace" "interpolate" "interpFrom" "initLength" "interpSmoothness";
+        editorTemplate -endLayout;
+
+        editorTemplate -beginLayout (uiRes("m_AExgmSplineBaseTemplate.kPlacing")) -collapse false;
+            editorTemplate -callCustom "AExgmSplineBasePlaceNew" "AExgmSplineBasePlaceReplace" "outSplineData";
+        editorTemplate -endLayout;
+
+        // CV settings
+        editorTemplate -beginLayout (uiRes("m_AExgmSplineBaseTemplate.kAECVSettings")) -collapse false;
+            editorTemplate -callCustom "AExgmSplineBaseCVSettingNew" "AExgmSplineBaseCVSettingReplace" "cvCount";
+        editorTemplate -endLayout;
+
+        //Density Grid Settings: collapse by default
+        editorTemplate -beginLayout (uiRes("m_AExgmSplineBaseTemplate.kAEdensityGridSettings")) -collapse true;
+            editorTemplate -callCustom "AExgmSplineBaseDensityGridSettingsNew" "AExgmSplineBaseDensityGridSettingsReplace" "resolution";
+        editorTemplate -endLayout;
+
+    editorTemplate -addExtraControls;
+
+    // Suppress attributes
+    editorTemplate -suppress "boundMesh";
+    editorTemplate -suppress "boundInfoData";
+    editorTemplate -suppress "cachedInSplineData";
+    editorTemplate -suppress "outMeshData";
+    editorTemplate -suppress "interpSource";
+    editorTemplate -suppress "initWidth";
+
+    editorTemplate -endScrollLayout;
+}
+

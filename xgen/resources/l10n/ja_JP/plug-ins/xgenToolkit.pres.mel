@@ -1,0 +1,859 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+// Resources for Plug-in: xgenToolkit
+// 
+// ----------------------------
+// Registered string resources:
+// ----------------------------
+setPluginResource( "xgenToolkit", "rAccept", "適用して閉じる");
+setPluginResource( "xgenToolkit", "rAddGuidesToolAvailability", "ガイドを追加ツールは、ガイドを使用するディスクリプションにのみ使用することができます");
+setPluginResource( "xgenToolkit", "rAddMoveGuidesTool", "ガイドを追加/移動ツール");
+setPluginResource( "xgenToolkit", "rAddWidget", "ウィジェットを追加");
+setPluginResource( "xgenToolkit", "rAlembicErrorBadAttribute", "Alembic エラーです。不良なアトリビュート ^1s がファイルに見つかりました: ^2s");
+setPluginResource( "xgenToolkit", "rAlembicErrorBadBoundingBox", "Alembic エラーです。不良なバウンディング ボックス データがファイルに見つかりました: ^1s");
+setPluginResource( "xgenToolkit", "rAlembicErrorBadControl", "Alembic エラーです。不良なコントロール ポイントがファイル(フレーム)に見つかりました: ^1s");
+setPluginResource( "xgenToolkit", "rAlembicErrorBadDegrees", "Alembic エラーです。不良な角度がファイル(フレーム)に見つかりました: ^1s");
+setPluginResource( "xgenToolkit", "rAlembicErrorBadKnot", "Alembic エラーです。不良なノット ベクトルがファイル(フレーム)に見つかりました: ^1s");
+setPluginResource( "xgenToolkit", "rAlembicErrorBadPosition", "Alembic エラーです。不良な位置データがファイルに見つかりました: ^1s");
+setPluginResource( "xgenToolkit", "rAlembicErrorBadPositionFile", "Alembic エラーです。不良な位置データがファイルに見つかりました: ^1s [^2s, ^3s]");
+setPluginResource( "xgenToolkit", "rAlembicErrorBadPositionFrame", "Alembic エラーです。不良な位置データがファイル(フレーム)に見つかりました: ^1s");
+setPluginResource( "xgenToolkit", "rAlembicErrorBadWeights", "Alembic エラーです。不良なウェイトがファイル(フレーム)に見つかりました: ^1s");
+setPluginResource( "xgenToolkit", "rAlembicErrorGeoTypeMismatch", "Alembic エラーです。'^1s' のジオメトリ タイプが XGen (^2s) とファイル間で一致しません: ^3s");
+setPluginResource( "xgenToolkit", "rAlembicErrorNoGeoFound", "Alembic エラーです。'^1s' という名前のジオメトリがファイル(フレーム)に見つかりません: ^2s");
+setPluginResource( "xgenToolkit", "rApply", "適用");
+setPluginResource( "xgenToolkit", "rBack", "戻る");
+setPluginResource( "xgenToolkit", "rCachePlayTypeBounce", "バウンス");
+setPluginResource( "xgenToolkit", "rCachePlayTypeHold", "保持");
+setPluginResource( "xgenToolkit", "rCachePlayTypeLoop", "ループ");
+setPluginResource( "xgenToolkit", "rCachePlayTypeReverse", "反転");
+setPluginResource( "xgenToolkit", "rCafErrorBadAttribute", "Caf エラーです。^1s という名前の不良なアトリビュートがファイル(フレーム)に見つかりました: ^2s");
+setPluginResource( "xgenToolkit", "rCafErrorBadControl", "Caf エラーです。不良なコントロール ポイントがファイル(フレーム)に見つかりました: ^1s");
+setPluginResource( "xgenToolkit", "rCafErrorBadDegree", "Caf エラーです。不良な角度がファイル(フレーム)に見つかりました: ^1s");
+setPluginResource( "xgenToolkit", "rCafErrorBadKnot", "Caf エラーです。不良なノット ベクトルがファイル(フレーム)に見つかりました: ^1s");
+setPluginResource( "xgenToolkit", "rCafErrorBadPointCount", "Caf エラーです。不良なポイント数がファイル(フレーム)に見つかりました: ^1s");
+setPluginResource( "xgenToolkit", "rCafErrorBadPointId", "Caf エラーです。不良なポイント ID がファイル(フレーム)に見つかりました: ^1s");
+setPluginResource( "xgenToolkit", "rCafErrorBadPositionData", "Caf エラーです。不良な位置データがファイルに見つかりました: ^1s");
+setPluginResource( "xgenToolkit", "rCafErrorBadPositionDataXgen", "Caf エラーです。不良な位置データがファイルに見つかりました: ^1s [^2s, ^3s]");
+setPluginResource( "xgenToolkit", "rCafErrorCvAttributeNotSimple", "見つかった CV アトリビュートが単純な浮動小数点数 xgen_cv_^1s ではありません。^2s [^3s, ^4s]");
+setPluginResource( "xgenToolkit", "rCafErrorFailedToOpenPtex", "Ptex を開けませんでした: ^1s -> ^2s");
+setPluginResource( "xgenToolkit", "rCafErrorFileDoesNotExist", "ファイルは存在しません: ^1s");
+setPluginResource( "xgenToolkit", "rCafErrorGeoTypeMismatch", "Caf エラーです。'^1s' のジオメトリ タイプが XGen (^2s) と caf ファイル間で一致しません: ^3s");
+setPluginResource( "xgenToolkit", "rCafErrorGuideIndexProblem", "guideIndex の読み取り時に問題が発生しました。^1s [^2s, ^3s]");
+setPluginResource( "xgenToolkit", "rCafErrorInvalidGuideIndex", "無効な guideIndex です: ^1s。^2s [^3s, ^4s]");
+setPluginResource( "xgenToolkit", "rCafErrorNoGeoNamed", "Caf エラーです。'^1s' という名前のジオメトリが caf ファイル(フレーム)に見つかりません: ^2s");
+setPluginResource( "xgenToolkit", "rCafErrorNoGuidesOverride", "オーバーライドするガイドがありません[^1s, ^2s]");
+setPluginResource( "xgenToolkit", "rCafErrorProblemReadingCv", "cv アトリビュート xgen_cv_^1s の読み取り時に問題が発生しました。^2s [^3s, ^4s]");
+setPluginResource( "xgenToolkit", "rCafErrorRefPos", "Caf エラーです。参照位置がファイル（フレーム）のメッシュに一致しません: ^1s");
+setPluginResource( "xgenToolkit", "rCafErrorUnableToLoadFile", "ファイルをロードできません: ^1s");
+setPluginResource( "xgenToolkit", "rCafErrorUnableToLoadMulti", "ロードできません: ^1s [^2s, ^3s]");
+setPluginResource( "xgenToolkit", "rCallToAttrExists", "attrExists の呼び出しに失敗しました。");
+setPluginResource( "xgenToolkit", "rCancel", "キャンセル");
+setPluginResource( "xgenToolkit", "rCannotModifyPath", "^1s ノードのパスを修正できません");
+setPluginResource( "xgenToolkit", "rClumpUseCustomControlMap", "カスタム マップ");
+setPluginResource( "xgenToolkit", "rColorCurveWidget", "カラー カーブ");
+setPluginResource( "xgenToolkit", "rColorWidget", "カラー");
+setPluginResource( "xgenToolkit", "rColorWidgetColor", "カラー");
+setPluginResource( "xgenToolkit", "rConvertXGenPrimToPoly", "XGen プリミティブをポリゴンに変換");
+setPluginResource( "xgenToolkit", "rCouldNotAddModifierType", "モディファイアを追加できませんでした[^1s, ^2s, ^3s]");
+setPluginResource( "xgenToolkit", "rCouldNotDeleteCollection", "コレクションを削除できませんでした[^1s]");
+setPluginResource( "xgenToolkit", "rCouldNotDeleteDescription", "ディスクリプションを削除できませんでした[^1s, ^2s]");
+setPluginResource( "xgenToolkit", "rCouldNotExportCollection", "コレクションを書き出せませんでした。コレクションが見つかりません: ^1s");
+setPluginResource( "xgenToolkit", "rCouldNotExportDesc", "ディスクリプションを書き出すことができませんでした[^1s, ^2s]");
+setPluginResource( "xgenToolkit", "rCouldNotExportDescAsPreset", "プリセットとしてディスクリプション[^1s, ^2s]を書き出せませんでした");
+setPluginResource( "xgenToolkit", "rCouldNotFindActiveType", "アクティブなタイプが見つかりませんでした[^1s, ^2s]");
+setPluginResource( "xgenToolkit", "rCouldNotFindCollection", "コレクションが見つかりませんでした [^1s]");
+setPluginResource( "xgenToolkit", "rCouldNotFindFileInDataPath", "FileInXgDataPath が見つかりませんでした[^1s, ^2s]");
+setPluginResource( "xgenToolkit", "rCouldNotFindFxModules", "fx モジュールが見つかりませんでした[^1s, ^2s]");
+setPluginResource( "xgenToolkit", "rCouldNotFindModifier", "モディファイアが見つかりませんでした[^1s, ^2s, ^3s]");
+setPluginResource( "xgenToolkit", "rCouldNotFindModifierForPreset", "モディファイア[^1s, ^2s, ^3s]が見つかりませんでした");
+setPluginResource( "xgenToolkit", "rCouldNotFindModifierType", "モディファイア タイプが見つかりませんでした[^1s, ^2s, ^3s]");
+setPluginResource( "xgenToolkit", "rCouldNotGetObjects", "オブジェクトを取得できませんでした[^1s, ^2s]");
+setPluginResource( "xgenToolkit", "rCouldNotImportDescAsPreset", "プリセットとしてディスクリプション [^1s, ^2s] を読み込むことができませんでした");
+setPluginResource( "xgenToolkit", "rCouldNotImportDescription", "ディスクリプションを読み込むことができませんでした[^1s, ^2s]");
+setPluginResource( "xgenToolkit", "rCouldNotImportModifier", "モディファイアを読み込むことができませんでした[^1s, ^2s]");
+setPluginResource( "xgenToolkit", "rCouldNotImportModifierFile", "モディファイアを読み込むことができませんでした[^1s, ^2s, ^3s]");
+setPluginResource( "xgenToolkit", "rCouldNotInitInterpolation", "補間を初期化できませんでした[^1s, ^2s]");
+setPluginResource( "xgenToolkit", "rCouldNotMoveModifierType", "モディファイアを移動できませんでした[^1s, ^2s, ^3s]");
+setPluginResource( "xgenToolkit", "rCouldNotRemoveModifierType", "モディファイアを除去できませんでした[^1s, ^2s, ^3s]");
+setPluginResource( "xgenToolkit", "rCouldNotReturnBoundFace", "バインドされた面を返すことができませんでした[^1s, ^2s, ^3s]");
+setPluginResource( "xgenToolkit", "rCouldNotReturnBoundFaceNotFound", "バインドされた面を返すことができませんでした。パッチが見つかりません。[^1s, ^2s, ^3s]");
+setPluginResource( "xgenToolkit", "rCouldNotReturnBoundGeo", "バインドされたジオメトリを返すことができませんでした[^1s, ^2s]");
+setPluginResource( "xgenToolkit", "rCouldNotReturnCulledPrims", "カリング済みのプリミティブを返すことができませんでした[^1s, ^2s, ^3s]");
+setPluginResource( "xgenToolkit", "rCouldNotReturnPatchIds", "カリング済みのパッチのフェース ID を返すことができませんでした[^1s, ^2s, ^3s]");
+setPluginResource( "xgenToolkit", "rCouldNotReturnPatchNotFound", "カリング済みのパッチを返すことができませんでした。パッチが見つかりません[^1s, ^2s, ^3s]");
+setPluginResource( "xgenToolkit", "rCouldNotReturnPatches", "カリング済みのパッチを返すことができませんでした[^1s, ^2s]");
+setPluginResource( "xgenToolkit", "rCouldNotSetActiveOfType", "指定されたタイプのアクティブなオブジェクトを設定できませんでした: [^1s, ^2s, ^3s]");
+setPluginResource( "xgenToolkit", "rCouldNotSetActiveType", "アクティブなタイプを設定できませんでした[^1s, ^2s]");
+setPluginResource( "xgenToolkit", "rCreateDefaultSculptLayer", "スカルプト レイヤが見つかりません。新しいレイヤを作成します。");
+setPluginResource( "xgenToolkit", "rCreatePtexUVAttachMesh", "エラー createPtexUV: メッシュへのアタッチに失敗しました。");
+setPluginResource( "xgenToolkit", "rCreatePtexUVCantGet", "エラー createPtexUV: UV セットを照会できませんでした");
+setPluginResource( "xgenToolkit", "rCreatePtexUVCommandFail", "createPtexUV コマンドが失敗しました。");
+setPluginResource( "xgenToolkit", "rCreatePtexUVCommandSucceed", "createPtexUV コマンドが成功しました。");
+setPluginResource( "xgenToolkit", "rCreatePtexUVHasUVs", "createPtexUV: メッシュには既に UV があります。スキップします。");
+setPluginResource( "xgenToolkit", "rCreatePtexUVNotAMesh", "エラー createPtexUV: ^1s はメッシュではありません");
+setPluginResource( "xgenToolkit", "rCreatePtexUVNotFound", "エラー createPtexUV: ^1s が見つかりません");
+setPluginResource( "xgenToolkit", "rCurveWidget", "カーブ");
+setPluginResource( "xgenToolkit", "rCurveWidgetLookup", "検索");
+setPluginResource( "xgenToolkit", "rErr_AlembicCacheBigPreRollStartFrame", "プリロール開始フレームは、開始フレームよりも小さくする必要があります。");
+setPluginResource( "xgenToolkit", "rErr_AlembicCacheExportCacheToFileInUse", "ファイル 「^1s」は使用中です。キャッシュを書き出すには別のファイルを指定してください。");
+setPluginResource( "xgenToolkit", "rErr_AlembicCacheFileNotExists", "Alembic file '^1s' は存在しません。");
+setPluginResource( "xgenToolkit", "rErr_AlembicCacheIgnoreUnsupportedFlag", "サポートされていないフラグを無視します: ^1s 。");
+setPluginResource( "xgenToolkit", "rErr_AlembicCacheInvalidDataFormatFlag", "データ形式が正しく指定されていません。");
+setPluginResource( "xgenToolkit", "rErr_AlembicCacheInvalidFile", "Alembic ファイルが無効です: ^1s。");
+setPluginResource( "xgenToolkit", "rErr_AlembicCacheInvalidFileFlag", "ファイルが正しく指定されていません。");
+setPluginResource( "xgenToolkit", "rErr_AlembicCacheInvalidFlag", "無効なキャッシュ フラグです。");
+setPluginResource( "xgenToolkit", "rErr_AlembicCacheInvalidFrameRangeFlag", "フレーム レンジが正しく指定されていません。");
+setPluginResource( "xgenToolkit", "rErr_AlembicCacheInvalidFrameRelativeSampleFlag", "フレーム相対サンプルが正しく指定されていません。");
+setPluginResource( "xgenToolkit", "rErr_AlembicCacheInvalidObjectFlag", "オブジェクト フラグが正しく指定されていません。");
+setPluginResource( "xgenToolkit", "rErr_AlembicCacheInvalidPreRollStartFrameFlag", "プリロール開始フレームが正しく指定されていません。");
+setPluginResource( "xgenToolkit", "rErr_AlembicCacheInvalidPreRollStepFlag", "プリロール ステップが正しく指定されていません。");
+setPluginResource( "xgenToolkit", "rErr_AlembicCacheInvalidStepFlag", "ステップが正しく指定されていません。");
+setPluginResource( "xgenToolkit", "rErr_AlembicCacheNoCacheNodeSelected", "キャッシュ ノードが選択されていません。");
+setPluginResource( "xgenToolkit", "rErr_AlembicCacheNoDescNodeSelected", "ディスクリプション ノードが選択されていません。");
+setPluginResource( "xgenToolkit", "rErr_AlembicCacheNoDescNorCacheNodeSelected", "ディスクリプション ノードもキャッシュ ノードも選択されていません。");
+setPluginResource( "xgenToolkit", "rErr_AlembicCacheNoFrameRangeFlag", "フレーム レンジが指定されませんでした。");
+setPluginResource( "xgenToolkit", "rErr_AlembicCacheNoXGenNodeSelected", "有効な XGen ノードが指定されていません。");
+setPluginResource( "xgenToolkit", "rErr_BrushContextFailToFindBase", "ベース ノードの検索に失敗しました。");
+setPluginResource( "xgenToolkit", "rErr_BrushContextFailToFindDesc", "ディスクリプション ノードの検索に失敗しました。");
+setPluginResource( "xgenToolkit", "rErr_BrushContextSpecifySculptNode", "グルーミングする有効なスカルプトノードを指定する必要があります。");
+setPluginResource( "xgenToolkit", "rErr_BrushContextXgmCurveSplineNodeInBetween", "現在のスカルプト ノードとディスクリプション ノードの間に 'xgmCurveToSpline' があります。");
+setPluginResource( "xgenToolkit", "rErr_BrushContextXgmSplineCacheNodeInBetween", "現在のスカルプト ノードとディスクリプション ノードの間に xgmSplineCache ノードがあります。");
+setPluginResource( "xgenToolkit", "rErr_CreateSplineNameArgIsEmpty", "-name 引数を空にすることはできません。");
+setPluginResource( "xgenToolkit", "rErr_CreateSplineNameArgNotFound", "-name 引数が指定されていないか、または見つかりません。");
+setPluginResource( "xgenToolkit", "rErr_CreateSplineNoMeshSelected", "バウンディングするメッシュが選択されていません。");
+setPluginResource( "xgenToolkit", "rErr_CreateSplineSkipNonManifoldMesh", "メッシュ ^1s には非多様体の頂点(polyInfo -nmv ^2s)があります。メッシュのディスクリプションの作成をスキップします。");
+setPluginResource( "xgenToolkit", "rErr_CreateSplineSplineCVCountTooBig", "CV 数を ^1s より大きくすることはできません。");
+setPluginResource( "xgenToolkit", "rErr_CreateSplineSplineCVCountTooSmall", "CV 数を ^1s より小さくすることはできません。");
+setPluginResource( "xgenToolkit", "rErr_CreateSplineSplineDensityTooBig", "スプラインの密度を ^1s より大きくすることはできません。");
+setPluginResource( "xgenToolkit", "rErr_CreateSplineSplineLengthTooBig", "スプラインの長さを ^1s より大きくすることはできません。");
+setPluginResource( "xgenToolkit", "rErr_CreateSplineSplineWidthScaleTooBig", "スプラインの幅のスケールを ^1s より大きくすることはできません。");
+setPluginResource( "xgenToolkit", "rErr_CreateSplineSplineWidthTooBig", "スプラインの幅を ^1s より大きくすることはできません。");
+setPluginResource( "xgenToolkit", "rErr_DensityBrushIllegalFloodMode", "不正なブラシの塗り潰しモード '^1s' です。");
+setPluginResource( "xgenToolkit", "rErr_DensityBrushIllegalOpMode", "不正なブラシ操作モード '^1s' です。");
+setPluginResource( "xgenToolkit", "rErr_DirectionBrushTurnOffFaceCamera", "ツイスト ブラシを使用するには[カメラに正対]をオフにします");
+setPluginResource( "xgenToolkit", "rErr_FailedToFindBaseNodeFromGuideNode", "指定されたガイド ノード '^1s' からのベース ノードの検索に失敗しました。");
+setPluginResource( "xgenToolkit", "rErr_FailedToFindProperBaseNode", "適切な XGen ベース ノードの検索に失敗しました。");
+setPluginResource( "xgenToolkit", "rErr_GroomConvertMustSelDescOrPal", "パレットまたはディスクリプションのいずれかを選択する必要があります。");
+setPluginResource( "xgenToolkit", "rErr_GroomConvertNoDesc", "変換用に選択されたディスクリプションがありません。");
+setPluginResource( "xgenToolkit", "rErr_GroomConvertPrefix", "接頭語名は文字で始まる必要があります。");
+setPluginResource( "xgenToolkit", "rErr_GroomTransferFail", "転送に失敗しました。");
+setPluginResource( "xgenToolkit", "rErr_GroomTransferNoValidBase", "有効なソース ベース ノードが見つかりません。");
+setPluginResource( "xgenToolkit", "rErr_GroomTransferNoValidDesc", "有効なディスクリプション ノードが指定されていません。");
+setPluginResource( "xgenToolkit", "rErr_GroomTransferNoValidMesh", "有効なメッシュ ノードが指定されていません。");
+setPluginResource( "xgenToolkit", "rErr_GroomTransferNoValidMeshForThisDesc", "指定されたディスクリプション ノードに対して有効なメッシュが見つかりません。");
+setPluginResource( "xgenToolkit", "rErr_GroomTransferSelectMeshDesc", "1 つのソース ディスクリプション ノードと 1 つのターゲット メッシュ ノードを選択してください。");
+setPluginResource( "xgenToolkit", "rErr_GuideDensityShouldNotBiggerThan", "ガイドの密度を '^1s' より大きくすることはできません。");
+setPluginResource( "xgenToolkit", "rErr_GuideInterpNoCandidateGuide", "候補ガイドは関連付けられていません。 ");
+setPluginResource( "xgenToolkit", "rErr_GuideInterpNoRefMeshInGuide", "入力ガイドに参照メッシュが見つかりません。");
+setPluginResource( "xgenToolkit", "rErr_GuideInterpNoRefMeshInSpline", "入力スプライン データに参照メッシュが見つかりません。");
+setPluginResource( "xgenToolkit", "rErr_LinearWireBadWireNumber", "プリミティブ #^1s のワイヤ数が不正です。^2s ノードに対してワイヤを再バインドしてください。");
+setPluginResource( "xgenToolkit", "rErr_LinearWireNoClosestPoint", "ノード ^2s のワイヤ #^1s に最も近いワイヤ ポイントが見つかりません。");
+setPluginResource( "xgenToolkit", "rErr_LinearWireNoRefMesh", "ノード  '^1s' の入力ガイドに参照メッシュが見つかりません。スキップします。");
+setPluginResource( "xgenToolkit", "rErr_LinearWireStaleRefState", "'^1s' のリファレンス ステータスは以前のバージョンのリニア ワイヤを使用して作成されたため、このバージョンでは正しく動作しない可能性があります。リファレンス ステータスを更新してください。");
+setPluginResource( "xgenToolkit", "rErr_LinearWireStaleRefStateInPreset", "'^1s' のリファレンス ステータスは以前のバージョンのリニア ワイヤを使用して作成されたため、このバージョンでは正しく動作しない可能性があります。このバージョンで元のシーンを開き、リファレンス ステータスを更新して、再び書き出してください。");
+setPluginResource( "xgenToolkit", "rErr_LinearWireTooSmallWeights", "ヒント/ベースのウェイトが正規化するには小さすぎます。 ");
+setPluginResource( "xgenToolkit", "rErr_MakeDynamicDisconnectGuideData", "この操作の前に現在の inGuideData の接続を解除してください。");
+setPluginResource( "xgenToolkit", "rErr_MakeDynamicFailToFindMesh", "指定されたガイド ノード '^1s' からバインドされたメッシュの検索に失敗しました。");
+setPluginResource( "xgenToolkit", "rErr_MakeDynamicFailToFindModifier", "適切なモディファイア ノードの検索に失敗しました。");
+setPluginResource( "xgenToolkit", "rErr_MakeDynamicMeshHasNoUV", "メッシュ '^1s' のカーブをダイナミックにするには、少なくとも 1 つの UV セットが必要です。");
+setPluginResource( "xgenToolkit", "rErr_MakeDynamicMultiModifierSelected", "複数のモディファイア ノードが選択されています。");
+setPluginResource( "xgenToolkit", "rErr_MakeDynamicNoCurve", "ガイドを作成するためのカーブが指定されていません。");
+setPluginResource( "xgenToolkit", "rErr_MakeDynamicNoGuideData", "ダイナミックにするためのガイド データがありません。");
+setPluginResource( "xgenToolkit", "rErr_MakeDynamicNoObject", "オブジェクトが指定または選択されていません。");
+setPluginResource( "xgenToolkit", "rErr_MakeDynamicNoValidModifier", "有効なモディファイア ノードが指定されていません。");
+setPluginResource( "xgenToolkit", "rErr_MakeDynamicThisModNotValid", "指定されたノード '^1s' は有効なガイド ノードではありません。");
+setPluginResource( "xgenToolkit", "rErr_MoreThanOneObjectSpecified", "複数のオブジェクトが指定または選択されています。");
+setPluginResource( "xgenToolkit", "rErr_NoXgmModifierGuideObjectSpecified", "正しい xgmModifierGuide オブジェクトが指定または選択されていません。");
+setPluginResource( "xgenToolkit", "rErr_NotAXgmModifierGuideOrXgmModifierLinearWire", "指定されたノード '^1s' は、'xgmModifierGuide' ノードまたは 'xgmModifierLinearWire' ノードではありません。");
+setPluginResource( "xgenToolkit", "rErr_PlaceBrushIllegalOpMode", "不正なブラシ操作モード '^1s' です。");
+setPluginResource( "xgenToolkit", "rErr_RebuildCVCntTooSmall", "少なくとも ^1s の CV を指定する必要があります。");
+setPluginResource( "xgenToolkit", "rErr_RebuildCantCrossSecondaryBaseNode", "現在のベース ノードとディスクリプション ノードの間に 'xgmCurveToSpline' または  'xgmSplineCache' ノードがある場合は、リビルドできません。");
+setPluginResource( "xgenToolkit", "rErr_RebuildFailToFindBase", "適切な XGen ベース ノードの検索に失敗しました。");
+setPluginResource( "xgenToolkit", "rErr_RebuildFailToFindBaseFromDesc", "ディスクリプション ノード '^1s' からの XGen ベース ノードの検索に失敗しました。");
+setPluginResource( "xgenToolkit", "rErr_RebuildFailToFindDesc", "ベース ノード '^1s' からのディスクリプション ノードの検索に失敗しました。");
+setPluginResource( "xgenToolkit", "rErr_RebuildInValidMode", "無効なモード '^1s' です。'^2s' または '^3s' のいずれかを使用してください。");
+setPluginResource( "xgenToolkit", "rErr_RebuildModeNotSupported", "モード [^1s] はまだサポートされていません。");
+setPluginResource( "xgenToolkit", "rErr_RebuildMoreThanOneObj", "複数のオブジェクトが指定または選択されています。");
+setPluginResource( "xgenToolkit", "rErr_RebuildNoObject", "正しい XGen オブジェクトが指定または選択されませんでした。");
+setPluginResource( "xgenToolkit", "rErr_RebuildNotBaseOrDesc", "ノード '^1s' は 'xgmSplineBase' ノードでも 'xgmSplineDescription' ノードでもありません。");
+setPluginResource( "xgenToolkit", "rErr_RebuildUnrecognizedNode", "認識されないノードにアクセスしました: ID='^1s'、名前='^2s'。");
+setPluginResource( "xgenToolkit", "rErr_SculptFailToCreateAttrChangCallback", "アトリビュートが変更されたコールバックを作成できません。");
+setPluginResource( "xgenToolkit", "rErr_SculptFailToCreateCallback", "コールバックを作成できません。");
+setPluginResource( "xgenToolkit", "rErr_SculptIllegalTweakIndex", "不正な微調整インデックス '^1s' です。微調整番号の範囲外です。");
+setPluginResource( "xgenToolkit", "rErr_UpdateRefMustOnXgmModifierLinearWire", "'xgmModifierLinearWire' ノードの参照状態を更新する必要があります。");
+setPluginResource( "xgenToolkit", "rErrorRegisteringPlugin", "^1s の登録エラーです。");
+setPluginResource( "xgenToolkit", "rExpr", "エクスプレッション名");
+setPluginResource( "xgenToolkit", "rFailedCanCreateDeltaCollectionNotFound", "デルタを作成できるかどうかを検出できませんでした。コレクションが見つかりません: ^1s");
+setPluginResource( "xgenToolkit", "rFailedDeltaCollectionNotFound", "デルタの作成に失敗しました。コレクションが見つかりません: ^1s");
+setPluginResource( "xgenToolkit", "rFailedDeltaSnapshotNotFound", "デルタの作成に失敗しました。コレクションのスナップショットが見つかりません: ^1s");
+setPluginResource( "xgenToolkit", "rFailedSnapshotCollectionNotFound", "スナップショットの作成に失敗しました。コレクションが見つかりません: ^1s");
+setPluginResource( "xgenToolkit", "rFailedToApplyDelta", "デルタをコレクション ^1s に適用できませんでした。読み込みを中止します。 ");
+setPluginResource( "xgenToolkit", "rFailedToCreateSnapshot", "コレクション ^1s のスナップショットの作成に失敗しました。デルタ ファイルの保存が機能しません。");
+setPluginResource( "xgenToolkit", "rFailedToImportCollectionFromFile", "コレクションをファイル ^1s から読み込むことができませんでした");
+setPluginResource( "xgenToolkit", "rFailedToImportDescAsPreset", "プリセットとしてディスクリプションの読み込みに失敗しました。 コレクションが見つかりません。[^1s]");
+setPluginResource( "xgenToolkit", "rFailedToImportDescription", "ディスクリプションの読み込みに失敗しました。コレクションが見つかりません。[^1s]");
+setPluginResource( "xgenToolkit", "rFailedToRegisterPlugin", "^1s を登録できませんでした。");
+setPluginResource( "xgenToolkit", "rFileDoesNotExist", "ファイルは存在しません: ^1s");
+setPluginResource( "xgenToolkit", "rFileNameImportModifier", "モディファイアを読み込むには、ファイル名を指定する必要があります。");
+setPluginResource( "xgenToolkit", "rFloatWidget", "float");
+setPluginResource( "xgenToolkit", "rForward", "進む");
+setPluginResource( "xgenToolkit", "rFxModuleNotFound", "モディファイアを除去できませんでした。モディファイアが見つかりません: [^1s, ^2s, ^3s]");
+setPluginResource( "xgenToolkit", "rFxModuleNotFoundMove", "モディファイアを移動できませんでした。モディファイアが見つかりません: [^1s, ^2s, ^3s]");
+setPluginResource( "xgenToolkit", "rHelp", "ヘルプ");
+setPluginResource( "xgenToolkit", "rInf_GroomTransferSucceeded", "変換に成功しました。");
+setPluginResource( "xgenToolkit", "rIntWidget", "int");
+setPluginResource( "xgenToolkit", "rInvalidGenerator", "ディスクリプションを作成するために指定されたジェネレータが無効です。");
+setPluginResource( "xgenToolkit", "rInvalidInterpolation", "無効な補間方法が指定されました。");
+setPluginResource( "xgenToolkit", "rInvalidModifierNode", "無効なモディファイア ノード: inMesh アトリビュートと outMesh アトリビュートが必要です。");
+setPluginResource( "xgenToolkit", "rInvalidPreviewer", "ディスクリプションを作成するために指定されたプレビューアが無効です。");
+setPluginResource( "xgenToolkit", "rInvalidPrimitive", "ディスクリプションを作成するために指定されたプリミティブが無効です。");
+setPluginResource( "xgenToolkit", "rInvalidRenderer", "ディスクリプションを作成するために指定されたレンダラが無効です。");
+setPluginResource( "xgenToolkit", "rMax", "最大:");
+setPluginResource( "xgenToolkit", "rMin", "最小:");
+setPluginResource( "xgenToolkit", "rModifierExportFileName", "モディファイアを書き出すには、ファイル名を指定する必要があります。");
+setPluginResource( "xgenToolkit", "rMsg_LinearWireNumIsZero", "リニア モディファイヤ '^1s' の参照または現在のワイヤ数がゼロです。");
+setPluginResource( "xgenToolkit", "rNeedInputMesh", "入力メッシュを指定する必要があります。");
+setPluginResource( "xgenToolkit", "rNoBoundGeometry", "[^1s] にバインドされたジオメトリはありません");
+setPluginResource( "xgenToolkit", "rNoDescriptionFound", "説明が見つかりません。");
+setPluginResource( "xgenToolkit", "rNoDescriptionName", "ディスクリプションを作成するためのディスクリプション名が指定されていません。");
+setPluginResource( "xgenToolkit", "rNoPaletteName", "ディスクリプションを作成するためのコレクション名が指定されていません。");
+setPluginResource( "xgenToolkit", "rNoPreviewVisibleBound", "プレビューが非表示です。ディスクリプションはシーン内のどのジオメトリにもバインドされていません。");
+setPluginResource( "xgenToolkit", "rNoPreviewVisibleGuidesTip", "表示可能なプレビューがありません。ディスクリプションはガイドを\\n使用するように設定されていますがガイドがまだ作成されていません。");
+setPluginResource( "xgenToolkit", "rNoPreviewVisibleLocationsTip", "表示可能なプレビューがありません。ディスクリプションは位置を\\n使用するように設定されていますが位置がまだ作成されていません。");
+setPluginResource( "xgenToolkit", "rNoVisibleBoundGeometry", "[^s1] にバインドされた表示可能なジオメトリはありません");
+setPluginResource( "xgenToolkit", "rNumericWidgetDefault", "既定");
+setPluginResource( "xgenToolkit", "rNumericWidgetMax", "最大");
+setPluginResource( "xgenToolkit", "rNumericWidgetMin", "最小");
+setPluginResource( "xgenToolkit", "rPaletteDoesNotExist", "パレット ^1s が存在しません。デルタの適用を中止します。");
+setPluginResource( "xgenToolkit", "rPatchNoDescription", "ディスクリプションがないため、パッチの編集に失敗しました。");
+setPluginResource( "xgenToolkit", "rPointHelpString", "マウス左ボタンで点をクリックし、ドラッグして点を追加します。半径内の点を削除するには、[Ctrl]+左クリックします。[B]キーを押しながらドラッグしてツールの半径を変更します。");
+setPluginResource( "xgenToolkit", "rPointsTool", "ポイント");
+setPluginResource( "xgenToolkit", "rPreviewerMustBeGL", "プレビューアを GL 以外に設定することはできません。[^1s, ^2s, ^3s]");
+setPluginResource( "xgenToolkit", "rRampInterpLinear", "リニア");
+setPluginResource( "xgenToolkit", "rRampInterpMSpline", "M-ｽﾌﾟﾗｲﾝ");
+setPluginResource( "xgenToolkit", "rRampInterpNone", "なし");
+setPluginResource( "xgenToolkit", "rRampInterpSmooth", "スムーズ");
+setPluginResource( "xgenToolkit", "rRampInterpSpline", "スプライン");
+setPluginResource( "xgenToolkit", "rRampPointInterp", "補間:");
+setPluginResource( "xgenToolkit", "rRampPointInterpShort", "補間:");
+setPluginResource( "xgenToolkit", "rRampPointPosition", "選択した位置:  ");
+setPluginResource( "xgenToolkit", "rRampPointPositionShort", "位置:");
+setPluginResource( "xgenToolkit", "rRampPointValue", "選択した値:  ");
+setPluginResource( "xgenToolkit", "rRampPointValueShort", "値:");
+setPluginResource( "xgenToolkit", "rRendererMustBeGL", "レンダラをプレビューア GL に設定することはできません。[^1s, ^2s, ^3s]");
+setPluginResource( "xgenToolkit", "rSave", "保存");
+setPluginResource( "xgenToolkit", "rSaveAs", "名前を付けて保存");
+setPluginResource( "xgenToolkit", "rSaveChanges", "変更の保存");
+setPluginResource( "xgenToolkit", "rSaveChangesToFile", "^1s への変更を保存しますか？");
+setPluginResource( "xgenToolkit", "rSaveChangesToUntitledFile", "無題のファイルに変更を保存しますか?");
+setPluginResource( "xgenToolkit", "rSaveExpression", "エクスプレッションを保存");
+setPluginResource( "xgenToolkit", "rSaveXGenLogFile", "XGen ログ ファイルを保存");
+setPluginResource( "xgenToolkit", "rSculptGuidesTool", "スカルプト ガイド ツール");
+setPluginResource( "xgenToolkit", "rSculptLockedLayerNotAllowed", "アクティブ レイヤがロックされています。");
+setPluginResource( "xgenToolkit", "rSculptLockedNodeNotAllowed", "アクティブ ノードがロックされています。");
+setPluginResource( "xgenToolkit", "rSculptReferencedNodeNotAllowed", "アクティブ ノードが参照されています。");
+setPluginResource( "xgenToolkit", "rSelectOneGroomSpline", "このツールを使用するには、インタラクティブ グルーミング スプラインのディスクリプションを選択してください。");
+setPluginResource( "xgenToolkit", "rSelectPrimitivesTool", "プリミティブを選択");
+setPluginResource( "xgenToolkit", "rSpecifyFileName", "読み込むファイル名を指定する必要があります。");
+setPluginResource( "xgenToolkit", "rSpecifyFileNameError", "ディスクリプションを読み込むファイル名を指定する必要があります。");
+setPluginResource( "xgenToolkit", "rSpecifyFileNameExportDesc", "ディスクリプションを書き出すファイル名を指定する必要があります。");
+setPluginResource( "xgenToolkit", "rSpecifyFileNameExportDescAsPreset", "プリセットとしてディスクリプションを書き出すには、ファイル名を指定する必要があります。");
+setPluginResource( "xgenToolkit", "rTriedToImportDuplicate", "ファイル ^2s から重複するコレクション ^1s を読み込もうとしました。読み込みを中止します。");
+setPluginResource( "xgenToolkit", "rTypeToSearch", "入力して検索...");
+setPluginResource( "xgenToolkit", "rUnableToExecutePlugin", "^1s を実行できません。");
+setPluginResource( "xgenToolkit", "rUnableToLoadFile", "ファイルをロードできません: ^1s");
+setPluginResource( "xgenToolkit", "rUnknownTypeGiven", "アクティブなタイプが見つかりませんでした。指定されたタイプが不明です: [^1s, ^2s, ^3s]");
+setPluginResource( "xgenToolkit", "rVariable", "変数");
+setPluginResource( "xgenToolkit", "rVectorWidget", "ベクトル");
+setPluginResource( "xgenToolkit", "rWarn_BrushContextNoValidMeshForThisDesc", "指定されたディスクリプション ノードに対して有効なメッシュが見つかりません。");
+setPluginResource( "xgenToolkit", "rWarn_GuideInterpCloseGuide", "フェース ^1s には非常に近接するガイドがあります。");
+setPluginResource( "xgenToolkit", "rWarn_GuideInterpCoincidentGuide", "フェース ^1s に一致ガイド [^2s, ^3s] があります。");
+setPluginResource( "xgenToolkit", "rWarn_LinearWireFailComputeMaxRadius", "MaxRadius の計算に失敗しました。すべてのガイドがアクティブになりました。");
+setPluginResource( "xgenToolkit", "rWarn_LinearWireNoLegalWire", "正当なワイヤの検索に失敗しました。");
+setPluginResource( "xgenToolkit", "rWarn_LinearWireNumChanged", "LinearModifier '^1s' に参照ワイヤが設定された後に、現在のワイヤ番号が変更されました。続行するには、参照状態を更新してください。");
+setPluginResource( "xgenToolkit", "rWarn_LinearWireNumIsNonEqual", "LinearModifier '^1s' で参照ワイヤと現在のワイヤの番号が異なります。続行するには、参照状態を更新してください。");
+setPluginResource( "xgenToolkit", "rWarn_SculptChangeActiveTweak", "^1s 個の微調整が残っています。アクティブな微調整インデックスは現在の微調整番号より大きいです。アクティブな微調整を '^2s' に変更します。");
+setPluginResource( "xgenToolkit", "rXGCouldNotGetDagNode", "ディスクリプション用の DAG ノードを取得できませんでした。");
+setPluginResource( "xgenToolkit", "rXGCouldNotGetXForm", "ディスクリプション用の xform を取得できませんでした。");
+setPluginResource( "xgenToolkit", "rXGDescUnableToCreateCB", "コールバックを作成できません。");
+setPluginResource( "xgenToolkit", "rXGPatchMayaNodeDoesNotExist", "Maya 側のパッチ ノードは存在しません。パッチの編集を終了してください。");
+setPluginResource( "xgenToolkit", "rXGPatchNoChanges", "パッチに行われた変更はありません。");
+setPluginResource( "xgenToolkit", "rXgIgBaseNodeInterpCurrent", "現在のディスクリプション");
+setPluginResource( "xgenToolkit", "rXgIgBaseNodeInterpSource", "補間ソース");
+setPluginResource( "xgenToolkit", "rXgIgBrushSize", "ブラシ サイズ: ^1s ");
+setPluginResource( "xgenToolkit", "rXgIgBrushStrength", "ブラシ強度: ^1s ");
+setPluginResource( "xgenToolkit", "rXgIgClumpBrushName", "束ブラシ ツール");
+setPluginResource( "xgenToolkit", "rXgIgCombBrushName", "ヘア ブラシ ツール");
+setPluginResource( "xgenToolkit", "rXgIgCutBrushName", "切り取りブラシ ツール");
+setPluginResource( "xgenToolkit", "rXgIgDensityBrushName", "密度ブラシ ツール");
+setPluginResource( "xgenToolkit", "rXgIgDirectionBrushName", "ツイスト ブラシ ツール");
+setPluginResource( "xgenToolkit", "rXgIgFreezeBrushName", "フリーズ ブラシ ツール");
+setPluginResource( "xgenToolkit", "rXgIgGrabBrushName", "グラブ ブラシ ツール");
+setPluginResource( "xgenToolkit", "rXgIgLengthBrushName", "長さブラシ ツール");
+setPluginResource( "xgenToolkit", "rXgIgModifierCutAbsolute", "絶対");
+setPluginResource( "xgenToolkit", "rXgIgModifierCutRelative", "相対");
+setPluginResource( "xgenToolkit", "rXgIgModifierDisplaceCoordsysXYZ", "Maya (xyz)");
+setPluginResource( "xgenToolkit", "rXgIgModifierDisplaceCoordsysXZY", "Mudbox (XZY)");
+setPluginResource( "xgenToolkit", "rXgIgModifierDisplaceModelGrayScale", "グレースケール");
+setPluginResource( "xgenToolkit", "rXgIgModifierDisplaceModelVector", "接線ベクトル");
+setPluginResource( "xgenToolkit", "rXgIgNoInputHairForGuideModifier", "ガイド モディファイヤの入力スプライン データにヘアがありません。入力ガイドにもスプライン ヘアがありません。");
+setPluginResource( "xgenToolkit", "rXgIgNoInputSplineDataForGuideModifier", "ガイド モディファイヤの入力スプラインデータが見つかりません。入力ガイドにもスプライン ヘアがありません。");
+setPluginResource( "xgenToolkit", "rXgIgNoiseBrushName", "ノイズ ブラシ ツール");
+setPluginResource( "xgenToolkit", "rXgIgPartBrushName", "パーツ ブラシ ツール");
+setPluginResource( "xgenToolkit", "rXgIgPlaceBrushName", "ブラシ ツールを配置");
+setPluginResource( "xgenToolkit", "rXgIgRegionBrushName", "領域ブラシ ツール");
+setPluginResource( "xgenToolkit", "rXgIgSelectBrushName", "ブラシ ツールを選択");
+setPluginResource( "xgenToolkit", "rXgIgSmoothBrushName", "スムーズ ブラシ ツール");
+setPluginResource( "xgenToolkit", "rXgIgTransferPositionBased", "位置ベース");
+setPluginResource( "xgenToolkit", "rXgIgTransferUVBased", "UV ベース");
+setPluginResource( "xgenToolkit", "rXgIgWidthBrushName", "幅広ブラシ ツール");
+setPluginResource( "xgenToolkit", "rXgenError", "XGen: ^1s ^2s");
+setPluginResource( "xgenToolkit", "rXgenExprEditor", "XGen エクスプレッションエディタ: ^1s");
+setPluginResource( "xgenToolkit", "rXgenTip", "XGen(ヒント): ^1s ^2s");
+setPluginResource( "xgenToolkit", "rXgenWarning", "XGen(^1s): ^2s ^3s");
+setPluginResource( "xgenToolkit", "rYouMustSpecifyAFileName", "書き出すファイル名を指定する必要があります。");
+// 
+// --------------------------
+// Registered node resources:
+// --------------------------
+// 
+// Node: xgmPalette
+// 
+setNodeNiceNameResource( "xgmPalette", "Xgm パレット" );
+setAttrNiceNameResource( "xgmPalette", "xbf", "Xg ベース ファイル" );
+setAttrNiceNameResource( "xgmPalette", "xdf", "Xg デルタ ファイル" );
+setAttrNiceNameResource( "xgmPalette", "xed", "Xg をデルタとして書き出し" );
+setAttrNiceNameResource( "xgmPalette", "xfn", "Xg ファイル名" );
+// 
+// Node: xgmDescription
+// 
+setNodeNiceNameResource( "xgmDescription", "Xgm ディスクリプション" );
+// 
+// Node: xgmMakeGuide
+// 
+setNodeNiceNameResource( "xgmMakeGuide", "Xgm 作成ガイド" );
+setAttrNiceNameResource( "xgmMakeGuide", "fzn", "フリーズ" );
+setAttrNiceNameResource( "xgmMakeGuide", "cgm", "C ジオメトリ" );
+setAttrNiceNameResource( "xgmMakeGuide", "mct", "最小数" );
+setAttrNiceNameResource( "xgmMakeGuide", "frm", "フレーム" );
+setAttrNiceNameResource( "xgmMakeGuide", "ovr", "オーバーライド" );
+setAttrNiceNameResource( "xgmMakeGuide", "os", "出力メッシュ" );
+setAttrNiceNameResource( "xgmMakeGuide", "gi", "ジオメトリ ヒット内側" );
+setAttrNiceNameResource( "xgmMakeGuide", "tg", "ガイド" );
+setAttrNiceNameResource( "xgmMakeGuide", "fza", "フリーズの影響を受ける" );
+// 
+// Node: xgmGuideManip
+// 
+setNodeNiceNameResource( "xgmGuideManip", "Xgm ガイド マニピュレータ" );
+// 
+// Node: xgmGuideSculptManip
+// 
+setNodeNiceNameResource( "xgmGuideSculptManip", "Xgm ガイド スカルプト マニピュレータ" );
+// 
+// Node: xgmPointsManip
+// 
+setNodeNiceNameResource( "xgmPointsManip", "Xgm ポイント マニピュレータ" );
+// 
+// Node: xgmConnectivity
+// 
+setNodeNiceNameResource( "xgmConnectivity", "Xgm 接続" );
+setAttrNiceNameResource( "xgmConnectivity", "gi", "ガイド" );
+setAttrNiceNameResource( "xgmConnectivity", "de", "ディスクリプション" );
+setAttrNiceNameResource( "xgmConnectivity", "rl", "リビルド リスト" );
+// 
+// Node: xgmPointsViewer
+// 
+setNodeNiceNameResource( "xgmPointsViewer", "Xgm ポイント ビューア" );
+setAttrNiceNameResource( "xgmPointsViewer", "len", "長さ" );
+setAttrNiceNameResource( "xgmPointsViewer", "gen", "生成" );
+setAttrNiceNameResource( "xgmPointsViewer", "rdr", "再描画" );
+// 
+// Node: xgmNurbsPatch
+// 
+setNodeNiceNameResource( "xgmNurbsPatch", "Xgm NURBS パッチ" );
+setAttrNiceNameResource( "xgmNurbsPatch", "geo", "ジオメトリ" );
+// 
+// Node: xgmSubdPatch
+// 
+setNodeNiceNameResource( "xgmSubdPatch", "Xgm サブ ディビジョン パッチ" );
+setAttrNiceNameResource( "xgmSubdPatch", "geo", "ジオメトリ" );
+// 
+// Node: xgmArchiveGuide
+// 
+setNodeNiceNameResource( "xgmArchiveGuide", "Xgm アーカイブ ガイド" );
+// 
+// Node: xgmCardGuide
+// 
+setNodeNiceNameResource( "xgmCardGuide", "Xgm カード ガイド" );
+// 
+// Node: createPtexUV
+// 
+setNodeNiceNameResource( "createPtexUV", "Ptex UV を作成" );
+setAttrNiceNameResource( "createPtexUV", "fzn", "フリーズ" );
+setAttrNiceNameResource( "createPtexUV", "im", "内側メッシュ" );
+setAttrNiceNameResource( "createPtexUV", "om", "外側メッシュ" );
+setAttrNiceNameResource( "createPtexUV", "bl", "ブリード" );
+setAttrNiceNameResource( "createPtexUV", "tc", "タイル数" );
+setAttrNiceNameResource( "createPtexUV", "fza", "フリーズの影響を受ける" );
+// 
+// Node: xgmHairMapping
+// 
+setNodeNiceNameResource( "xgmHairMapping", "Xgm ヘア マッピング" );
+setAttrNiceNameResource( "xgmHairMapping", "fzn", "フリーズ" );
+setAttrNiceNameResource( "xgmHairMapping", "uv", "UV 座標" );
+setAttrNiceNameResource( "xgmHairMapping", "u", "U 座標" );
+setAttrNiceNameResource( "xgmHairMapping", "v", "V 座標" );
+setAttrNiceNameResource( "xgmHairMapping", "fs", "UV フィルタ サイズ" );
+setAttrNiceNameResource( "xgmHairMapping", "fsx", "UV フィルタ サイズ X" );
+setAttrNiceNameResource( "xgmHairMapping", "fsy", "UV フィルタ サイズ Y" );
+setAttrNiceNameResource( "xgmHairMapping", "c", "有効範囲" );
+setAttrNiceNameResource( "xgmHairMapping", "cu", "有効範囲 U" );
+setAttrNiceNameResource( "xgmHairMapping", "cv", "有効範囲 V" );
+setAttrNiceNameResource( "xgmHairMapping", "tf", "フレームの移動" );
+setAttrNiceNameResource( "xgmHairMapping", "tfu", "フレームの移動 U" );
+setAttrNiceNameResource( "xgmHairMapping", "tfv", "フレームの移動 V" );
+setAttrNiceNameResource( "xgmHairMapping", "re", "繰り返し UV" );
+setAttrNiceNameResource( "xgmHairMapping", "reu", "繰り返し U" );
+setAttrNiceNameResource( "xgmHairMapping", "rev", "繰り返し V" );
+setAttrNiceNameResource( "xgmHairMapping", "of", "オフセット" );
+setAttrNiceNameResource( "xgmHairMapping", "ofu", "オフセット U" );
+setAttrNiceNameResource( "xgmHairMapping", "ofv", "オフセット V" );
+setAttrNiceNameResource( "xgmHairMapping", "o", "出力 UV" );
+setAttrNiceNameResource( "xgmHairMapping", "ou", "出力 U" );
+setAttrNiceNameResource( "xgmHairMapping", "ov", "出力 V" );
+setAttrNiceNameResource( "xgmHairMapping", "ofs", "出力 UV フィルタ サイズ" );
+setAttrNiceNameResource( "xgmHairMapping", "ofsx", "出力 UV フィルタ サイズ X" );
+setAttrNiceNameResource( "xgmHairMapping", "ofsy", "出力 UV フィルタ サイズ Y" );
+setAttrNiceNameResource( "xgmHairMapping", "fza", "フリーズの影響を受ける" );
+// 
+// Node: xgmSphereGuide
+// 
+setNodeNiceNameResource( "xgmSphereGuide", "Xgm 球ガイド" );
+// 
+// Node: xgmSplineGuide
+// 
+setNodeNiceNameResource( "xgmSplineGuide", "Xgm スプライン ガイド" );
+setAttrNiceNameResource( "xgmSplineGuide", "tpr", "テーパ" );
+setAttrNiceNameResource( "xgmSplineGuide", "wid", "幅" );
+setAttrNiceNameResource( "xgmSplineGuide", "dwi", "幅を表示" );
+setAttrNiceNameResource( "xgmSplineGuide", "fcm", "カメラに正対" );
+// 
+// Node: xgmSplineBase
+// 
+setNodeNiceNameResource( "xgmSplineBase", "Xgm スプライン ベース" );
+setAttrNiceNameResource( "xgmSplineBase", "fzn", "フリーズ" );
+setAttrNiceNameResource( "xgmSplineBase", "bm", "バインドされたメッシュ" );
+setAttrNiceNameResource( "xgmSplineBase", "bid", "バインド情報データ" );
+setAttrNiceNameResource( "xgmSplineBase", "r", "解像度" );
+setAttrNiceNameResource( "xgmSplineBase", "dm", "密度乗数" );
+setAttrNiceNameResource( "xgmSplineBase", "dmk", "密度マスク" );
+setAttrNiceNameResource( "xgmSplineBase", "gs", "ジェネレータ シード" );
+setAttrNiceNameResource( "xgmSplineBase", "i", "補間" );
+setAttrNiceNameResource( "xgmSplineBase", "if", "補完元" );
+setAttrNiceNameResource( "xgmSplineBase", "is", "Interp ソース" );
+setAttrNiceNameResource( "xgmSplineBase", "ism", "補間の平滑性" );
+setAttrNiceNameResource( "xgmSplineBase", "l", "初期長" );
+setAttrNiceNameResource( "xgmSplineBase", "w", "初期幅" );
+setAttrNiceNameResource( "xgmSplineBase", "d", "初期方向" );
+setAttrNiceNameResource( "xgmSplineBase", "dx", "初期方向 X" );
+setAttrNiceNameResource( "xgmSplineBase", "dy", "初期方向 Y" );
+setAttrNiceNameResource( "xgmSplineBase", "dz", "初期方向 Z" );
+setAttrNiceNameResource( "xgmSplineBase", "csd", "キャッシュされた入力スプライン データ" );
+setAttrNiceNameResource( "xgmSplineBase", "osd", "出力スプライン データ" );
+setAttrNiceNameResource( "xgmSplineBase", "omd", "出力メッシュ データ" );
+setAttrNiceNameResource( "xgmSplineBase", "cvc", "CV の数" );
+setAttrNiceNameResource( "xgmSplineBase", "tmo", "転送モード" );
+setAttrNiceNameResource( "xgmSplineBase", "tan", "転送モードを法線に位置合わせ" );
+setAttrNiceNameResource( "xgmSplineBase", "tmt", "転送モードのマッピング タイプ" );
+setAttrNiceNameResource( "xgmSplineBase", "tbi", "転送モード BBInfo" );
+setAttrNiceNameResource( "xgmSplineBase", "fza", "フリーズの影響を受ける" );
+setAttrEnumResource( "xgmSplineBase", "if", 0, "現在のディスクリプション" );
+setAttrEnumResource( "xgmSplineBase", "if", 1, "補間ソース" );
+setAttrEnumResource( "xgmSplineBase", "tmt", 0, "位置ベース" );
+setAttrEnumResource( "xgmSplineBase", "tmt", 1, "UV ベース" );
+// 
+// Node: xgmModifierCut
+// 
+setNodeNiceNameResource( "xgmModifierCut", "Xgm モディファイアのカット" );
+setAttrNiceNameResource( "xgmModifierCut", "ctm", "切り取りモード" );
+setAttrNiceNameResource( "xgmModifierCut", "mk", "マスク" );
+setAttrNiceNameResource( "xgmModifierCut", "a", "総数" );
+setAttrNiceNameResource( "xgmModifierCut", "pt", "パーセンテージ" );
+setAttrNiceNameResource( "xgmModifierCut", "mrl", "残りの最小長" );
+setAttrNiceNameResource( "xgmModifierCut", "rd", "CV の再分配" );
+setAttrEnumResource( "xgmModifierCut", "ctm", 0, "絶対" );
+setAttrEnumResource( "xgmModifierCut", "ctm", 1, "相対" );
+// 
+// Node: xgmModifierCollision
+// 
+setNodeNiceNameResource( "xgmModifierCollision", "Xgm モディファイヤ衝突" );
+setAttrNiceNameResource( "xgmModifierCollision", "mk", "マスク" );
+setAttrNiceNameResource( "xgmModifierCollision", "cd", "衝突距離" );
+setAttrNiceNameResource( "xgmModifierCollision", "ac", "メッシュのサンプリング" );
+setAttrNiceNameResource( "xgmModifierCollision", "rt", "解決タイプ" );
+setAttrNiceNameResource( "xgmModifierCollision", "it", "反復" );
+setAttrNiceNameResource( "xgmModifierCollision", "sg", "シグマ" );
+setAttrNiceNameResource( "xgmModifierCollision", "dp", "デフォメーションが維持されている" );
+setAttrNiceNameResource( "xgmModifierCollision", "t", "微調整" );
+setAttrNiceNameResource( "xgmModifierCollision", "cld", "コライダ" );
+setAttrNiceNameResource( "xgmModifierCollision", "cm", "コライダ メッシュ" );
+setAttrNiceNameResource( "xgmModifierCollision", "cmx", "コライダ行列" );
+setAttrNiceNameResource( "xgmModifierCollision", "ce", "コライダが有効" );
+setAttrNiceNameResource( "xgmModifierCollision", "cnf", "コライダの法線が反転されている" );
+// 
+// Node: xgmModifierSculpt
+// 
+setNodeNiceNameResource( "xgmModifierSculpt", "Xgm モディファイア スカルプト" );
+setAttrNiceNameResource( "xgmModifierSculpt", "ts", "微調整" );
+setAttrNiceNameResource( "xgmModifierSculpt", "t", "微調整" );
+setAttrNiceNameResource( "xgmModifierSculpt", "e", "有効化" );
+setAttrNiceNameResource( "xgmModifierSculpt", "l", "ロック" );
+setAttrNiceNameResource( "xgmModifierSculpt", "s", "強さ" );
+setAttrNiceNameResource( "xgmModifierSculpt", "oi", "オーナー ID" );
+setAttrNiceNameResource( "xgmModifierSculpt", "uin", "UI 名" );
+setAttrNiceNameResource( "xgmModifierSculpt", "uig", "UI グループ" );
+setAttrNiceNameResource( "xgmModifierSculpt", "uio", "UI の順番" );
+setAttrNiceNameResource( "xgmModifierSculpt", "gs", "グループ" );
+setAttrNiceNameResource( "xgmModifierSculpt", "tg", "微調整グループ" );
+setAttrNiceNameResource( "xgmModifierSculpt", "tge", "微調整グループの有効化" );
+setAttrNiceNameResource( "xgmModifierSculpt", "tgi", "微調整ｸﾞﾙｰﾌﾟのｵｰﾅｰID" );
+setAttrNiceNameResource( "xgmModifierSculpt", "tgn", "微調整ｸﾞﾙｰﾌﾟのUIName" );
+setAttrNiceNameResource( "xgmModifierSculpt", "tgo", "微調整ｸﾞﾙｰﾌﾟのUIOrder" );
+setAttrNiceNameResource( "xgmModifierSculpt", "a", "アクティブな微調整" );
+setAttrNiceNameResource( "xgmModifierSculpt", "mk", "マスク" );
+setAttrNiceNameResource( "xgmModifierSculpt", "tmo", "転送モード" );
+setAttrNiceNameResource( "xgmModifierSculpt", "tan", "転送モードを法線に位置合わせ" );
+setAttrNiceNameResource( "xgmModifierSculpt", "tmt", "転送モードのマッピング タイプ" );
+setAttrEnumResource( "xgmModifierSculpt", "tmt", 0, "位置ベース" );
+setAttrEnumResource( "xgmModifierSculpt", "tmt", 1, "UV ベース" );
+// 
+// Node: xgmModifierNoise
+// 
+setNodeNiceNameResource( "xgmModifierNoise", "Xgm モディファイヤ ノイズ" );
+setAttrNiceNameResource( "xgmModifierNoise", "mk", "マスク" );
+setAttrNiceNameResource( "xgmModifierNoise", "fy", "周波数" );
+setAttrNiceNameResource( "xgmModifierNoise", "mg", "マグニチュード" );
+setAttrNiceNameResource( "xgmModifierNoise", "ms", "マグニチュードのスケール" );
+setAttrNiceNameResource( "xgmModifierNoise", "msp", "マグニチュード スケール位置" );
+setAttrNiceNameResource( "xgmModifierNoise", "msfv", "マグニチュード スケール float 値" );
+setAttrNiceNameResource( "xgmModifierNoise", "msi", "マグニチュード スケール補間" );
+setAttrNiceNameResource( "xgmModifierNoise", "cl", "相関" );
+setAttrNiceNameResource( "xgmModifierNoise", "pl", "長さを保持" );
+setAttrNiceNameResource( "xgmModifierNoise", "t", "微調整" );
+setAttrNiceNameResource( "xgmModifierNoise", "lv", "ライブ" );
+setAttrEnumResource( "xgmModifierNoise", "msi", 0, "なし" );
+setAttrEnumResource( "xgmModifierNoise", "msi", 1, "リニア" );
+setAttrEnumResource( "xgmModifierNoise", "msi", 2, "スムーズ" );
+setAttrEnumResource( "xgmModifierNoise", "msi", 3, "スプライン" );
+// 
+// Node: xgmModifierDisplacement
+// 
+setNodeNiceNameResource( "xgmModifierDisplacement", "Xgm モディファイア ディスプレイスメント" );
+setAttrNiceNameResource( "xgmModifierDisplacement", "dis", "ディスプレイスメント" );
+setAttrNiceNameResource( "xgmModifierDisplacement", "vdis", "ﾍﾞｸﾄﾙ ﾃﾞｨｽﾌﾟﾚｲｽﾒﾝﾄ" );
+setAttrNiceNameResource( "xgmModifierDisplacement", "vdis0", "ベクトル ディスプレイスメント 0" );
+setAttrNiceNameResource( "xgmModifierDisplacement", "vdis1", "ベクトル ディスプレイスメント 1" );
+setAttrNiceNameResource( "xgmModifierDisplacement", "vdis2", "ベクトル ディスプレイスメント 2" );
+setAttrNiceNameResource( "xgmModifierDisplacement", "cds", "Coordsys" );
+setAttrNiceNameResource( "xgmModifierDisplacement", "scl", "スケール" );
+setAttrNiceNameResource( "xgmModifierDisplacement", "bs", "ベース" );
+setAttrNiceNameResource( "xgmModifierDisplacement", "os", "オフセット" );
+setAttrNiceNameResource( "xgmModifierDisplacement", "bp", "バンプ" );
+setAttrNiceNameResource( "xgmModifierDisplacement", "t", "微調整" );
+setAttrEnumResource( "xgmModifierDisplacement", "cds", 0, "Mudbox (XZY)" );
+setAttrEnumResource( "xgmModifierDisplacement", "cds", 1, "Maya (xyz)" );
+// 
+// Node: xgmModifierGuide
+// 
+setNodeNiceNameResource( "xgmModifierGuide", "Xgm モディファイヤ ガイド" );
+setAttrNiceNameResource( "xgmModifierGuide", "igd", "入力ガイド データ" );
+setAttrNiceNameResource( "xgmModifierGuide", "mk", "マスク" );
+setAttrNiceNameResource( "xgmModifierGuide", "mg", "マグニチュード" );
+setAttrNiceNameResource( "xgmModifierGuide", "ms", "マグニチュードのスケール" );
+setAttrNiceNameResource( "xgmModifierGuide", "msp", "マグニチュード スケール位置" );
+setAttrNiceNameResource( "xgmModifierGuide", "msfv", "マグニチュード スケール float 値" );
+setAttrNiceNameResource( "xgmModifierGuide", "msi", "マグニチュード スケール補間" );
+setAttrNiceNameResource( "xgmModifierGuide", "bl", "ブレンド" );
+setAttrNiceNameResource( "xgmModifierGuide", "urm", "領域マップを使用" );
+setAttrNiceNameResource( "xgmModifierGuide", "rm", "領域マスク" );
+setAttrNiceNameResource( "xgmModifierGuide", "rmp", "領域マップ" );
+setAttrNiceNameResource( "xgmModifierGuide", "rmpr", "領域マップ R" );
+setAttrNiceNameResource( "xgmModifierGuide", "rmpg", "領域マップ G" );
+setAttrNiceNameResource( "xgmModifierGuide", "rmpb", "領域マップ B" );
+setAttrNiceNameResource( "xgmModifierGuide", "pc", "プレビュー カラー" );
+setAttrEnumResource( "xgmModifierGuide", "msi", 0, "なし" );
+setAttrEnumResource( "xgmModifierGuide", "msi", 1, "リニア" );
+setAttrEnumResource( "xgmModifierGuide", "msi", 2, "スムーズ" );
+setAttrEnumResource( "xgmModifierGuide", "msi", 3, "スプライン" );
+// 
+// Node: xgmModifierLinearWire
+// 
+setNodeNiceNameResource( "xgmModifierLinearWire", "Xgm モディファイヤ直線ワイヤ" );
+setAttrNiceNameResource( "xgmModifierLinearWire", "iwd", "入力ワイヤ データ" );
+setAttrNiceNameResource( "xgmModifierLinearWire", "mk", "マスク" );
+setAttrNiceNameResource( "xgmModifierLinearWire", "mg", "マグニチュード" );
+setAttrNiceNameResource( "xgmModifierLinearWire", "ms", "マグニチュードのスケール" );
+setAttrNiceNameResource( "xgmModifierLinearWire", "msp", "マグニチュード スケール位置" );
+setAttrNiceNameResource( "xgmModifierLinearWire", "msfv", "マグニチュード スケール float 値" );
+setAttrNiceNameResource( "xgmModifierLinearWire", "msi", "マグニチュード スケール補間" );
+setAttrNiceNameResource( "xgmModifierLinearWire", "s", "平滑性" );
+setAttrNiceNameResource( "xgmModifierLinearWire", "b", "破断" );
+setAttrNiceNameResource( "xgmModifierLinearWire", "rw", "リファレンス ワイヤ" );
+setAttrNiceNameResource( "xgmModifierLinearWire", "tmo", "転送モード" );
+setAttrNiceNameResource( "xgmModifierLinearWire", "tan", "転送モードを法線に位置合わせ" );
+setAttrNiceNameResource( "xgmModifierLinearWire", "tmt", "転送モードのマッピング タイプ" );
+setAttrEnumResource( "xgmModifierLinearWire", "msi", 0, "なし" );
+setAttrEnumResource( "xgmModifierLinearWire", "msi", 1, "リニア" );
+setAttrEnumResource( "xgmModifierLinearWire", "msi", 2, "スムーズ" );
+setAttrEnumResource( "xgmModifierLinearWire", "msi", 3, "スプライン" );
+setAttrEnumResource( "xgmModifierLinearWire", "tmt", 0, "位置ベース" );
+setAttrEnumResource( "xgmModifierLinearWire", "tmt", 1, "UV ベース" );
+// 
+// Node: xgmModifierScale
+// 
+setNodeNiceNameResource( "xgmModifierScale", "Xgm モディファイア スケール" );
+setAttrNiceNameResource( "xgmModifierScale", "mk", "マスク" );
+setAttrNiceNameResource( "xgmModifierScale", "s", "スケール" );
+// 
+// Node: xgmModifierClump
+// 
+setNodeNiceNameResource( "xgmModifierClump", "Xgm モディファイアの束" );
+setAttrNiceNameResource( "xgmModifierClump", "mk", "マスク" );
+setAttrNiceNameResource( "xgmModifierClump", "cp", "束" );
+setAttrNiceNameResource( "xgmModifierClump", "cs", "束のスケール" );
+setAttrNiceNameResource( "xgmModifierClump", "csp", "束のスケール位置" );
+setAttrNiceNameResource( "xgmModifierClump", "csfv", "束のスケール float 値" );
+setAttrNiceNameResource( "xgmModifierClump", "csi", "束のスケール補間" );
+setAttrNiceNameResource( "xgmModifierClump", "cvl", "束のボリューム化" );
+setAttrNiceNameResource( "xgmModifierClump", "cvr", "束の変動" );
+setAttrNiceNameResource( "xgmModifierClump", "pl", "長さを保持" );
+setAttrNiceNameResource( "xgmModifierClump", "pd", "ポイント密度" );
+setAttrNiceNameResource( "xgmModifierClump", "pdm", "ポイント密度のマスク" );
+setAttrNiceNameResource( "xgmModifierClump", "pr", "ポイントのランダム性" );
+setAttrNiceNameResource( "xgmModifierClump", "ps", "ポイント シード" );
+setAttrNiceNameResource( "xgmModifierClump", "uip", "入力ポイントを使用" );
+setAttrNiceNameResource( "xgmModifierClump", "ips", "入力ポイント" );
+setAttrNiceNameResource( "xgmModifierClump", "au", "自動更新" );
+setAttrNiceNameResource( "xgmModifierClump", "rv", "半径の変化" );
+setAttrNiceNameResource( "xgmModifierClump", "ucm", "束のマップを更新" );
+setAttrNiceNameResource( "xgmModifierClump", "msl", "マップ サブディビジョン レベル" );
+setAttrNiceNameResource( "xgmModifierClump", "utm", "コントロール マップを使用" );
+setAttrNiceNameResource( "xgmModifierClump", "cmp", "コントロール マップ" );
+setAttrNiceNameResource( "xgmModifierClump", "acm", "アクティブ コントロール マップ" );
+setAttrNiceNameResource( "xgmModifierClump", "ccm", "カスタム コントロール マップ" );
+setAttrNiceNameResource( "xgmModifierClump", "ccmr", "カスタム コントロール マップ R" );
+setAttrNiceNameResource( "xgmModifierClump", "ccmg", "カスタム コントロール マップ G" );
+setAttrNiceNameResource( "xgmModifierClump", "ccmb", "カスタム コントロール マップ B" );
+setAttrNiceNameResource( "xgmModifierClump", "cms", "コントロール マスク" );
+setAttrNiceNameResource( "xgmModifierClump", "cmsr", "コントロール マスク R" );
+setAttrNiceNameResource( "xgmModifierClump", "cmsg", "コントロール マスク G" );
+setAttrNiceNameResource( "xgmModifierClump", "cmsb", "コントロール マスク B" );
+setAttrNiceNameResource( "xgmModifierClump", "pc", "プレビュー カラー" );
+setAttrNiceNameResource( "xgmModifierClump", "fl", "平坦性" );
+setAttrNiceNameResource( "xgmModifierClump", "fls", "平坦性のスケール" );
+setAttrNiceNameResource( "xgmModifierClump", "flsp", "平坦性のスケール位置" );
+setAttrNiceNameResource( "xgmModifierClump", "flsfv", "平坦性のスケール float 値" );
+setAttrNiceNameResource( "xgmModifierClump", "flsi", "平坦性のスケール補間" );
+setAttrNiceNameResource( "xgmModifierClump", "of", "オフセット" );
+setAttrNiceNameResource( "xgmModifierClump", "ofs", "オフセットのスケール" );
+setAttrNiceNameResource( "xgmModifierClump", "ofsp", "オフセットのスケールの位置" );
+setAttrNiceNameResource( "xgmModifierClump", "ofsfv", "オフセットのスケール float 値" );
+setAttrNiceNameResource( "xgmModifierClump", "ofsi", "オフセットのスケール補間" );
+setAttrNiceNameResource( "xgmModifierClump", "cu", "カール" );
+setAttrNiceNameResource( "xgmModifierClump", "cus", "カールのスケール" );
+setAttrNiceNameResource( "xgmModifierClump", "cusp", "カールのスケール位置" );
+setAttrNiceNameResource( "xgmModifierClump", "cusfv", "カールのスケール float 値" );
+setAttrNiceNameResource( "xgmModifierClump", "cusi", "カールのスケール補間" );
+setAttrNiceNameResource( "xgmModifierClump", "or", "方向" );
+setAttrNiceNameResource( "xgmModifierClump", "co", "コピー" );
+setAttrNiceNameResource( "xgmModifierClump", "cos", "コピーのスケール" );
+setAttrNiceNameResource( "xgmModifierClump", "cosp", "コピーのスケール位置" );
+setAttrNiceNameResource( "xgmModifierClump", "cosfv", "コピーのスケール float 値" );
+setAttrNiceNameResource( "xgmModifierClump", "cosi", "コピーのスケール補間" );
+setAttrNiceNameResource( "xgmModifierClump", "cov", "コピーの変化" );
+setAttrNiceNameResource( "xgmModifierClump", "ct", "カット" );
+setAttrNiceNameResource( "xgmModifierClump", "no", "ノイズ" );
+setAttrNiceNameResource( "xgmModifierClump", "nos", "ノイズのスケール" );
+setAttrNiceNameResource( "xgmModifierClump", "nosp", "ノイズのスケールの位置" );
+setAttrNiceNameResource( "xgmModifierClump", "nosfv", "ノイズのスケール float 値" );
+setAttrNiceNameResource( "xgmModifierClump", "nosi", "ノイズのスケール補間" );
+setAttrNiceNameResource( "xgmModifierClump", "nof", "ノイズ周波数" );
+setAttrNiceNameResource( "xgmModifierClump", "noc", "ノイズの相関" );
+setAttrNiceNameResource( "xgmModifierClump", "imd", "入力メッシュ データ" );
+setAttrEnumResource( "xgmModifierClump", "csi", 0, "なし" );
+setAttrEnumResource( "xgmModifierClump", "csi", 1, "リニア" );
+setAttrEnumResource( "xgmModifierClump", "csi", 2, "スムーズ" );
+setAttrEnumResource( "xgmModifierClump", "csi", 3, "スプライン" );
+setAttrEnumResource( "xgmModifierClump", "flsi", 0, "なし" );
+setAttrEnumResource( "xgmModifierClump", "flsi", 1, "リニア" );
+setAttrEnumResource( "xgmModifierClump", "flsi", 2, "スムーズ" );
+setAttrEnumResource( "xgmModifierClump", "flsi", 3, "スプライン" );
+setAttrEnumResource( "xgmModifierClump", "ofsi", 0, "なし" );
+setAttrEnumResource( "xgmModifierClump", "ofsi", 1, "リニア" );
+setAttrEnumResource( "xgmModifierClump", "ofsi", 2, "スムーズ" );
+setAttrEnumResource( "xgmModifierClump", "ofsi", 3, "スプライン" );
+setAttrEnumResource( "xgmModifierClump", "cusi", 0, "なし" );
+setAttrEnumResource( "xgmModifierClump", "cusi", 1, "リニア" );
+setAttrEnumResource( "xgmModifierClump", "cusi", 2, "スムーズ" );
+setAttrEnumResource( "xgmModifierClump", "cusi", 3, "スプライン" );
+setAttrEnumResource( "xgmModifierClump", "cosi", 0, "なし" );
+setAttrEnumResource( "xgmModifierClump", "cosi", 1, "リニア" );
+setAttrEnumResource( "xgmModifierClump", "cosi", 2, "スムーズ" );
+setAttrEnumResource( "xgmModifierClump", "cosi", 3, "スプライン" );
+setAttrEnumResource( "xgmModifierClump", "nosi", 0, "なし" );
+setAttrEnumResource( "xgmModifierClump", "nosi", 1, "リニア" );
+setAttrEnumResource( "xgmModifierClump", "nosi", 2, "スムーズ" );
+setAttrEnumResource( "xgmModifierClump", "nosi", 3, "スプライン" );
+// 
+// Node: xgmCurveToSpline
+// 
+setNodeNiceNameResource( "xgmCurveToSpline", "スプラインに Xgm カーブ" );
+setAttrNiceNameResource( "xgmCurveToSpline", "fzn", "フリーズ" );
+setAttrNiceNameResource( "xgmCurveToSpline", "isd", "入力スプライン データ" );
+setAttrNiceNameResource( "xgmCurveToSpline", "umc", "Maya カーブを使用" );
+setAttrNiceNameResource( "xgmCurveToSpline", "ics", "入力カーブ" );
+setAttrNiceNameResource( "xgmCurveToSpline", "imd", "入力メッシュ データ" );
+setAttrNiceNameResource( "xgmCurveToSpline", "csd", "キャッシュされた入力スプライン データ" );
+setAttrNiceNameResource( "xgmCurveToSpline", "m", "ミュート" );
+setAttrNiceNameResource( "xgmCurveToSpline", "osd", "出力スプライン データ" );
+setAttrNiceNameResource( "xgmCurveToSpline", "uac", "Alembic カーブを使用" );
+setAttrNiceNameResource( "xgmCurveToSpline", "fn", "ファイル名" );
+setAttrNiceNameResource( "xgmCurveToSpline", "ld", "ロードされたデータ" );
+setAttrNiceNameResource( "xgmCurveToSpline", "ad", "アクティブなデータ" );
+setAttrNiceNameResource( "xgmCurveToSpline", "sf", "開始フレーム" );
+setAttrNiceNameResource( "xgmCurveToSpline", "ef", "終了フレーム" );
+setAttrNiceNameResource( "xgmCurveToSpline", "tm", "時間" );
+setAttrNiceNameResource( "xgmCurveToSpline", "sp", "スピード" );
+setAttrNiceNameResource( "xgmCurveToSpline", "of", "オフセット" );
+setAttrNiceNameResource( "xgmCurveToSpline", "ct", "サイクル タイプ" );
+setAttrNiceNameResource( "xgmCurveToSpline", "atn", "法線に位置合わせ" );
+setAttrNiceNameResource( "xgmCurveToSpline", "fza", "フリーズの影響を受ける" );
+setAttrEnumResource( "xgmCurveToSpline", "ct", 0, "保持" );
+setAttrEnumResource( "xgmCurveToSpline", "ct", 1, "ループ" );
+setAttrEnumResource( "xgmCurveToSpline", "ct", 2, "反転" );
+setAttrEnumResource( "xgmCurveToSpline", "ct", 3, "バウンス" );
+// 
+// Node: xgmSeExpr
+// 
+setNodeNiceNameResource( "xgmSeExpr", "Xgm Se エクスプレッション" );
+setAttrNiceNameResource( "xgmSeExpr", "fzn", "フリーズ" );
+setAttrNiceNameResource( "xgmSeExpr", "expr", "エクスプレッション" );
+setAttrNiceNameResource( "xgmSeExpr", "oa", "出力アルファ値" );
+setAttrNiceNameResource( "xgmSeExpr", "oc", "出力カラー" );
+setAttrNiceNameResource( "xgmSeExpr", "ocr", "出力カラー R" );
+setAttrNiceNameResource( "xgmSeExpr", "ocg", "出力カラー G" );
+setAttrNiceNameResource( "xgmSeExpr", "ocb", "出力カラー B" );
+setAttrNiceNameResource( "xgmSeExpr", "fza", "フリーズの影響を受ける" );
+// 
+// Node: xgmSplineCache
+// 
+setNodeNiceNameResource( "xgmSplineCache", "Xgm スプライン キャッシュ" );
+setAttrNiceNameResource( "xgmSplineCache", "fn", "ファイル名" );
+setAttrNiceNameResource( "xgmSplineCache", "dc", "ディスクリプション" );
+setAttrNiceNameResource( "xgmSplineCache", "ad", "アクティブ ディスクリプション" );
+setAttrNiceNameResource( "xgmSplineCache", "sf", "開始フレーム" );
+setAttrNiceNameResource( "xgmSplineCache", "ef", "終了フレーム" );
+setAttrNiceNameResource( "xgmSplineCache", "tm", "時間" );
+setAttrNiceNameResource( "xgmSplineCache", "sp", "スピード" );
+setAttrNiceNameResource( "xgmSplineCache", "of", "オフセット" );
+setAttrNiceNameResource( "xgmSplineCache", "ct", "サイクル タイプ" );
+setAttrNiceNameResource( "xgmSplineCache", "w", "幅" );
+setAttrNiceNameResource( "xgmSplineCache", "wdt", "幅のテーパ" );
+setAttrNiceNameResource( "xgmSplineCache", "wdts", "幅のテーパ開始" );
+setAttrNiceNameResource( "xgmSplineCache", "wdr", "幅のランプ" );
+setAttrNiceNameResource( "xgmSplineCache", "wdrp", "幅のランプ位置" );
+setAttrNiceNameResource( "xgmSplineCache", "wdrfv", "幅のランプ float 値" );
+setAttrNiceNameResource( "xgmSplineCache", "wdri", "幅のランプ補間" );
+setAttrEnumResource( "xgmSplineCache", "ct", 0, "保持" );
+setAttrEnumResource( "xgmSplineCache", "ct", 1, "ループ" );
+setAttrEnumResource( "xgmSplineCache", "ct", 2, "反転" );
+setAttrEnumResource( "xgmSplineCache", "ct", 3, "バウンス" );
+setAttrEnumResource( "xgmSplineCache", "wdri", 0, "なし" );
+setAttrEnumResource( "xgmSplineCache", "wdri", 1, "リニア" );
+setAttrEnumResource( "xgmSplineCache", "wdri", 2, "スムーズ" );
+setAttrEnumResource( "xgmSplineCache", "wdri", 3, "スプライン" );
+// 
+// Node: xgmSplineDescription
+// 
+setNodeNiceNameResource( "xgmSplineDescription", "Xgm スプラインのディスクリプション" );
+setAttrNiceNameResource( "xgmSplineDescription", "w", "幅" );
+setAttrNiceNameResource( "xgmSplineDescription", "wdt", "幅のテーパ" );
+setAttrNiceNameResource( "xgmSplineDescription", "wdts", "幅のテーパ開始" );
+setAttrNiceNameResource( "xgmSplineDescription", "wdr", "幅のランプ" );
+setAttrNiceNameResource( "xgmSplineDescription", "wdrp", "幅のランプ位置" );
+setAttrNiceNameResource( "xgmSplineDescription", "wdrfv", "幅のランプ float 値" );
+setAttrNiceNameResource( "xgmSplineDescription", "wdri", "幅のランプ補間" );
+setAttrNiceNameResource( "xgmSplineDescription", "ts", "チューブ シェード" );
+setAttrNiceNameResource( "xgmSplineDescription", "fca", "カメラに正対" );
+setAttrNiceNameResource( "xgmSplineDescription", "oci", "全体的なカラー強度" );
+setAttrNiceNameResource( "xgmSplineDescription", "fc", "不正カラー" );
+setAttrNiceNameResource( "xgmSplineDescription", "fcc", "不正カラー カーブ" );
+setAttrNiceNameResource( "xgmSplineDescription", "psh", "事前選択ハイライト" );
+setAttrNiceNameResource( "xgmSplineDescription", "psc", "事前選択ハイライト カラー" );
+setAttrNiceNameResource( "xgmSplineDescription", "pscr", "事前選択ハイライト カラー R" );
+setAttrNiceNameResource( "xgmSplineDescription", "pscg", "事前選択ハイライト カラー G" );
+setAttrNiceNameResource( "xgmSplineDescription", "pscb", "事前選択ハイライト カラー B" );
+setAttrNiceNameResource( "xgmSplineDescription", "slh", "選択項目のハイライト" );
+setAttrNiceNameResource( "xgmSplineDescription", "slc", "選択項目ハイライト カラー" );
+setAttrNiceNameResource( "xgmSplineDescription", "slcr", "選択ハイライト カラー R" );
+setAttrNiceNameResource( "xgmSplineDescription", "slcg", "選択ハイライト カラー G" );
+setAttrNiceNameResource( "xgmSplineDescription", "slcb", "選択ハイライト カラー B" );
+setAttrNiceNameResource( "xgmSplineDescription", "sfz", "フリーズを表示" );
+setAttrNiceNameResource( "xgmSplineDescription", "sfc", "フリーズされたカラーを表示" );
+setAttrNiceNameResource( "xgmSplineDescription", "sfcr", "フリーズされたカラー R を表示" );
+setAttrNiceNameResource( "xgmSplineDescription", "sfcg", "フリーズされたカラー G を表示" );
+setAttrNiceNameResource( "xgmSplineDescription", "sfcb", "フリーズされたカラー B を表示" );
+setAttrNiceNameResource( "xgmSplineDescription", "hp", "ハイライトを配置" );
+setAttrNiceNameResource( "xgmSplineDescription", "hpc", "配置カラーをハイライト" );
+setAttrNiceNameResource( "xgmSplineDescription", "hpcr", "配置カラー R をハイライト" );
+setAttrNiceNameResource( "xgmSplineDescription", "hpcg", "配置カラー G をハイライト" );
+setAttrNiceNameResource( "xgmSplineDescription", "hpcb", "配置カラー B をハイライト" );
+setAttrNiceNameResource( "xgmSplineDescription", "hpi", "配置強度をハイライト" );
+setAttrNiceNameResource( "xgmSplineDescription", "scv", "CV を表示" );
+setAttrNiceNameResource( "xgmSplineDescription", "scvs", "CV のサイズを表示" );
+setAttrNiceNameResource( "xgmSplineDescription", "scvo", "CV の不透明度を表示" );
+setAttrNiceNameResource( "xgmSplineDescription", "smv", "メッシュ ボクセルを表示" );
+setAttrNiceNameResource( "xgmSplineDescription", "as", "アクティブなスカルプト" );
+setAttrNiceNameResource( "xgmSplineDescription", "rdm", "レンダー密度乗数" );
+setAttrNiceNameResource( "xgmSplineDescription", "isd", "入力スプライン データ" );
+setAttrNiceNameResource( "xgmSplineDescription", "ord", "出力レンダー データ" );
+setAttrNiceNameResource( "xgmSplineDescription", "osd", "出力スプライン データ" );
+setAttrEnumResource( "xgmSplineDescription", "wdri", 0, "なし" );
+setAttrEnumResource( "xgmSplineDescription", "wdri", 1, "リニア" );
+setAttrEnumResource( "xgmSplineDescription", "wdri", 2, "スムーズ" );
+setAttrEnumResource( "xgmSplineDescription", "wdri", 3, "スプライン" );
+// 
+// Node: igBrushManip
+// 
+setNodeNiceNameResource( "igBrushManip", "Ig ブラシ マニピュレータ" );
+// 
+// Node: igmDescription
+// 
+setNodeNiceNameResource( "igmDescription", "Igm ディスクリプション" );
+setAttrNiceNameResource( "igmDescription", "geo", "ジオメトリ" );
+setAttrNiceNameResource( "igmDescription", "fid", "フェース ID" );
+setAttrNiceNameResource( "igmDescription", "den", "密度" );
+setAttrNiceNameResource( "igmDescription", "its", "補間スタイル" );
+setAttrNiceNameResource( "igmDescription", "msk", "マスク" );
+setAttrNiceNameResource( "igmDescription", "xuv", "Xuv 方向" );
+setAttrNiceNameResource( "igmDescription", "bcl", "ベース カラー" );
+setAttrNiceNameResource( "igmDescription", "bclr", "ベース カラー R" );
+setAttrNiceNameResource( "igmDescription", "bclg", "ベース カラー G" );
+setAttrNiceNameResource( "igmDescription", "bclb", "ベース カラー B" );
+setAttrNiceNameResource( "igmDescription", "tcl", "毛先のカラー" );
+setAttrNiceNameResource( "igmDescription", "tclr", "毛先のカラー R" );
+setAttrNiceNameResource( "igmDescription", "tclg", "毛先のカラー G" );
+setAttrNiceNameResource( "igmDescription", "tclb", "毛先のカラー B" );
+setAttrNiceNameResource( "igmDescription", "dt", "表示タイプ" );
+setAttrNiceNameResource( "igmDescription", "pth", "パス" );
+setAttrNiceNameResource( "igmDescription", "tkl", "ティクル" );
+setAttrNiceNameResource( "igmDescription", "len", "長さ" );
+setAttrNiceNameResource( "igmDescription", "wid", "幅" );
+setAttrNiceNameResource( "igmDescription", "cdt", "キャッシュされたデータ" );
+setAttrNiceNameResource( "igmDescription", "loc", "キャッシュをロード" );
+setAttrNiceNameResource( "igmDescription", "floc", "キャッシュを強制的にロード" );

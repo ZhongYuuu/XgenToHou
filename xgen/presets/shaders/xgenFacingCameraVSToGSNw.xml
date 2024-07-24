@@ -1,0 +1,87 @@
+<!--
+Copyright 2015 Autodesk, Inc. All rights reserved.
+
+Use of this software is subject to the terms of the Autodesk
+license agreement provided at the time of installation or download,
+or which otherwise accompanies this software in either electronic
+or hard copy form.
+-->
+<fragment uiName="xgenFacingCameraVSToGSNw" name="xgenFacingCameraVSToGSNw" type="interpolant" class="ShadeFragment" version="1.0" feature_level="0" >
+    <description>
+        <![CDATA[
+XGen wide spline vertex normal generator (world space)]]>
+    </description>
+    <properties>
+        <float3   name="mayaTangentIn"          semantic="TANGENT"    flags="varyingInputParam" />
+        <float3   name="mayaBitangentIn"        semantic="BITANGENT"  flags="varyingInputParam" />
+        <float4x4 name="worldInverseTranspose"  semantic="worldinversetranspose" />
+    </properties>
+    <values>
+    </values>
+    <outputs>
+        <float3 name="Nw" />
+    </outputs>
+    <implementation>
+        <implementation render="OGSRenderer" language="Cg" lang_version="2.100000" >
+            <function_name val="xgenFacingCameraVSToGSNw" />
+            <vertex_source>
+                <![CDATA[
+float3 ixgenFacingCameraVSToGSNw(float3 Tw, float3 Bw, float4x4 worldInverseTranspose)
+{
+    // Normal is the cross product of tangent and bitangent
+    return normalize(mul(worldInverseTranspose, float4(cross(Tw, Bw), 0.0f)).xyz);
+}
+                ]]>
+            </vertex_source>
+            <source>
+                <![CDATA[
+float3 xgenFacingCameraVSToGSNw(float3 iNw)
+{
+    return normalize(iNw);
+}
+                ]]>
+            </source>
+        </implementation>
+        <implementation render="OGSRenderer" language="GLSL" lang_version="3.000000" >
+            <function_name val="xgenFacingCameraVSToGSNw" />
+            <vertex_source>
+                <![CDATA[
+vec3 ixgenFacingCameraVSToGSNw(vec3 Tw, vec3 Bw, mat4 worldInverseTranspose)
+{
+    // Normal is the cross product of tangent and bitangent
+    return normalize(mul(worldInverseTranspose, vec4(cross(Tw, Bw), 0.0f)).xyz);
+}
+                ]]>
+            </vertex_source>
+            <source>
+                <![CDATA[
+vec3 xgenFacingCameraVSToGSNw(vec3 iNw)
+{
+    return normalize(iNw);
+}
+                ]]>
+            </source>
+        </implementation>
+        <implementation render="OGSRenderer" language="HLSL" lang_version="11.000000" >
+            <function_name val="xgenFacingCameraVSToGSNw" />
+            <vertex_source>
+                <![CDATA[
+float3 ixgenFacingCameraVSToGSNw(float3 Tw, float3 Bw, float4x4 worldInverseTranspose)
+{
+    // Normal is the cross product of tangent and bitangent
+    return normalize(mul(float4(cross(Tw, Bw), 0.0f), worldInverseTranspose).xyz);
+}
+                ]]>
+            </vertex_source>
+            <source>
+                <![CDATA[
+float3 xgenFacingCameraVSToGSNw(float3 iNw)
+{
+    return normalize(iNw);
+}
+                ]]>
+            </source>
+        </implementation>
+    </implementation>
+</fragment>
+

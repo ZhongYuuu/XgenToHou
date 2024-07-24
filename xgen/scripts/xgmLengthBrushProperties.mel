@@ -1,0 +1,223 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+// ===========================================================================
+// Copyright 2015 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+
+
+//  Description:    defines behaviour and layout of xgmLengthBrushContext
+//                    tool property sheet
+//
+
+global string $gXgmLengthBrushLayout = "xgmLengthBrush";
+global string $gXgmLengthBrushCmd = "xgmLengthBrushContext";
+global string $gXgmLengthBrushToolName = "xgmLengthBrushTool";
+
+global string $gXgmLengthBrushSettingFrame = "xgmLengthBrushSettingFrame";
+global string $gXgmLengthBrushFalloffFrame = "xgmLengthBrushFalloffFrame";
+global string $gXgmLengthRootToTipFalloffFrame = "xgmLengthRootToTipFalloffFrame";
+global string $gXgmLengthBrushDisplaySettingFrame = "xgmLengthBrushDisplaySettingFrame";
+global string $gXgmLengthBrushSymmetrySettingFrame = "xgmLengthBrushSymmetrySettingFrame";
+
+global string $gXgmLengthBrushFalloffTypes;
+global string $gXgmLengthBrushFalloffTypesL10N[];
+global int $gXgmLengthSurfaceFalloffIndex;
+
+//
+//    Description:
+//        Initializes the length brush falloff types
+//
+//    Input Arguments:
+//        None.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmInitLengthBrushFalloffTypes()
+{
+    global string $gXgmLengthBrushFalloffTypes;
+    global string $gXgmLengthBrushFalloffTypesL10N[];
+    global int $gXgmLengthSurfaceFalloffIndex;
+
+    if( $gXgmLengthBrushFalloffTypes == "" || size($gXgmLengthBrushFalloffTypesL10N) == 0 ) {
+        $gXgmLengthBrushFalloffTypes = "screen,volume,surface";
+        $gXgmLengthBrushFalloffTypesL10N  = { (uiRes("m_xgmLengthBrushProperties.kXgmLengthBrushFalloffTypeScreen")),
+                                              (uiRes("m_xgmLengthBrushProperties.kXgmLengthBrushFalloffTypeVolume")),
+                                              (uiRes("m_xgmLengthBrushProperties.kXgmLengthBrushFalloffTypeSurface"))};
+        $gXgmLengthSurfaceFalloffIndex = size($gXgmLengthBrushFalloffTypesL10N) - 1 ;
+    }
+}
+
+//
+//    Description:
+//        Script runs when the selection of the operation option menu is changed.
+//
+//    Input Arguments:
+//        brushCmd       Brush command to be used by the UI objects
+//        tool           Name of the instance of the tool that the command is applied on
+//
+//    Return Value:
+//        None.
+//
+global proc xgmLengthBrushOperationChanged( string $brushCmd, string $tool )
+{
+    int $op = `optionMenuGrp -q -select xgmLengthBrushOperationOMG` - 1;
+    eval($brushCmd + " -e -operation " + $op + " " + $tool);
+}
+
+//
+//    Description:
+//        Creates the UI of the custom brush settings for the smooth brush
+//
+//    Input Arguments:
+//        None.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmLengthBrushSettingsCustom()
+{
+    global string $gXgmLengthBrushCmd;
+
+    string $curctx = `currentCtx`;
+
+    optionMenuGrp -label (uiRes("m_xgmLengthBrushProperties.kXgmLengthBrushOperation"))
+                -cc ( "xgmLengthBrushOperationChanged( \"" + $gXgmLengthBrushCmd + "\", \"" +  $curctx + "\")" )
+                xgmLengthBrushOperationOMG;
+
+                menuItem -label (uiRes("m_xgmLengthBrushProperties.kXgmLengthBrushOperationPaint"));
+                menuItem -label (uiRes("m_xgmLengthBrushProperties.kXgmLengthBrushOperationSmooth"));
+
+    radioButtonGrp -label (uiRes("m_xgmLengthBrushProperties.kXgmLengthBrushScaleMode"))
+                -numberOfRadioButtons 2
+                -label1 (uiRes("m_xgmLengthBrushProperties.kXgmLengthBrushScaleModeAffectBase"))
+                -label2 (uiRes("m_xgmLengthBrushProperties.kXgmLengthBrushScaleModeAsSculpt"))
+                -on1 ( $gXgmLengthBrushCmd + " -e -scaleMode 0 " + $curctx )
+                -on2 ( $gXgmLengthBrushCmd + " -e -scaleMode 1 " + $curctx )
+                -enable 0
+                -visible 0
+                xgmLengthBrushScaleModeRBG;
+
+    radioButtonGrp -label (uiRes("m_xgmLengthBrushProperties.kXgmLengthBrushSelectMode"))
+                -numberOfRadioButtons 2
+                -label1 (uiRes("m_xgmLengthBrushProperties.kXgmLengthBrushSelectModeLocked"))
+                -label2 (uiRes("m_xgmLengthBrushProperties.kXgmLengthBrushSelectModeFloating"))
+                -on1 ( $gXgmLengthBrushCmd + " -e -selectMode 0 " + $curctx )
+                -on2 ( $gXgmLengthBrushCmd + " -e -selectMode 1 " + $curctx )
+                xgmLengthBrushSelectModeRBG;
+
+    separator -style "none";
+    
+    floatSliderGrp -field true -pre 3
+                -min -1
+                -max 1
+                -fieldMinValue -10000000
+                -fieldMaxValue 10000000
+                -label (uiRes("m_xgmLengthBrushProperties.kXgmLengthBrushIncrement"))
+                -cc ( $gXgmLengthBrushCmd + " -e -increment #1 " + $curctx )
+                xgmLengthBrushIncrementFSG;
+
+    floatSliderGrp -field true -pre 3
+                -min 0.001
+                -max 1
+                -fieldMinValue 0.001
+                -fieldMaxValue 10000000
+                -label (uiRes("m_xgmLengthBrushProperties.kXgmLengthBrushMinLength"))
+                -cc ( $gXgmLengthBrushCmd + " -e -minLength #1 " + $curctx )
+                xgmLengthBrushMinLengthFSG;
+                
+    floatSliderGrp -field true -pre 3
+                -min 1
+                -max 100
+                -fieldMinValue 0.001
+                -fieldMaxValue 10000000
+                -label (uiRes("m_xgmLengthBrushProperties.kXgmLengthBrushMaxLength"))
+                -cc ( $gXgmLengthBrushCmd + " -e -maxLength #1 " + $curctx )
+                xgmLengthBrushMaxLengthFSG;
+
+    rowLayout -numberOfColumns 1
+        -columnAttach 1 "left" 135
+        xgmBrushButtonsRow;
+        button -label (uiRes("m_xgmLengthBrushProperties.kXgmBrushFlood"))
+                -command ($gXgmLengthBrushCmd + " -e -flood " + $curctx )
+                -width 60
+                xgmBrushFloodButton;
+    setParent ..;
+}
+
+//
+//    Description:
+//        layout of length brush tool property sheet
+//
+//    Input Arguments:
+//        None.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmLengthBrushProperties ()
+{
+    global string $gXgmLengthBrushLayout;
+    global string $gXgmLengthBrushCmd;
+    global string $gXgmLengthBrushToolName;
+    global string $gXgmLengthBrushSettingFrame;
+    global string $gXgmLengthBrushFalloffFrame;
+    global string $gXgmLengthRootToTipFalloffFrame;
+    global string $gXgmLengthBrushDisplaySettingFrame;
+    global string $gXgmLengthBrushSymmetrySettingFrame;
+    global string $gXgmLengthBrushFalloffTypes;
+    global string $gXgmLengthBrushFalloffTypesL10N[];
+
+    xgmInitLengthBrushFalloffTypes();
+
+    string $parent = `toolPropertyWindow -q -location`;
+    setParent $parent;
+
+    setUITemplate -pushTemplate OptionsTemplate;
+
+    columnLayout $gXgmLengthBrushLayout;
+
+    xgmBrushSettingsProperties( $gXgmLengthBrushLayout, 
+                            $gXgmLengthBrushSettingFrame, 
+                            $gXgmLengthBrushCmd, 
+                            $gXgmLengthBrushToolName, 
+                            "xgmLengthBrushSettingsCustom" );
+
+    xgmBrushFalloffProperties( $gXgmLengthBrushLayout, 
+                            $gXgmLengthBrushFalloffFrame, 
+                            $gXgmLengthBrushCmd, 
+                            $gXgmLengthBrushToolName,
+                            "",
+                            $gXgmLengthBrushFalloffTypes,
+                            $gXgmLengthBrushFalloffTypesL10N ); 
+    string $temp[];
+    xgmRootToTipFalloffProperties( $gXgmLengthBrushLayout, 
+                            $gXgmLengthRootToTipFalloffFrame, 
+                            $gXgmLengthBrushCmd, 
+                            $gXgmLengthBrushToolName,
+                            $temp,
+                            "" ); 
+
+    xgmBrushDisplaySettingsProperties( $gXgmLengthBrushLayout, 
+                            $gXgmLengthBrushDisplaySettingFrame,
+                            $gXgmLengthBrushCmd, 
+                            $gXgmLengthBrushToolName,
+                            "" );
+
+    xgmBrushSymmetrySettingsProperties( $gXgmLengthBrushLayout, 
+                            $gXgmLengthBrushSymmetrySettingFrame,
+                            $gXgmLengthBrushCmd, 
+                            $gXgmLengthBrushToolName,
+                            "" );
+
+    setUITemplate -popTemplate;
+}

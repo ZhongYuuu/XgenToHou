@@ -1,0 +1,38 @@
+<!--
+Copyright 2015 Autodesk, Inc. All rights reserved.
+
+Use of this software is subject to the terms of the Autodesk
+license agreement provided at the time of installation or download,
+or which otherwise accompanies this software in either electronic
+or hard copy form.
+-->
+<fragment_graph name="xgenCPVRemap0" ref="xgenCPVRemap0" class="FragmentGraph" version="1.0" feature_level="0" >
+    <fragments>
+        <fragment_ref name="xgenCPVRemapPassing0" ref="xgenCPVRemapPassing0" />
+        <fragment_ref name="xgenCPVRemapTint0"    ref="xgenCPVRemapTint0" />
+    </fragments>
+    <connections>
+        <connect from="xgenCPVRemapPassing0.remapValueTuple" to="xgenCPVRemapTint0.remapValueTuple" />
+    </connections>
+    <properties>
+        <!-- 1st remapping -->
+        <float    name="remapValue0"        ref="xgenCPVRemapPassing0.remapValue0" semantic="TEXCOORD3" flags="varyingInputParam" />
+        <float2   name="remapRange0"        ref="xgenCPVRemapTint0.remapRange0" />
+        <float4   name="remapColor0"        ref="xgenCPVRemapTint0.remapColor0" />
+
+        <!-- 2nd remapping -->
+        <float    name="remapValue1"        ref="xgenCPVRemapPassing0.remapValue1" semantic="TEXCOORD4" flags="varyingInputParam" />
+        <float4   name="remapColor1"        ref="xgenCPVRemapTint0.remapColor1" />
+
+        <!-- Input -->
+        <float4   name="inputColor0"        ref="xgenCPVRemapTint0.inputColor0" />
+    </properties>
+    <values>
+        <float2 name="remapRange0"     value="0.000000,1.000000" />
+        <float4 name="remapColor0"     value="0.000000,0.450000,0.900000,0.000000" />
+        <float4 name="remapColor1"     value="0.000000,0.000000,0.000000,0.000000" />
+    </values>
+    <outputs>
+        <float4 name="outColor0" ref="xgenCPVRemapTint0.outColor0" />
+    </outputs>
+</fragment_graph>

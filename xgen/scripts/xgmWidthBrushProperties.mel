@@ -1,0 +1,188 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+// ===========================================================================
+// Copyright 2015 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+
+
+//  Description:    defines behaviour and layout of xgmWidthBrushContext
+//                    tool property sheet
+//
+
+global string $gXgmWidthBrushLayout = "xgmWidthBrush";
+global string $gXgmWidthBrushCmd = "xgmWidthBrushContext";
+global string $gXgmWidthBrushToolName = "xgmWidthBrushTool";
+
+global string $gXgmWidthBrushSettingFrame = "xgmWidthBrushSettingFrame";
+global string $gXgmWidthBrushFalloffFrame = "xgmWidthBrushFalloffFrame";
+global string $gXgmWidthRootToTipFalloffFrame = "xgmWidthRootToTipFalloffFrame";
+global string $gXgmWidthBrushDisplaySettingFrame = "xgmWidthBrushDisplaySettingFrame";
+global string $gXgmWidthBrushSymmetrySettingFrame = "xgmWidthBrushSymmetrySettingFrame";
+
+global string $gXgmWidthBrushFalloffTypes;
+global string $gXgmWidthBrushFalloffTypesL10N[];
+global int $gXgmWidthSurfaceFalloffIndex;
+
+//
+//    Description:
+//        Initializes the Width brush falloff types
+//
+//    Input Arguments:
+//        None.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmInitWidthBrushFalloffTypes()
+{
+    global string $gXgmWidthBrushFalloffTypes;
+    global string $gXgmWidthBrushFalloffTypesL10N[];
+    global int $gXgmWidthSurfaceFalloffIndex;
+
+    if( $gXgmWidthBrushFalloffTypes == "" || size($gXgmWidthBrushFalloffTypesL10N) == 0 ) {
+        $gXgmWidthBrushFalloffTypes = "screen,volume,surface";
+        $gXgmWidthBrushFalloffTypesL10N  = { (uiRes("m_xgmWidthBrushProperties.kXgmWidthBrushFalloffTypeScreen")),
+                                              (uiRes("m_xgmWidthBrushProperties.kXgmWidthBrushFalloffTypeVolume")),
+                                              (uiRes("m_xgmWidthBrushProperties.kXgmWidthBrushFalloffTypeSurface"))};
+        $gXgmWidthSurfaceFalloffIndex = size($gXgmWidthBrushFalloffTypesL10N) - 1 ;
+    }
+}
+
+
+//
+//    Description:
+//        Creates the UI of the custom brush settings for the width brush
+//
+//    Input Arguments:
+//        None.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmWidthBrushSettingsCustom()
+{
+    global string $gXgmWidthBrushCmd;
+
+    string $curctx = `currentCtx`;
+
+    radioButtonGrp -label (uiRes("m_xgmWidthBrushProperties.kXgmWidthBrushBrushMode"))
+                -numberOfRadioButtons 2
+                -label1 (uiRes("m_xgmWidthBrushProperties.kXgmWidthBrushBrushModeGlobal"))
+                -label2 (uiRes("m_xgmWidthBrushProperties.kXgmWidthBrushBrushModeLocal"))
+                -on1 ( $gXgmWidthBrushCmd + " -e -globalSelection 1 " + $curctx )
+                -on2 ( $gXgmWidthBrushCmd + " -e -globalSelection 0 " + $curctx )
+                xgmWidthBrushBrushModeRBG;
+
+    floatSliderGrp -field true -pre 3
+                -min -1
+                -max 1
+                -fieldMinValue -10000000
+                -fieldMaxValue 10000000
+                -label (uiRes("m_xgmWidthBrushProperties.kXgmWidthBrushIncrement"))
+                -cc ( $gXgmWidthBrushCmd + " -e -increment #1 " + $curctx )
+                xgmWidthBrushIncrementFSG;
+
+    floatSliderGrp -field true -pre 3
+                -min 0.001
+                -max 1
+                -fieldMinValue 0.001
+                -fieldMaxValue 10000000
+                -label (uiRes("m_xgmWidthBrushProperties.kXgmWidthBrushMinWidth"))
+                -cc ( $gXgmWidthBrushCmd + " -e -minWidth #1 " + $curctx )
+                xgmWidthBrushMinWidthFSG;
+
+    floatSliderGrp -field true -pre 3
+                -min 1
+                -max 100
+                -fieldMinValue 0.001
+                -fieldMaxValue 10000000
+                -label (uiRes("m_xgmWidthBrushProperties.kXgmWidthBrushMaxWidth"))
+                -cc ( $gXgmWidthBrushCmd + " -e -maxWidth #1 " + $curctx )
+                xgmWidthBrushMaxWidthFSG;
+
+    rowLayout -numberOfColumns 1
+        -columnAttach 1 "left" 135
+        xgmBrushButtonsRow;
+        button -label (uiRes("m_xgmWidthBrushProperties.kXgmBrushFlood"))
+            -command ($gXgmWidthBrushCmd + " -e -flood " + $curctx )
+            -width 60
+            xgmBrushFloodButton;
+    setParent ..;
+}
+
+//
+//    Description:
+//        layout of width brush tool property sheet
+//
+//    Input Arguments:
+//        None.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmWidthBrushProperties ()
+{
+    global string $gXgmWidthBrushLayout;
+    global string $gXgmWidthBrushCmd;
+    global string $gXgmWidthBrushToolName;
+    global string $gXgmWidthBrushSettingFrame;
+    global string $gXgmWidthBrushFalloffFrame;
+    global string $gXgmWidthRootToTipFalloffFrame;
+    global string $gXgmWidthBrushDisplaySettingFrame;
+    global string $gXgmWidthBrushSymmetrySettingFrame;
+    global string $gXgmWidthBrushFalloffTypes;
+    global string $gXgmWidthBrushFalloffTypesL10N[];
+
+    xgmInitWidthBrushFalloffTypes();
+
+    string $parent = `toolPropertyWindow -q -location`;
+    setParent $parent;
+
+    setUITemplate -pushTemplate OptionsTemplate;
+
+    columnLayout $gXgmWidthBrushLayout;
+
+    xgmBrushSettingsProperties( $gXgmWidthBrushLayout,
+                            $gXgmWidthBrushSettingFrame,
+                            $gXgmWidthBrushCmd,
+                            $gXgmWidthBrushToolName,
+                            "xgmWidthBrushSettingsCustom" );
+
+    xgmBrushFalloffProperties( $gXgmWidthBrushLayout,
+                            $gXgmWidthBrushFalloffFrame,
+                            $gXgmWidthBrushCmd,
+                            $gXgmWidthBrushToolName,
+                            "",
+                            $gXgmWidthBrushFalloffTypes,
+                            $gXgmWidthBrushFalloffTypesL10N );
+    string $temp[];
+    xgmRootToTipFalloffProperties( $gXgmWidthBrushLayout,
+                            $gXgmWidthRootToTipFalloffFrame,
+                            $gXgmWidthBrushCmd,
+                            $gXgmWidthBrushToolName,
+                            $temp,
+                            "" );
+
+    xgmBrushDisplaySettingsProperties( $gXgmWidthBrushLayout,
+                            $gXgmWidthBrushDisplaySettingFrame,
+                            $gXgmWidthBrushCmd,
+                            $gXgmWidthBrushToolName,
+                            "" );
+
+    xgmBrushSymmetrySettingsProperties( $gXgmWidthBrushLayout,
+                            $gXgmWidthBrushSymmetrySettingFrame,
+                            $gXgmWidthBrushCmd,
+                            $gXgmWidthBrushToolName,
+                            "" );
+
+    setUITemplate -popTemplate;
+}

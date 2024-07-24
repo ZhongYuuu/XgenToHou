@@ -1,0 +1,82 @@
+<!--
+Copyright 2015 Autodesk, Inc. All rights reserved.
+
+Use of this software is subject to the terms of the Autodesk
+license agreement provided at the time of installation or download,
+or which otherwise accompanies this software in either electronic
+or hard copy form.
+-->
+<fragment uiName="xgenFacingCameraVSToGSBw" name="xgenFacingCameraVSToGSBw" type="interpolant" class="ShadeFragment" version="1.0" feature_level="0" >
+    <description>
+        <![CDATA[
+XGen wide spline vertex bitangent passthrough (object space!)]]>
+    </description>
+    <properties>
+        <float3 name="mayaBitangentIn" semantic="BITANGENT" flags="varyingInputParam" />
+    </properties>
+    <values>
+    </values>
+    <outputs>
+        <float3 name="Bw" />
+    </outputs>
+    <implementation>
+        <implementation render="OGSRenderer" language="Cg" lang_version="2.100000" >
+            <function_name val="xgenFacingCameraVSToGSBw" />
+            <vertex_source>
+                <![CDATA[
+float3 ixgenFacingCameraVSToGSBw(float3 Bw)
+{
+    return normalize(Bw);
+}
+                ]]>
+            </vertex_source>
+            <source>
+                <![CDATA[
+float3 xgenFacingCameraVSToGSBw(float3 iBw)
+{
+    return normalize(iBw);
+}
+                ]]>
+            </source>
+        </implementation>
+        <implementation render="OGSRenderer" language="GLSL" lang_version="3.000000" >
+            <function_name val="xgenFacingCameraVSToGSBw" />
+            <vertex_source>
+                <![CDATA[
+vec3 ixgenFacingCameraVSToGSBw(vec3 Bw)
+{
+    return normalize(Bw);
+}
+                ]]>
+            </vertex_source>
+            <source>
+                <![CDATA[
+vec3 xgenFacingCameraVSToGSBw(vec3 iBw)
+{
+    return normalize(iBw);
+}
+                ]]>
+            </source>
+        </implementation>
+        <implementation render="OGSRenderer" language="HLSL" lang_version="11.000000" >
+            <function_name val="xgenFacingCameraVSToGSBw" />
+            <vertex_source>
+                <![CDATA[
+float3 ixgenFacingCameraVSToGSBw(float3 Bw)
+{
+    return normalize(Bw);
+}
+                ]]>
+            </vertex_source>
+            <source>
+                <![CDATA[
+float3 xgenFacingCameraVSToGSBw(float3 iBw)
+{
+    return normalize(iBw);
+}
+                ]]>
+            </source>
+        </implementation>
+    </implementation>
+</fragment>
+

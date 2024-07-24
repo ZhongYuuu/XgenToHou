@@ -1,0 +1,233 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+// ===========================================================================
+// Copyright 2015 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+
+//    Description:    initializes tool property sheet - brush settings values
+//
+//    Input Arguments:
+//        parent         Parent layout of the common brush settings layout.
+//                       Required so that UI object names can be successfully resolved
+//        brushCmd       Brush command to be used by the UI objects
+//        tool           Name of the instance of the tool that the command is applied on
+//        customProc     Procedure to initialize the UI for the custom brush settings 
+//
+//    Return Value:
+//        None.
+//
+global proc xgmBrushSettingsValues( string $parent, string $brushCmd, string $tool, string $customProc )
+{
+    setParent $parent;
+
+    xgmBrushRadiusGroupValues($parent, $brushCmd, $tool);
+
+    float $strength = eval( $brushCmd + " -q -strength " + $tool );
+    floatSliderGrp -e -value $strength xgmBrushStrengthFSG;
+
+    int $enableCollision = eval( $brushCmd + " -q -enableCollision " + $tool );
+    checkBoxGrp -e -value1 $enableCollision xgmBrushCollisionGRP;
+
+    float $collisionDistance = eval( $brushCmd + " -q -collisionDistance " + $tool );
+    floatSliderGrp -e -value $collisionDistance -enable $enableCollision xgmBrushCollisionDistanceFSG;
+
+    int $freezeMode = !eval( $brushCmd + " -q -freezeMode " + $tool );
+    checkBoxGrp -e -value1 $freezeMode xgmBrushInvertFrozenEffectCBG;
+
+    if($customProc != "") 
+        eval($customProc);
+}
+
+//    Description:    initializes tool property sheet - brush falloff values
+//
+//    Input Arguments:
+//        parent                Parent layout of the common brush falloff layout.
+//                              Required so that UI object names can be successfully resolved
+//        brushCmd              Brush command to be used by the UI objects
+//        tool                  Name of the instance of the tool that the command is applied on
+//        customProc            Procedure to initialize the UI for the custom brush falloff settings
+//        brushFalloffTypes     Brush falloff types supported by current brush
+//
+//    Return Value:
+//        None.
+//
+global proc xgmBrushFalloffValues( string $parent, string $brushCmd, string $tool, string $customProc, string $brushFalloffTypes)
+{
+    global string $gXgmDefaultBrushFalloffTypes;
+    string $currentBrushFalloffTypes[];
+
+    setParent $parent;
+
+    int $filterBackface = eval( $brushCmd + " -q -filterBackface " + $tool );
+    checkBoxGrp -e -value1 $filterBackface xgmBrushFilterBackfaceGRP;
+
+    float $filterBackfaceStartAngle = eval( $brushCmd + " -q -fsa " + $tool );
+    floatSliderGrp -e -value $filterBackfaceStartAngle -enable $filterBackface xgmBrushFilterBackfaceStartAngleFSG;
+
+    float $filterBackfaceEndAngle = eval( $brushCmd + " -q -fea " + $tool );
+    floatSliderGrp -e -value $filterBackfaceEndAngle -enable $filterBackface xgmBrushFilterBackfaceEndAngleFSG;
+
+    if($brushFalloffTypes == "") {
+        tokenize($gXgmDefaultBrushFalloffTypes, ",", $currentBrushFalloffTypes);
+    } else {
+        tokenize($brushFalloffTypes, ",", $currentBrushFalloffTypes);
+    }
+    string $falloffType = eval( $brushCmd + " -q -brushFalloffType " + $tool );
+    int $index = 1;
+    for ($item in $currentBrushFalloffTypes) {
+        if($item == $falloffType) {
+            optionMenuGrp -e -select $index xgmBrushFalloffTypeOMG;
+            break;
+        }
+        $index++;
+    }
+
+    float $volumeSearchRadius = eval( $brushCmd + " -q -vsr " + $tool );
+    float $volumeCenterOffset = eval( $brushCmd + " -q -vco " + $tool );
+    float $offsetHotkeyInterval = eval( $brushCmd + " -q -ohi " + $tool );
+    int   $volume = 0;
+    if($falloffType == "volume") {
+        $volume = 1;
+    }
+    floatSliderGrp -e -en $volume -value $volumeSearchRadius xgmBrushVolumeSearchRadiusFSG;
+    floatSliderGrp -e -en $volume -value $volumeCenterOffset xgmBrushVolumeCenterOffsetFSG;
+    floatSliderGrp -e -en $volume -value $offsetHotkeyInterval xgmBrushOffsetHotkeyIntervalFSG;
+
+    xgmFalloffCurveGroupValues( $parent, $brushCmd, "-brushFalloffCurve", $tool, 1 );
+
+    float $intensity = eval( $brushCmd + " -q -overallColorIntensity " + $tool );
+    floatSliderGrp -e -value $intensity xgmBrushOverallColorIntensityFSG;
+
+    xgmFalloffColorGroupValues( $parent, $brushCmd, $tool );
+
+    int $preSelHighlight = eval( $brushCmd + " -q -preselectionHighlight " + $tool );
+    checkBoxGrp -e -value1 $preSelHighlight xgmPreSelHighlightingEnableCBG;
+
+    float $preSelHighlightR = eval( $brushCmd + " -q -psr " + $tool );
+    float $preSelHighlightG = eval( $brushCmd + " -q -psg " + $tool );
+    float $preSelHighlightB = eval( $brushCmd + " -q -psb " + $tool );
+    colorSliderGrp -e -en $preSelHighlight -rgb $preSelHighlightR $preSelHighlightG $preSelHighlightB xgmPreSelHighlightColorCSG;
+
+    if($customProc != "") 
+        eval($customProc);
+}
+
+//    Description:    initializes tool property sheet - "Root to Tip" falloff values
+//
+//    Input Arguments:
+//        parent         Parent layout of the common "Root to Tip" falloff layout.
+//                       Required so that UI object names can be successfully resolved
+//        brushCmd       Brush command to be used by the UI objects
+//        tool           Name of the instance of the tool that the command is applied on
+//        customProc     Procedure to initialize the UI for the custom "Root to Tip" falloff settings 
+//
+//    Return Value:
+//        None.
+//
+global proc xgmRootToTipFalloffValues( string $parent, string $brushCmd, string $tool, string $customProc )
+{
+    setParent $parent;
+
+    int $enable = eval( $brushCmd + " -q -enableRootToTip " + $tool );
+    checkBoxGrp -e -value1 $enable xgmRootToTipToggleGRP;
+    
+    xgmFalloffCurveGroupValues( $parent, $brushCmd, "-rootToTipCurve", $tool, $enable );
+
+    if($customProc != "") 
+        eval($customProc);
+}
+
+//    Description:    initializes tool property sheet - brush display settings values
+//
+//    Input Arguments:
+//        parent         Parent layout of the common brush display settings layout.
+//                       Required so that UI object names can be successfully resolved
+//        brushCmd       Brush command to be used by the UI objects
+//        tool           Name of the instance of the tool that the command is applied on
+//        customProc     Procedure to initialize the UI for the custom brush settings 
+//
+//    Return Value:
+//        None.
+//
+global proc xgmBrushDisplaySettingsValues( string $parent, string $brushCmd, string $tool, string $customProc )
+{
+    setParent $parent;
+
+    // Overall intensity
+    float $intensity = eval( $brushCmd + " -q -overallColorIntensity " + $tool );
+    floatSliderGrp -e -value $intensity xgmDispBrushOverallColorIntensityFSG;
+
+    // Selection hightlight
+    int $selHighlight = eval( $brushCmd + " -q -selectionHighlight " + $tool );
+    checkBoxGrp -e -value1 $selHighlight xgmDispSelectionHighlightingEnableCBG;
+    float $sc[3];
+    $sc[0] = eval( $brushCmd + " -q -shr " + $tool );
+    $sc[1] = eval( $brushCmd + " -q -shg " + $tool );
+    $sc[2] = eval( $brushCmd + " -q -shb " + $tool );
+    colorSliderGrp -e
+        -rgb $sc[0] $sc[1] $sc[2]
+        -en $selHighlight
+        xgmDispSelectionHighlightingColorCSG;
+
+    // Preselection highlight
+    int $preSelHighlight = eval( $brushCmd + " -q -preselectionHighlight " + $tool );
+    checkBoxGrp -e -value1 $preSelHighlight xgmDispPreSelHighlightingEnableCBG;
+    float $psc[3];
+    $psc[0] = eval( $brushCmd + " -q -psr " + $tool );
+    $psc[1] = eval( $brushCmd + " -q -psg " + $tool );
+    $psc[2] = eval( $brushCmd + " -q -psb " + $tool );
+    colorSliderGrp -e
+        -rgb $psc[0] $psc[1] $psc[2]
+        -en $preSelHighlight
+        xgmDispPreSelHighlightColorCSG;
+
+    // Frozen color
+    int $showFrozen = eval( $brushCmd + " -q -showFrozen " + $tool );
+    checkBoxGrp -e -value1 $showFrozen xgmDispShowFrozenEnableCBG;
+    float $sfc[3];
+    $sfc[0] = eval( $brushCmd + " -q -sfr " + $tool );
+    $sfc[1] = eval( $brushCmd + " -q -sfg " + $tool );
+    $sfc[2] = eval( $brushCmd + " -q -sfb " + $tool );
+    colorSliderGrp -e
+        -rgb $sfc[0] $sfc[1] $sfc[2]
+        -en $showFrozen
+        xgmDispFrozenColorCSG;
+
+    if($customProc != "") 
+    eval($customProc);
+}
+
+//    Description:    initializes tool property sheet - brush symmetry settings values
+//
+//    Input Arguments:
+//        parent         Parent layout of the common brush display settings layout.
+//                       Required so that UI object names can be successfully resolved
+//        brushCmd       Brush command to be used by the UI objects
+//        tool           Name of the instance of the tool that the command is applied on
+//        customProc     Procedure to initialize the UI for the custom brush settings 
+//
+//    Return Value:
+//        None.
+//
+global proc xgmBrushSymmetrySettingsValues( string $parent, string $brushCmd, string $tool, string $customProc )
+{
+    setParent $parent;
+
+	int $symmetryType = eval( $brushCmd + " -q -brushSymmetryType " + $tool ) + 1;
+	optionMenuGrp -e -sl $symmetryType xgmBrushSymmetryTypeOMG;
+
+	float $symmetryTolerance = eval( $brushCmd + " -q -brushSymmetryTolerance " + $tool );
+	floatSliderGrp -e -value $symmetryTolerance xgmBrushSymmetryToleranceFSG;
+
+    if($customProc != "") 
+    eval($customProc);
+}

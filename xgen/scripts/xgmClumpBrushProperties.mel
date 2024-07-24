@@ -1,0 +1,186 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+// ===========================================================================
+// Copyright 2015 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+
+
+//  Description:    defines behaviour and layout of xgmClumpBrushContext
+//                    tool property sheet
+//
+
+global string $gXgmClumpBrushLayout = "xgmClumpBrush";
+global string $gXgmClumpBrushCmd = "xgmClumpBrushContext";
+global string $gXgmClumpBrushToolName = "xgmClumpBrushTool";
+
+global string $gXgmClumpBrushSettingFrame = "xgmClumpBrushSettingFrame";
+global string $gXgmClumpBrushFalloffFrame = "xgmClumpBrushFalloffFrame";
+global string $gXgmClumpRootToTipFalloffFrame = "xgmClumpRootToTipFalloffFrame";
+global string $gXgmClumpDisplaySettingFrame = "xgmClumpBrushDisplaySettingFrame";
+global string $gXgmClumpSymmetrySettingFrame = "xgmClumpBrushSymmetrySettingFrame";
+
+global string $gXgmClumpBrushFalloffTypes;
+global string $gXgmClumpBrushFalloffTypesL10N[];
+global int $gXgmClumpSurfaceFalloffIndex;
+
+//
+//    Description:
+//        Initializes the Clump brush falloff types
+//
+//    Input Arguments:
+//        None.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmInitClumpBrushFalloffTypes()
+{
+    global string $gXgmClumpBrushFalloffTypes;
+    global string $gXgmClumpBrushFalloffTypesL10N[];
+    global int $gXgmClumpSurfaceFalloffIndex;
+
+    if( $gXgmClumpBrushFalloffTypes == "" || size($gXgmClumpBrushFalloffTypesL10N) == 0 ) {
+        $gXgmClumpBrushFalloffTypes = "screen,volume,surface";
+        $gXgmClumpBrushFalloffTypesL10N  = { (uiRes("m_xgmClumpBrushProperties.kXgmClumpBrushFalloffTypeScreen")),
+                                              (uiRes("m_xgmClumpBrushProperties.kXgmClumpBrushFalloffTypeVolume")),
+                                              (uiRes("m_xgmClumpBrushProperties.kXgmClumpBrushFalloffTypeSurface"))};
+        $gXgmClumpSurfaceFalloffIndex = size($gXgmClumpBrushFalloffTypesL10N) - 1 ;
+    }
+}
+
+
+//
+//    Description:
+//        Creates the UI of the custom brush settings for the Clump brush
+//
+//    Input Arguments:
+//        None.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmClumpBrushSettingsCustom()
+{
+    global string $gXgmClumpBrushCmd;
+
+    string $curctx = `currentCtx`;
+
+    radioButtonGrp -label (uiRes("m_xgmClumpBrushProperties.kXgmClumpBrushSelectionMode"))
+                -numberOfRadioButtons 2
+                -label1 (uiRes("m_xgmClumpBrushProperties.kXgmClumpBrushSelectionModeLocked"))
+                -label2 (uiRes("m_xgmClumpBrushProperties.kXgmClumpBrushSelectionModeFloating"))
+                -on1 ( $gXgmClumpBrushCmd + " -e -lockSelection 1 " + $curctx )
+                -on2 ( $gXgmClumpBrushCmd + " -e -lockSelection 0 " + $curctx )
+                xgmClumpBrushSelectionModeRBG;
+    //Disable Global/Local mode. Local mode will be added in the future.
+    //radioButtonGrp -label _L10N( kXgmClumpBrushBrushMode, "Brush Mode:" )
+    //            -numberOfRadioButtons 2
+    //            -label1 _L10N( kXgmClumpBrushBrushModeGlobal, "Global" )
+    //            -label2 _L10N( kXgmClumpBrushBrushModeLocal, "Local" )
+    //            -on1 ( $gXgmClumpBrushCmd + " -e -globalSelection 1 " + $curctx )
+    //            -on2 ( $gXgmClumpBrushCmd + " -e -globalSelection 0 " + $curctx )
+    //            xgmClumpBrushBrushModeRBG;
+
+    floatSliderGrp -field true -pre 3
+                -min 0
+                -max 1
+                -fieldMaxValue 1
+                -label (uiRes("m_xgmClumpBrushProperties.kXgmClumpBrushIntensityFactor"))
+                -cc ( $gXgmClumpBrushCmd + " -e -intensityFactor #1 " + $curctx )
+                xgmClumpBrushIntensityFSG;
+
+    checkBoxGrp 
+                -label (uiRes("m_xgmClumpBrushProperties.kPreserveLength"))
+                -numberOfCheckBoxes 1
+                -on1 ( $gXgmClumpBrushCmd + " -e -preserveLength 1 " + $curctx)
+                -of1 ( $gXgmClumpBrushCmd + " -e -preserveLength 0 " + $curctx)
+                xgmClumpBrushPreserveLengthGRP;
+}
+
+//
+//    Description:
+//        layout of Clump brush tool property sheet
+//
+//    Input Arguments:
+//        None.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmClumpBrushProperties ()
+{
+    global string $gXgmClumpBrushLayout;
+    global string $gXgmClumpBrushCmd;
+    global string $gXgmClumpBrushToolName;
+    global string $gXgmClumpBrushSettingFrame;
+    global string $gXgmClumpBrushFalloffFrame;
+    global string $gXgmClumpRootToTipFalloffFrame;
+    global string $gXgmClumpDisplaySettingFrame;
+    global string $gXgmClumpSymmetrySettingFrame;
+    global string $gXgmClumpBrushFalloffTypes;
+    global string $gXgmClumpBrushFalloffTypesL10N[];
+
+    xgmInitClumpBrushFalloffTypes();
+
+    string $parent = `toolPropertyWindow -q -location`;
+    setParent $parent;
+
+    setUITemplate -pushTemplate OptionsTemplate;
+
+    columnLayout $gXgmClumpBrushLayout;
+
+    xgmBrushSettingsProperties( $gXgmClumpBrushLayout, 
+                            $gXgmClumpBrushSettingFrame, 
+                            $gXgmClumpBrushCmd, 
+                            $gXgmClumpBrushToolName, 
+                            "xgmClumpBrushSettingsCustom" );
+
+    xgmBrushFalloffProperties( $gXgmClumpBrushLayout, 
+                            $gXgmClumpBrushFalloffFrame, 
+                            $gXgmClumpBrushCmd, 
+                            $gXgmClumpBrushToolName,
+                            "",
+                            $gXgmClumpBrushFalloffTypes,
+                            $gXgmClumpBrushFalloffTypesL10N ); 
+
+    global string $gXgmCurvePresets[];
+    if (size($gXgmCurvePresets) == 0){
+        xgmInitCurvePreset();
+    }
+    //always enable Root to tip for Clump brush. Hide checkBox.
+    string $customProc =  "checkBoxGrp -e -visible 0 xgmRootToTipToggleGRP";
+    xgmRootToTipFalloffProperties( $gXgmClumpBrushLayout, 
+                            $gXgmClumpRootToTipFalloffFrame, 
+                            $gXgmClumpBrushCmd, 
+                            $gXgmClumpBrushToolName,
+                            $gXgmCurvePresets,
+                            $customProc); 
+
+    // The "Root to Tip" falloff only applies to the Clump.
+    // Treat "RootToTip" Magnitude as ClumpScale. Users can define clump shape through ClumpScale.
+    frameLayout -e -l (uiRes("m_xgmClumpBrushProperties.kXgmClumpScale")) $gXgmClumpRootToTipFalloffFrame;
+
+    xgmBrushDisplaySettingsProperties( $gXgmClumpBrushLayout, 
+                            $gXgmClumpDisplaySettingFrame,
+                            $gXgmClumpBrushCmd, 
+                            $gXgmClumpBrushToolName,
+                            "" );
+
+    xgmBrushSymmetrySettingsProperties( $gXgmClumpBrushLayout, 
+                            $gXgmClumpSymmetrySettingFrame,
+                            $gXgmClumpBrushCmd, 
+                            $gXgmClumpBrushToolName,
+                            "" );
+
+    setUITemplate -popTemplate;
+}
+

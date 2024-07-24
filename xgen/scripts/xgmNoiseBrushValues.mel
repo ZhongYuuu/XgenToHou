@@ -1,0 +1,130 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+// ===========================================================================
+// Copyright 2015 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+
+
+//
+//    Description:    initializes the custom Noise brush setting values
+//
+//    Input Arguments:
+//        parent    Parent layout of the custom Noise brush settings layout.
+//                  Required so that UI object names can be successfully resolved
+//        tool      this is the name of the instance of the tool
+//                    that the property sheet is modifying.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmNoiseBrushSettingsValues(string $parent, string $tool)
+{
+    global string $gXgmNoiseBrushCmd;
+
+    setParent $parent;
+
+    int $globalSel = eval ( $gXgmNoiseBrushCmd + " -q -globalSelection " + $tool );
+    if($globalSel) {
+        radioButtonGrp -e -select 1 xgmNoiseBrushBrushModeRBG;
+    } else {
+        radioButtonGrp -e -select 2 xgmNoiseBrushBrushModeRBG;
+    }
+
+    float $frequency = eval( $gXgmNoiseBrushCmd + " -q -frequency " + $tool );
+    floatSliderGrp -e -value $frequency xgmNoiseBrushFrequencyFSG;
+
+    float $magnitude = eval( $gXgmNoiseBrushCmd + " -q -magnitude " + $tool );
+    floatSliderGrp -e -value $magnitude xgmNoiseBrushMagnitudeFSG;
+
+    float $correlation = eval( $gXgmNoiseBrushCmd + " -q -correlation " + $tool );
+    floatSliderGrp -e -value $correlation xgmNoiseBrushCorrelationFSG;
+
+    int $preserveLength = eval( $gXgmNoiseBrushCmd + " -q -preserveLength " + $tool );
+    checkBoxGrp -e -value1 $preserveLength xgmNoiseBrushLockLengthGRP;
+
+}
+
+//
+//    Description:    initializes the custom Noise brush faloff values
+//
+//    Input Arguments:
+//        parent    Parent layout of the custom Noise brush settings layout.
+//                  Required so that UI object names can be successfully resolved
+//        tool      this is the name of the instance of the tool
+//                    that the property sheet is modifying.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmNoiseBrushFalloffValues(string $parent, string $tool)
+{
+    global string $gXgmNoiseBrushCmd;
+    global int $gXgmNoiseSurfaceFalloffIndex;
+
+    setParent $parent;
+
+    int $globalSel = eval ( $gXgmNoiseBrushCmd + " -q -globalSelection " + $tool );
+    string $menuItems[] = `optionMenuGrp -q -itemListLong xgmBrushFalloffTypeOMG`;
+    menuItem -e -en $globalSel $menuItems[$gXgmNoiseSurfaceFalloffIndex];
+
+    int $currentIndex = `optionMenuGrp -q -select xgmBrushFalloffTypeOMG` - 1;
+    if(!$globalSel && $currentIndex == $gXgmNoiseSurfaceFalloffIndex) {
+        optionMenuGrp -e -select 1 xgmBrushFalloffTypeOMG;
+        eval ( $gXgmNoiseBrushCmd + " -e -brushFalloffType screen " + $tool );
+    }
+}
+
+//
+//    Description:    initializes NoiseBrushContext tool property sheet values
+//
+//    Input Arguments:
+//        tool      this is the name of the instance of the tool
+//                    that the property sheet is modifying.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmNoiseBrushValues(string $tool) 
+{
+    global string $gXgmNoiseBrushLayout;
+    global string $gXgmNoiseBrushCmd;
+    global string $gXgmNoiseBrushSettingFrame;
+    global string $gXgmNoiseBrushFalloffFrame;
+    global string $gXgmNoiseRootToTipFalloffFrame;
+    global string $gXgmNoiseDisplaySettingFrame;
+    global string $gXgmNoiseSymmetrySettingFrame;
+	global string $gXgmNoiseBrushFalloffTypes;
+
+    string $parent = `toolPropertyWindow -q -location`;
+    setParent $parent;
+
+    frameLayout -e -en true $gXgmNoiseBrushSettingFrame;
+    frameLayout -e -en true $gXgmNoiseBrushFalloffFrame;
+    frameLayout -e -en true $gXgmNoiseRootToTipFalloffFrame;
+    frameLayout -e -en true $gXgmNoiseDisplaySettingFrame;
+
+    string $settingsCustom = "xgmNoiseBrushSettingsValues( \"" + $gXgmNoiseBrushLayout + "\", \"" + $tool + "\")";
+	string $falloffCustom = "xgmNoiseBrushFalloffValues( \"" + $gXgmNoiseBrushLayout + "\", \"" + $tool + "\")";
+    xgmBrushSettingsValues( $gXgmNoiseBrushSettingFrame, $gXgmNoiseBrushCmd, $tool, $settingsCustom );
+    xgmBrushFalloffValues( $gXgmNoiseBrushFalloffFrame, $gXgmNoiseBrushCmd, $tool, $falloffCustom, $gXgmNoiseBrushFalloffTypes );
+    xgmRootToTipFalloffValues( $gXgmNoiseRootToTipFalloffFrame, $gXgmNoiseBrushCmd, $tool, "" );
+    xgmBrushDisplaySettingsValues( $gXgmNoiseDisplaySettingFrame, $gXgmNoiseBrushCmd, $tool, "" );
+    xgmBrushSymmetrySettingsValues( $gXgmNoiseSymmetrySettingFrame, $gXgmNoiseBrushCmd, $tool, "" );
+
+    string $help = "NoiseBrushTool";
+    toolPropertySetCommon $tool "xgmNoiseBrushTool.xpm" $help;
+
+    toolPropertySelect $gXgmNoiseBrushLayout;
+
+    string $nameField = `toolPropertyWindow -query -field`;
+    text -edit -label (uiRes("m_xgmNoiseBrushValues.kNoiseBrushToolName")) $nameField;
+}

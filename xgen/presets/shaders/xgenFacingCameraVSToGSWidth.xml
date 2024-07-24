@@ -1,0 +1,86 @@
+<!--
+Copyright 2015 Autodesk, Inc. All rights reserved.
+
+Use of this software is subject to the terms of the Autodesk
+license agreement provided at the time of installation or download,
+or which otherwise accompanies this software in either electronic
+or hard copy form.
+-->
+<!--
+OBSOLETE: Width is now the length of TANGENT.
+-->
+<fragment uiName="xgenFacingCameraVSToGSWidth" name="xgenFacingCameraVSToGSWidth" type="interpolant" class="ShadeFragment" version="1.0" feature_level="0" >
+    <description>
+        <![CDATA[
+XGen wide spline spline cv width passthrough (object space!)]]>
+    </description>
+    <properties>
+        <float name="xgenCVWidth" semantic="TEXCOORD2" flags="varyingInputParam" />
+    </properties>
+    <values>
+    </values>
+    <outputs>
+        <float name="xgenCVWidth" />
+    </outputs>
+    <implementation>
+        <implementation render="OGSRenderer" language="Cg" lang_version="2.100000" >
+            <function_name val="xgenFacingCameraVSToGSWidth" />
+            <vertex_source>
+                <![CDATA[
+float ixgenFacingCameraVSToGSWidth(float width)
+{
+    return width;
+}
+                ]]>
+            </vertex_source>
+            <source>
+                <![CDATA[
+float xgenFacingCameraVSToGSWidth(float width)
+{
+    return width;
+}
+                ]]>
+            </source>
+        </implementation>
+        <implementation render="OGSRenderer" language="GLSL" lang_version="3.000000" >
+            <function_name val="xgenFacingCameraVSToGSWidth" />
+            <vertex_source>
+                <![CDATA[
+float ixgenFacingCameraVSToGSWidth(float width)
+{
+    return width;
+}
+                ]]>
+            </vertex_source>
+            <source>
+                <![CDATA[
+float xgenFacingCameraVSToGSWidth(float width)
+{
+    return width;
+}
+                ]]>
+            </source>
+        </implementation>
+        <implementation render="OGSRenderer" language="HLSL" lang_version="11.000000" >
+            <function_name val="xgenFacingCameraVSToGSWidth" />
+            <vertex_source>
+                <![CDATA[
+float ixgenFacingCameraVSToGSWidth(float width)
+{
+    return width;
+}
+                ]]>
+            </vertex_source>
+            <source>
+                <![CDATA[
+float xgenFacingCameraVSToGSWidth(float width)
+{
+    return width;
+}
+                ]]>
+            </source>
+        </implementation>
+    </implementation>
+</fragment>
+
+

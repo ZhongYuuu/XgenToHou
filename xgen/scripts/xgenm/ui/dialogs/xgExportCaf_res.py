@@ -1,0 +1,15 @@
+import maya
+
+maya.stringTable['y_xgenm_ui_dialogs_xgExportCaf.kAnimated'] = u'Animated'
+maya.stringTable['y_xgenm_ui_dialogs_xgExportCaf.kAnimatedAnn'] = u'Set to true if the geometry is animated.'
+maya.stringTable['y_xgenm_ui_dialogs_xgExportCaf.kCafFile'] = u'Caf File'
+maya.stringTable['y_xgenm_ui_dialogs_xgExportCaf.kCafFileAnn'] = u'Path to caf file to write.'
+maya.stringTable['y_xgenm_ui_dialogs_xgExportCaf.kCancel'] = u'Cancel'
+maya.stringTable['y_xgenm_ui_dialogs_xgExportCaf.kCancelAnn'] = u'Cancel the file export.'
+maya.stringTable['y_xgenm_ui_dialogs_xgExportCaf.kEndFrameAnn'] = u'Last frame for an animated sequence.'
+maya.stringTable['y_xgenm_ui_dialogs_xgExportCaf.kExportFile'] = u'Export File'
+maya.stringTable['y_xgenm_ui_dialogs_xgExportCaf.kExportFileAnn'] = u'Export selected geometry to the specified caf file.'
+maya.stringTable['y_xgenm_ui_dialogs_xgExportCaf.kExportToCafOnlyAvailableInMaya'] = u'Export to Caf only available in Maya.'
+maya.stringTable['y_xgenm_ui_dialogs_xgExportCaf.kFrameRange'] = u'Frame Range'
+maya.stringTable['y_xgenm_ui_dialogs_xgExportCaf.kFrameRangeAnn'] = u'First frame for an animated sequence.'
+maya.stringTable['y_xgenm_ui_dialogs_xgExportCaf.kXgenCafExport'] = u'XGen CAF Export'

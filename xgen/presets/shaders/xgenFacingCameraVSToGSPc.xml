@@ -1,0 +1,67 @@
+<!--
+Copyright 2015 Autodesk, Inc. All rights reserved.
+
+Use of this software is subject to the terms of the Autodesk
+license agreement provided at the time of installation or download,
+or which otherwise accompanies this software in either electronic
+or hard copy form.
+-->
+<fragment uiName="xgenFacingCameraVSToGSPc" name="xgenFacingCameraVSToGSPc" type="plumbing" class="ShadeFragment" version="1.0" feature_level="0" >
+    <description>
+        <![CDATA[
+XGen face camera spline vertex position (clip space) generator]]>
+    </description>
+    <properties>
+        <float3   name="Pm"                   semantic="Pm"                 flags="varyingInputParam" />
+        <float4x4 name="worldViewProjection"  semantic="worldviewprojection" />
+        <float    name="depthPriority"        semantic="depthpriority" />
+    </properties>
+    <values>
+    </values>
+    <outputs>
+        <float4 name="Pc" semantic="SV_Position" />
+        <undefined name="positionShader" semantic="positionShader" />
+    </outputs>
+    <implementation>
+        <implementation render="OGSRenderer" language="Cg" lang_version="2.100000" >
+            <function_name val="xgenFacingCameraVSToGSPc" />
+            <source>
+                <![CDATA[
+float4 xgenFacingCameraVSToGSPc(float3 Pm, float4x4 worldViewProjection, float depthPriority)
+{
+    float4 pc = mul(worldViewProjection, float4(Pm, 1.0f));
+    pc.z -= pc.w * 2.0f * depthPriority;
+    return pc;
+}
+                ]]>
+            </source>
+        </implementation>
+        <implementation render="OGSRenderer" language="GLSL" lang_version="3.000000" >
+            <function_name val="xgenFacingCameraVSToGSPc" />
+            <source>
+                <![CDATA[
+vec4 xgenFacingCameraVSToGSPc(vec3 Pm, mat4 worldViewProjection, float depthPriority)
+{
+    vec4 pc = mul(worldViewProjection, vec4(Pm, 1.0f));
+    pc.z -= pc.w * 2.0f * depthPriority;
+    return pc;
+}
+                ]]>
+            </source>
+        </implementation>
+        <implementation render="OGSRenderer" language="HLSL" lang_version="11.000000" >
+            <function_name val="xgenFacingCameraVSToGSPc" />
+            <source>
+                <![CDATA[
+float4 xgenFacingCameraVSToGSPc(float3 Pm, float4x4 worldViewProjection, float depthPriority)
+{
+    float4 pc = mul(float4(Pm, 1.0f), worldViewProjection);
+    pc.z -= pc.w * depthPriority;
+    return pc;
+}
+                ]]>
+            </source>
+        </implementation>
+    </implementation>
+</fragment>
+

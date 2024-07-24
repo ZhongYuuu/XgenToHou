@@ -1,0 +1,134 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+// ===========================================================================
+// Copyright 2015 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+
+
+//    Description:    initializes the custom length brush setting values
+//
+//    Input Arguments:
+//        parent    Parent layout of the custom length brush settings layout.
+//                  Required so that UI object names can be successfully resolved
+//        tool      this is the name of the instance of the tool
+//                    that the property sheet is modifying.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmLengthBrushSettingsValues(string $parent, string $tool)
+{
+    global string $gXgmLengthBrushCmd;
+
+    setParent $parent;
+	
+	separator -e -visible 0 xgmBrushCollisionSEP;
+	checkBoxGrp -e -visible 0 xgmBrushCollisionGRP;
+	floatSliderGrp -e -visible 0 xgmBrushCollisionDistanceFSG;
+	
+	int $scaleMode = eval ( $gXgmLengthBrushCmd + " -q -scaleMode " + $tool );
+    if($scaleMode == 0) {
+		radioButtonGrp -e -select 1 xgmLengthBrushScaleModeRBG;
+    } 
+	else {
+		radioButtonGrp -e -select 2 xgmLengthBrushScaleModeRBG;
+    }
+	
+	int $selectMode = eval ( $gXgmLengthBrushCmd + " -q -selectMode " + $tool );
+    if($selectMode == 0) {
+		radioButtonGrp -e -select 1 xgmLengthBrushSelectModeRBG;
+    } 
+	else {
+		radioButtonGrp -e -select 2 xgmLengthBrushSelectModeRBG;
+    }
+	floatSliderGrp -e -en $selectMode xgmLengthBrushIncrementFSG;
+	floatSliderGrp -e -en $selectMode xgmLengthBrushMinLengthFSG;
+	floatSliderGrp -e -en $selectMode xgmLengthBrushMaxLengthFSG;
+
+    button -e -en $selectMode xgmBrushFloodButton;
+	
+	float $increment = eval( $gXgmLengthBrushCmd + " -q -increment " + $tool );
+    floatSliderGrp -e -value $increment xgmLengthBrushIncrementFSG;
+	
+	float $minLength = eval( $gXgmLengthBrushCmd + " -q -minLength " + $tool );
+    floatSliderGrp -e -value $minLength xgmLengthBrushMinLengthFSG;
+	
+	float $maxLength = eval( $gXgmLengthBrushCmd + " -q -maxLength " + $tool );
+    floatSliderGrp -e -value $maxLength xgmLengthBrushMaxLengthFSG;
+
+    int $op = eval( $gXgmLengthBrushCmd + " -q -operation " + $tool ) + 1;
+    optionMenuGrp -e -select $op xgmLengthBrushOperationOMG;
+}
+
+//    Description:    initializes the custom length brush faloff values
+//
+//    Input Arguments:
+//        parent    Parent layout of the custom length brush settings layout.
+//                  Required so that UI object names can be successfully resolved
+//        tool      this is the name of the instance of the tool
+//                    that the property sheet is modifying.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmLengthBrushFalloffValues(string $parent, string $tool)
+{
+    global string $gXgmLengthBrushCmd;
+
+    setParent $parent;
+}
+
+//
+//    Description:    initializes lengthBrushContext tool property sheet values
+//
+//    Input Arguments:
+//        tool      this is the name of the instance of the tool
+//                    that the property sheet is modifying.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmLengthBrushValues(string $tool) 
+{
+    global string $gXgmLengthBrushLayout;
+    global string $gXgmLengthBrushCmd;
+    global string $gXgmLengthBrushSettingFrame;
+    global string $gXgmLengthBrushFalloffFrame;
+    global string $gXgmLengthRootToTipFalloffFrame;
+    global string $gXgmLengthBrushDisplaySettingFrame;
+    global string $gXgmLengthBrushSymmetrySettingFrame;
+    global string $gXgmLengthBrushFalloffTypes;
+
+    string $parent = `toolPropertyWindow -q -location`;
+    setParent $parent;
+
+    frameLayout -e -en true $gXgmLengthBrushSettingFrame;
+    frameLayout -e -en true $gXgmLengthBrushFalloffFrame;
+    frameLayout -e -en true $gXgmLengthRootToTipFalloffFrame;
+    frameLayout -e -en true $gXgmLengthBrushDisplaySettingFrame;
+
+    string $settingsCustom = "xgmLengthBrushSettingsValues( \"" + $gXgmLengthBrushLayout + "\", \"" + $tool + "\")";
+    string $falloffCustom = "xgmLengthBrushFalloffValues( \"" + $gXgmLengthBrushLayout + "\", \"" + $tool + "\")";
+    xgmBrushSettingsValues( $gXgmLengthBrushSettingFrame, $gXgmLengthBrushCmd, $tool, $settingsCustom );
+    xgmBrushFalloffValues( $gXgmLengthBrushFalloffFrame, $gXgmLengthBrushCmd, $tool, $falloffCustom, $gXgmLengthBrushFalloffTypes );
+    xgmRootToTipFalloffValues( $gXgmLengthRootToTipFalloffFrame, $gXgmLengthBrushCmd, $tool, "" );
+    xgmBrushDisplaySettingsValues( $gXgmLengthBrushDisplaySettingFrame, $gXgmLengthBrushCmd, $tool, "" );
+    xgmBrushSymmetrySettingsValues( $gXgmLengthBrushSymmetrySettingFrame, $gXgmLengthBrushCmd, $tool, "" );
+
+    string $help = "LengthBrushTool";
+    toolPropertySetCommon $tool "xgmLengthBrushTool.xpm" $help;
+
+    toolPropertySelect $gXgmLengthBrushLayout;
+
+    string $nameField = `toolPropertyWindow -query -field`;
+    text -edit -label (uiRes("m_xgmLengthBrushValues.kLengthBrushToolName")) $nameField;
+}

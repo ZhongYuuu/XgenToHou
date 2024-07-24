@@ -1,0 +1,496 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+global proc AExgmModifierClumpDensityMultiplierChange(string $attrName)
+{
+    float $dm = `getAttr $attrName`;
+
+    floatSliderGrp -e -value $dm xgModifierClumpDensityMultiplierFsg;
+}
+
+global proc AExgmModifierClumpDensityMultiplierSliderChange(string $attrName)
+{
+    float $dm = `floatSliderGrp -q -v xgModifierClumpDensityMultiplierFsg`;
+
+    setAttr $attrName $dm;
+}
+
+global proc AExgmModifierClumpDensityMultiplierNew(string $attrName)
+{
+    setUITemplate -pst attributeEditorTemplate;
+        floatSliderGrp -label (uiRes("m_AExgmModifierClumpTemplate.kPointDensity"))
+            -field true
+            -minValue 0.0
+            -maxValue 1.0
+            -fieldMinValue 0.0
+            -fieldMaxValue 1000000.0
+            xgModifierClumpDensityMultiplierFsg;
+    setUITemplate -ppt;
+    
+    AExgmModifierClumpDensityMultiplierReplace($attrName);
+}
+
+global proc AExgmModifierClumpDensityMultiplierReplace(string $attrName)
+{
+    // Get parent for script job use
+    string $parent = `setParent -q`;
+    string $setParentCmd = ("setParent " + $parent + ";");
+
+    float $dm = `getAttr $attrName`;
+
+    floatSliderGrp -e
+            -value $dm 
+            -cc ($setParentCmd + "AExgmModifierClumpDensityMultiplierSliderChange " + $attrName)
+        xgModifierClumpDensityMultiplierFsg;
+
+    scriptJob
+        -replacePrevious
+        -parent xgModifierClumpDensityMultiplierFsg
+        -attributeChange $attrName
+        ($setParentCmd + "AExgmModifierClumpDensityMultiplierChange " + $attrName);
+
+    AExgmModifierClumpDensityMultiplierChange($attrName);
+}
+
+global proc AExgmModifierClumpRandomnessChange(string $attrName)
+{
+    float $rn = `getAttr $attrName`;
+
+    floatSliderGrp -e -value $rn xgModifierClumpRandomnessFsg;
+}
+
+global proc AExgmModifierClumpRandomnessSliderChange(string $attrName)
+{
+    float $rn = `floatSliderGrp -q -v xgModifierClumpRandomnessFsg`;
+
+    setAttr $attrName $rn;
+}
+
+global proc AExgmModifierClumpRandomnessNew(string $attrName)
+{
+    setUITemplate -pst attributeEditorTemplate;
+        floatSliderGrp -label (uiRes("m_AExgmModifierClumpTemplate.kPointRandomness"))
+            -field true
+            -minValue 0.0
+            -maxValue 1.0
+            -fieldMinValue 0.0
+            -fieldMaxValue 1000000.0
+            xgModifierClumpRandomnessFsg;
+    setUITemplate -ppt;
+    
+    AExgmModifierClumpRandomnessReplace($attrName);
+}
+
+global proc AExgmModifierClumpRandomnessReplace(string $attrName)
+{
+    // Get parent for script job use
+    string $parent = `setParent -q`;
+    string $setParentCmd = ("setParent " + $parent + ";");
+
+    float $rn = `getAttr $attrName`;
+
+    floatSliderGrp -e
+        -value $rn 
+        -cc ($setParentCmd + "AExgmModifierClumpRandomnessSliderChange " + $attrName)
+        xgModifierClumpRandomnessFsg;
+
+    scriptJob
+        -replacePrevious
+        -parent xgModifierClumpRandomnessFsg
+        -attributeChange $attrName
+        ($setParentCmd + "AExgmModifierClumpRandomnessChange " + $attrName);
+
+    AExgmModifierClumpRandomnessChange($attrName);
+}
+
+global proc AExgmModifierClumpMapSubdLevelChange(string $attrName)
+{
+    float $msl = `getAttr $attrName`;
+
+    intSliderGrp -e -value $msl xgModifierClumpMapSubdLevelIsg;
+}
+
+global proc AExgmModifierClumpMapSubdLevelSliderChange(string $attrName)
+{
+    float $dm = `intSliderGrp -q -v xgModifierClumpMapSubdLevelIsg`;
+
+    setAttr $attrName $dm;
+}
+
+global proc AExgmModifierClumpMapSubdLevelNew(string $attrName, string $useControlAttr)
+{
+    setUITemplate -pst attributeEditorTemplate;
+        intSliderGrp -label (uiRes("m_AExgmModifierClumpTemplate.kMapSubdLevel"))
+            -field true
+            -minValue 0
+            -maxValue 5
+            -fieldMinValue 0
+            -fieldMaxValue 1000000
+            xgModifierClumpMapSubdLevelIsg;
+    setUITemplate -ppt;
+    
+    AExgmModifierClumpMapSubdLevelReplace($attrName, $useControlAttr);
+}
+
+global proc AExgmModifierClumpMapSubdLevelReplace(string $attrName, string $useControlAttr)
+{
+    // Get parent for script job use
+    string $parent = `setParent -q`;
+    string $setParentCmd = ("setParent " + $parent + ";");
+
+    float $msl = `getAttr $attrName`;
+    int $enable = 1 - `getAttr $useControlAttr`;
+
+    intSliderGrp -e
+        -value $msl
+        -en $enable
+        -cc ($setParentCmd + "AExgmModifierClumpMapSubdLevelSliderChange " + $attrName)
+        xgModifierClumpMapSubdLevelIsg;
+
+    scriptJob
+        -replacePrevious
+        -parent xgModifierClumpMapSubdLevelIsg
+        -attributeChange $attrName
+        ($setParentCmd + "AExgmModifierClumpMapSubdLevelChange " + $attrName);
+
+    AExgmModifierClumpMapSubdLevelChange($attrName);
+}
+
+global proc AExgmModifierClumpUpdateClumpMapNew(string $attrName)
+{
+    setUITemplate -pst attributeEditorTemplate;
+            rowLayout -numberOfColumns 2 -columnWidth 2 120;
+                text -label "";
+                button -label (uiRes("m_AExgmModifierClumpTemplate.kUpdateClumpMap")) xgModifierClumpUpdateClumpMapButton;
+            setParent ..;
+    setUITemplate -ppt;
+
+    AExgmModifierClumpUpdateClumpMapReplace($attrName);
+}
+
+global proc AExgmModifierClumpUpdateClumpMapReplace(string $attrName)
+{
+    // Dirty the attribute to trigger compute
+    int $update = `getAttr $attrName`;
+    button -e -c ("setAttr " + $attrName + " " + $update) xgModifierClumpUpdateClumpMapButton;
+}
+
+global proc AExgmModifierClumpUseContolMapChange(string $useControlAttr)
+{
+    int $enable =`checkBoxGrp -q -v1 xgmSplineClumpUsecControlMapCBG`;
+    setAttr $useControlAttr $enable;
+
+    optionMenuGrp -e -en $enable xgmSplineClumpControlUsingOption;
+    attrNavigationControlGrp -e -en $enable xgmClumpModifierControMaskNCG;
+
+    int $subdEn = 1 - $enable;
+    intSliderGrp -e -en $subdEn xgModifierClumpMapSubdLevelIsg;
+
+    int $index = `optionMenuGrp -q -select xgmSplineClumpControlUsingOption` - 1;
+    string $items[] =`optionMenuGrp -q -itemListLong xgmSplineClumpControlUsingOption`;
+
+    if($enable && $index == (size($items) - 1) ) {
+        $enable = 1;
+    } else {
+        $enable = 0;
+    }
+    attrNavigationControlGrp -e -en $enable xgmClumpModifierCustomControMapNCG;
+}
+
+global proc AExgmModifierClumpUseContolMapAttrChange(string $useControlAttr, string $mapsAttr, string $activeAttr)
+{
+    int $val = `getAttr $useControlAttr`;
+    checkBoxGrp -e -v1 $val xgmSplineClumpUsecControlMapCBG;
+
+    optionMenuGrp -e -en $val xgmSplineClumpControlUsingOption;
+    attrNavigationControlGrp -e -en $val xgmClumpModifierControMaskNCG;
+
+    AExgmModifierClumpControlUsingFillMenu($useControlAttr, $mapsAttr, $activeAttr);
+}
+
+global proc AExgmModifierClumpControlUsingChange( string $activeAttr )
+{
+    int $index = `optionMenuGrp -q -select xgmSplineClumpControlUsingOption` - 1;
+    string $items[] =`optionMenuGrp -q -itemListLong xgmSplineClumpControlUsingOption`;
+    int $customMapIndex = size($items) - 1;
+
+    string $currentNode = `plugNode $activeAttr`;
+    string $currentSubd = $currentNode + ".mapSubdLevel";
+
+    if(`connectionInfo -isDestination $activeAttr`)
+    {
+        string $source = `connectionInfo -sourceFromDestination $activeAttr`;
+        disconnectAttr $source $activeAttr;
+
+        if(`connectionInfo -isDestination $currentSubd`)
+        {
+            $source = `connectionInfo -sourceFromDestination $currentSubd`;
+            disconnectAttr $source $currentSubd;
+        }
+    }
+
+    if( $index >= 0 && $index < $customMapIndex)
+    {
+        string $srcNode = `menuItem -q -label $items[$index]`;
+        string $newSource = $srcNode + ".message";
+        connectAttr -f $newSource $activeAttr;
+
+        string $srcSubd = $srcNode + ".mapSubdLevel";
+        connectAttr -f $srcSubd $currentSubd;
+    }
+
+    int $enable = 0;
+    if( $index == $customMapIndex ) {
+        $enable = 1;
+    }
+
+    attrNavigationControlGrp -e -en $enable xgmClumpModifierCustomControMapNCG;
+}
+
+global proc AExgmModifierClumpControlUsingFillMenu( string $useControlAttr, string $mapsAttr, string $activeAttr )
+{
+    string $menuItems[] = `optionMenuGrp -q -itemListLong xgmSplineClumpControlUsingOption`;
+    string $optionMenuName = `optionMenuGrp -q -fullPathName xgmSplineClumpControlUsingOption`;
+
+    // remove old menu items
+    if (size($menuItems) > 0)
+    {
+        string $deleteCommand = "deleteUI";
+        for ($menuItem in $menuItems){
+            $deleteCommand += (" " + $menuItem); 
+        }
+        eval($deleteCommand);
+    }
+
+    string $mapNames[] = `getAttr $mapsAttr`;
+    int $itemNum = size($mapNames);
+    if( $itemNum == 0 )
+        return;
+
+    string $activeMap = $mapNames[$itemNum - 1];
+    if(`connectionInfo -isDestination $activeAttr`)
+    {
+        $activeMap = `connectionInfo -sourceFromDestination $activeAttr`;
+        $activeMap = `plugNode $activeMap`;
+    }
+
+    // fill menu items
+    int $index = 1;
+    int $select = 1;
+    for ($mapName in $mapNames)
+    {
+         menuItem -parent ($optionMenuName + "|OptionMenu") -label $mapName;
+
+        if($mapName == $activeMap)
+            $select = $index;
+
+        $index++;
+    }
+
+    $itemNum= `optionMenuGrp -q -numberOfItems $optionMenuName`;
+    if($select <= $itemNum) {
+        optionMenuGrp -e -select $select $optionMenuName;
+    }
+
+    int $enable = `optionMenuGrp -q -en $optionMenuName`;
+    if( $enable && $select == $itemNum ) {
+        $enable = 1;
+    } else {
+        $enable = 0;
+    }
+    attrNavigationControlGrp -e -en $enable xgmClumpModifierCustomControMapNCG;
+
+    // Lock/unLock the subd level
+    {
+        int $subdEn = 1 - `getAttr $useControlAttr`;
+        intSliderGrp -e -en $subdEn xgModifierClumpMapSubdLevelIsg;
+
+        string $currentNode = `plugNode $useControlAttr`;
+        string $currentSubd = $currentNode + ".mapSubdLevel";
+
+        string $oldSrcSubd = "";
+        if(`connectionInfo -isDestination $currentSubd`) {
+            $oldSrcSubd = `connectionInfo -sourceFromDestination $currentSubd`;
+        }
+
+        if($subdEn == 0 && `connectionInfo -isDestination $activeAttr`) {
+            string $srcAttr = `connectionInfo -sourceFromDestination $activeAttr`;
+            string $srcNode = `plugNode $srcAttr`;
+            string $srcSubd = $srcNode + ".mapSubdLevel";
+
+            if($srcSubd != $oldSrcSubd) {
+                connectAttr -f $srcSubd $currentSubd;
+            }
+        } else if($oldSrcSubd != ""){
+            disconnectAttr $oldSrcSubd $currentSubd;
+        }
+    }
+}
+
+global proc AExgmSplineClumpControlUsingNew (
+    string $useControlAttr,
+    string $mapsAttr,
+    string $activeAttr,
+    string $customMapAttr,
+    string $maskAttr)
+{
+    setUITemplate -pushTemplate attributeEditorTemplate;
+
+    columnLayout -adjustableColumn true;
+
+        checkBoxGrp -vr -ncb 1 -adj off -cw2 100 240
+            -label1 (uiRes("m_AExgmModifierClumpTemplate.kUseControlMap"))
+            xgmSplineClumpUsecControlMapCBG;
+
+        optionMenuGrp -label (uiRes("m_AExgmModifierClumpTemplate.kXGenSplineCacheLoadedData"))
+            xgmSplineClumpControlUsingOption;
+
+        attrNavigationControlGrp -columnAttach 1 "right" 5
+            -l (uiRes("m_AExgmModifierClumpTemplate.kCustomControMap"))
+            -eb true -ebi "xg3dPaint.png"
+            -nkm true -nim true
+            -at $customMapAttr
+            xgmClumpModifierCustomControMapNCG;
+
+        attrNavigationControlGrp -columnAttach 1 "right" 5
+            -l (uiRes("m_AExgmModifierClumpTemplate.kControlMask"))
+            -eb true -ebi "xg3dPaint.png"
+            -nkm true -nim true
+            -at $maskAttr
+        xgmClumpModifierControMaskNCG;
+
+    setParent ..;
+
+    setUITemplate -popTemplate;
+
+    AExgmSplineClumpControlUsingReplace($useControlAttr, $mapsAttr, $activeAttr, $customMapAttr, $maskAttr);
+}
+
+global proc AExgmSplineClumpControlUsingReplace (
+    string $useControlAttr,
+    string $mapsAttr,
+    string $activeAttr,
+    string $customMapAttr,
+    string $maskAttr)
+{
+    string $setParentCmd = ("setParent " + `setParent -q` + ";");
+    int $enable = `getAttr $useControlAttr`;
+
+    checkBoxGrp -e -v1 $enable
+        -cc1 ($setParentCmd + "AExgmModifierClumpUseContolMapChange " + $useControlAttr + ";")
+        xgmSplineClumpUsecControlMapCBG;
+
+    optionMenuGrp -e -en $enable
+        -changeCommand ($setParentCmd + "AExgmModifierClumpControlUsingChange " + $activeAttr + ";")
+        xgmSplineClumpControlUsingOption;
+
+    attrNavigationControlGrp -e
+        -at $customMapAttr
+        -ebc ($setParentCmd + "xgmAEFloatAttrPaintBtnClicked " + $customMapAttr + " 1")
+        xgmClumpModifierCustomControMapNCG;
+
+    attrNavigationControlGrp -e -en $enable
+        -at $maskAttr
+        -ebc ($setParentCmd + "xgmAEFloatAttrPaintBtnClicked " + $maskAttr + " 1")
+        xgmClumpModifierControMaskNCG;
+
+    scriptJob -parent xgmSplineClumpUsecControlMapCBG -replacePrevious
+        -attributeChange $useControlAttr ($setParentCmd + "AExgmModifierClumpUseContolMapAttrChange " + $useControlAttr + " " + $mapsAttr + " " + $activeAttr + ";");
+
+    scriptJob -parent xgmSplineClumpControlUsingOption -replacePrevious
+        -attributeChange $mapsAttr ($setParentCmd + "AExgmModifierClumpControlUsingFillMenu " + $useControlAttr + " " + $mapsAttr + " " + $activeAttr + ";");
+
+    scriptJob -parent xgmSplineClumpControlUsingOption
+        -attributeChange $activeAttr ($setParentCmd + "AExgmModifierClumpControlUsingFillMenu " + $useControlAttr + " " + $mapsAttr + " " + $activeAttr + ";");
+
+    AExgmModifierClumpControlUsingFillMenu($useControlAttr, $mapsAttr, $activeAttr);
+}
+
+
+global proc AExgmModifierClumpTemplate(string $nodeName)
+{
+    editorTemplate -beginScrollLayout;
+        // Common Attributes
+        AExgmModifierBaseTemplate $nodeName;
+
+        // Clump modifier attributes
+        editorTemplate -beginLayout (uiRes("m_AExgmModifierClumpTemplate.kClumpModifier")) -collapse 0;
+
+            xgmCreateAEUiForFloatAttr "mask" (uiRes("m_AExgmModifierClumpTemplate.kMask")) "xgmModifierClump";
+
+            editorTemplate -beginLayout (uiRes("m_AExgmModifierClumpTemplate.kClumpEffect")) -collapse 0;
+                xgmCreateAEUiWithFieldForFloatAttr "clump" (uiRes("m_AExgmModifierClumpTemplate.kClump")) "xgmModifierClump" -1.0 1.0 -1000000.0 1000000.0;
+                AEaddRampControl ($nodeName+".clumpScale");
+
+                editorTemplate -addSeparator;
+
+                editorTemplate -addControl -label (uiRes("m_AExgmModifierClumpTemplate.kClumpVolumize")) "clumpVolumize";
+                xgmCreateAEUiForFloatAttr "clumpVariance" (uiRes("m_AExgmModifierClumpTemplate.kClumpVariance")) "xgmModifierClump";
+                xgmCreateAEUiForFloatAttr "preserveLength" (uiRes("m_AExgmModifierClumpTemplate.kPreserveLength")) "xgmModifierClump";
+            editorTemplate -endLayout;
+
+            editorTemplate -beginLayout (uiRes("m_AExgmModifierClumpTemplate.kClumpPoints")) -collapse 0;
+                editorTemplate -callCustom "AExgmModifierClumpRandomnessNew" "AExgmModifierClumpRandomnessReplace" "pointRandomness";
+                editorTemplate -callCustom "AExgmModifierClumpDensityMultiplierNew" "AExgmModifierClumpDensityMultiplierReplace" "pointDensity";
+                xgmCreateAEUiForFloatAttr "pointDensityMask" (uiRes("m_AExgmModifierClumpTemplate.kPointDensityMask")) "xgmModifierClump";
+                editorTemplate -addControl -label (uiRes("m_AExgmModifierClumpTemplate.kPointSeed")) "pointSeed";
+            editorTemplate -endLayout;
+
+            editorTemplate -beginLayout (uiRes("m_AExgmModifierClumpTemplate.kClumpMap")) -collapse 0;
+                editorTemplate -addControl -label (uiRes("m_AExgmModifierClumpTemplate.kAutoUpdate")) "autoUpdate";
+                xgmCreateAEUiWithFieldForFloatAttr "radiusVariance" (uiRes("m_AExgmModifierClumpTemplate.kRadiusVariance")) "xgmModifierClump"  0.0 1.0 0.0 1000000.0;
+                editorTemplate -callCustom "AExgmModifierClumpMapSubdLevelNew" "AExgmModifierClumpMapSubdLevelReplace" "mapSubdLevel" "useControlMap";
+
+                editorTemplate -addSeparator;
+
+                editorTemplate -callCustom "AExgmSplineClumpControlUsingNew"
+                    "AExgmSplineClumpControlUsingReplace" "useControlMap" "controlMaps" 
+                    "activeControlMap" "customControlMap" "controlMask";
+
+                editorTemplate -addSeparator;
+                editorTemplate -callCustom "AExgmModifierClumpUpdateClumpMapNew" "AExgmModifierClumpUpdateClumpMapReplace" "updateClumpMap";
+
+            editorTemplate -endLayout;
+
+            editorTemplate -beginLayout (uiRes("m_AExgmModifierClumpTemplate.kAdvancedShape")) -collapse 0;
+                xgmCreateAEUiForFloatAttr "flatness" (uiRes("m_AExgmModifierClumpTemplate.kFlatness")) "xgmModifierClump";
+                xgmCreateAEUiWithFieldForFloatAttr "offset" (uiRes("m_AExgmModifierClumpTemplate.kOffset")) "xgmModifierClump" -1.0 1.0 -1000000.0 1000000.0;
+                xgmCreateAEUiWithFieldForFloatAttr "curl" (uiRes("m_AExgmModifierClumpTemplate.kCurl")) "xgmModifierClump"  -1.0 1.0 -1000000.0 1000000.0;;
+                xgmCreateAEUiWithFieldForFloatAttr "orient" (uiRes("m_AExgmModifierClumpTemplate.kOrient")) "xgmModifierClump" 0.0 360.0 0.0 1000000.0;
+
+                AEaddRampControl ($nodeName+".flatnessScale");
+                AEaddRampControl ($nodeName+".offsetScale");
+                AEaddRampControl ($nodeName+".curlScale");
+            editorTemplate -endLayout;
+
+            editorTemplate -beginLayout (uiRes("m_AExgmModifierClumpTemplate.kSecondary")) -collapse 0;
+                xgmCreateAEUiForFloatAttr "copy" (uiRes("m_AExgmModifierClumpTemplate.kCopy")) "xgmModifierClump";
+                xgmCreateAEUiForFloatAttr "copyVariance" (uiRes("m_AExgmModifierClumpTemplate.kCopyVariance")) "xgmModifierClump";
+                xgmCreateAEUiForFloatAttr "cut" (uiRes("m_AExgmModifierClumpTemplate.kCut")) "xgmModifierClump";
+                xgmCreateAEUiWithFieldForFloatAttr "noise" (uiRes("m_AExgmModifierClumpTemplate.kNoise")) "xgmModifierClump" 0.0 1.0 0.0 1000000.0;
+                xgmCreateAEUiWithFieldForFloatAttr "noiseFrequency" (uiRes("m_AExgmModifierClumpTemplate.kNoiseFrequency")) "xgmModifierClump" 0.0 1.0 0.0 1000000.0;
+                xgmCreateAEUiForFloatAttr "noiseCorrelation" (uiRes("m_AExgmModifierClumpTemplate.kNoiseCorrelation")) "xgmModifierClump";
+
+                AEaddRampControl ($nodeName+".copyScale");
+                AEaddRampControl ($nodeName+".noiseScale");
+            editorTemplate -endLayout;
+
+            // Disable for stage 1
+            // editorTemplate -addSeparator;
+            // editorTemplate -addControl -label _L10N(kPreviewColor, "Preview Color on Splines") "previewColor";
+
+        editorTemplate -endLayout;
+
+        // Inherited depend node attributes
+        AEdependNodeTemplate $nodeName;
+
+        // Additional dynamic attributes
+        editorTemplate -addExtraControls;
+
+    editorTemplate -endScrollLayout;
+}
+

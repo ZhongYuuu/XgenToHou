@@ -1,0 +1,334 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+global proc int getGroomingToolIndex()
+{
+	global string $gGroomToolList[];
+	if(size($gGroomToolList) == 0)
+	{
+		$gGroomToolList = {	"xgmDensityBrushTool", 
+							"xgmPlaceBrushTool", 
+							"xgmLengthBrushTool", 
+							"xgmCutBrushTool", 
+							"xgmWidthBrushTool",
+							"xgmDirectionBrushTool",
+							"xgmCombBrushTool", 
+							"xgmGrabBrushTool", 
+							"xgmSmoothBrushTool", 
+							"xgmNoiseBrushTool", 
+							"xgmClumpBrushTool", 
+							"xgmPartBrushTool", 
+							"xgmFreezeBrushTool",
+							"xgmSelectBrushTool",
+							"xgmPlaceBrushTool"
+							};
+	}
+	
+	string $currentTool = `currentCtx`;
+	
+	int $index = stringArrayFind( $currentTool, 0, $gGroomToolList );
+	return $index;
+}
+
+global proc int getXGenGroomingToolHUDVisiblity()
+{
+	int $index = getGroomingToolIndex();
+
+	int $groomingToolVisible = 0;
+	if($index != -1)
+	{
+		$groomingToolVisible = 1;
+	}
+	
+	return $groomingToolVisible;
+}
+
+global proc int getXGenGroomingOnHUDVisiblity()
+{
+	int $groomingToolVisible = getXGenGroomingToolHUDVisiblity();
+	
+	int $descEditOn = 0;
+	string $currentDesc = python("xgui.currentSplineDescription()");
+	if(size($currentDesc) > 0)
+	{
+		$descEditOn = 1;
+	}
+	
+	int $groomingOnVisible = ($groomingToolVisible && $descEditOn);
+
+	return $groomingOnVisible;
+}
+
+global proc int[] getXGenSplinesCount()
+{
+	int $totalCount;
+	string $splineDescList[] = `xgmSplineQuery -listSplineDescriptions`;
+	for($splineDesc in $splineDescList)
+	{
+		$totalCount += `xgmSplineQuery -splineCount $splineDesc`; 
+	}
+	
+	int $selectedDescCount;
+	string $selectedSplineDescList[] = `xgmSplineQuery -listSelectedSplineDescriptions`;
+	for($selectedSplineDesc in $selectedSplineDescList)
+	{
+		$selectedDescCount += `xgmSplineQuery -splineCount $selectedSplineDesc`; 
+	}
+
+	int $resultCounts[] = {$totalCount, $selectedDescCount};
+	return $resultCounts;
+}
+
+global proc int[] getXGenGPUMemory()
+{
+	int $dedicated = `xgmSplineQuery -videoMemoryDedicated`;
+	int $used	  = `xgmSplineQuery -videoMemoryUsed`;
+	int $available = `xgmSplineQuery -videoMemoryAvailable`;
+	if ($available >= 0 && $available < 9999999)
+	{
+		// Dedicated Video Memory, Used (Recorded) Video Memory, Available Video Memory
+		int $resultCounts[] = {$dedicated, $used, $available};
+		return $resultCounts;
+	}
+	else
+	{
+		// Dedicated Video Memory, Used (Recorded) Video Memory
+		int $resultCounts[] = {$dedicated, $used};
+		return $resultCounts;
+	}
+}
+
+global proc string[] xgenCount_format( int $counts[] ) 
+{
+	string $result[];
+	int $count;
+	for( $count in $counts ) {
+		string $pycmd = "'{:,}'.format(" + $count + ").replace(',',' ')";
+		$result[size($result)]=`python $pycmd`;
+	}
+	return $result;
+}
+
+global proc string[] getXGenSplinesCount_format()
+{
+	return xgenCount_format( `getXGenSplinesCount` );
+}
+
+global proc string[] getXGenGPUMemory_format()
+{
+	return xgenCount_format( `getXGenGPUMemory` );
+}
+
+global proc string getXGenGroomingOn()
+{
+	setXGenHUDGroomingOnVisibility(`optionVar -q xgenHUDVisibility`);
+	
+	string $groomingOnString;
+	string $groomingTool = getXGenGroomingTool();
+	
+	// For Density/Width/Place brush    
+	// 1) If there is one base node is selected, Density brush will operate on that node;
+    // 2) If there is one description node is selected, Maya will find its related
+    //    based node and Density/Width brush will operate on that node;
+    // 3) If one interactive groom spline description is selected in the XGen panel,
+    //    Maya will find its related based node and Density/Width brush will operate on that node. 
+	if($groomingTool == "Density" || $groomingTool == "Width" || $groomingTool == "Place")
+	{
+		if($groomingTool == "Density" || $groomingTool == "Place")
+		{
+			string $selectedBases[] = `ls -selection -type xgmSplineBase`;
+			int $selectedBasesCount = size($selectedBases);
+			if($selectedBasesCount>0)
+			{
+				return $selectedBases[$selectedBasesCount-1];
+			}
+		}
+		
+		string $selectedDescShapes[] = `ls -selection -type xgmSplineDescription`;
+		int $selectedDescShapesCount = size($selectedDescShapes);
+		if($selectedDescShapesCount>0)
+		{
+			string $lastSelectedDescShape = $selectedDescShapes[$selectedDescShapesCount-1];
+			string $descTransform = firstParentOf($lastSelectedDescShape);
+			if(startsWith($descTransform, "|"))
+			{
+				$descTransform = substring($descTransform, 2, size($descTransform));
+				return $descTransform;
+			}
+		}
+		
+		string $selectedTransforms[] = `ls -selection -type transform`;
+		int $selectedTransformsCount = size($selectedTransforms);
+		int $i;
+		for($i = $selectedTransformsCount; $i>0; $i--)
+		{
+			string $selectedTran = $selectedTransforms[$i-1];
+			string $selectedTransShape[] = `ls -g -dag $selectedTran`;
+			string $shapeType = `nodeType $selectedTransShape[0]`;
+			if($shapeType == "xgmSplineDescription")
+			{
+				return $selectedTran;
+			}
+		}
+	}
+	
+	string $currentDesc = python("xgui.currentSplineDescription()");
+	
+	if(size($currentDesc) > 0)
+	{
+		string $cmd = "listConnections -source true " + $currentDesc + ".activeSculpt";
+		string $currentSculpts[] = eval($cmd);
+		
+		$groomingOnString = $currentDesc + " | ";
+		if(size($currentSculpts[0]) > 0)
+		{
+			$groomingOnString = $groomingOnString + $currentSculpts[0] + " | ";
+			$cmd = "getAttr " + $currentSculpts[0] + ".activeTweak";
+			int $physicalIndex = eval($cmd) - 1;
+			
+			if($physicalIndex>=0)
+			{
+				$cmd = "getAttr -mi " + $currentSculpts[0] + ".tweaks";
+				int $indices[] = eval($cmd);
+        
+				if(size($indices)>$physicalIndex)
+				{
+					int $logicalIndex = $indices[$physicalIndex];
+					
+					$cmd = "getAttr " + $currentSculpts[0] + ".tweaks[" + $logicalIndex + "].uiName";
+					string $layerName = eval($cmd);
+					if ($layerName == "")
+						$layerName = "Sculpt Layer " + ($logicalIndex+1);
+					
+					$groomingOnString = $groomingOnString + $layerName;
+				}
+			}
+		}
+	}
+
+	return $groomingOnString;
+}
+
+global proc string getXGenGroomingTool()
+{
+	global string $gGroomToolLabelList[];
+    if(size($gGroomToolLabelList) == 0)
+    {
+		$gGroomToolLabelList = {	"Density",
+									"Place",
+									"Length",
+									"Cut",
+									"Width",
+									"Twist",
+									"Comb",
+									"Grab",
+									"Smooth",
+									"Noise",
+									"Clump",
+									"Part",
+									"Freeze",
+									"Select",
+									"Place"
+									};
+	}
+									
+	setXGenHUDGroomingToolVisibility(`optionVar -q xgenHUDVisibility`);
+	
+	string $groomingToolName = "";
+	int $index = getGroomingToolIndex();
+	if($index != -1)
+	{
+		$groomingToolName = $gGroomToolLabelList[$index];
+	}
+	
+	return $groomingToolName;
+}
+
+global proc MakeXGenHUD()
+{
+	eval( "python( \"import xgenm.ui as xgui\" )" );
+	
+	int $xgenHUDVisible = `optionVar -q xgenHUDVisibility`;
+	int $groomingToolVisibility = getXGenGroomingToolHUDVisiblity();
+	int $groomingOnVisibility = getXGenGroomingOnHUDVisiblity();
+	
+	headsUpDisplay
+		-section 0
+		-block `headsUpDisplay -nextFreeBlock 0`
+		-visible $xgenHUDVisible
+		-label (uiRes("m_xgenHUD.kXGenSplines"))
+		-labelWidth 100
+		-dataWidth 65
+		-dataAlignment "right"
+		-command "getXGenSplinesCount_format()"
+		-attachToRefresh
+		-allowOverlap true
+		HUDXGenSplinesCount;
+
+	headsUpDisplay
+		-section 0
+		-block `headsUpDisplay -nextFreeBlock 0`
+		-visible $xgenHUDVisible
+		-label (uiRes("m_xgenHUD.kXGenGPUMemory"))
+		-labelWidth 100
+		-dataWidth 65
+		-dataAlignment "right"
+		-command "getXGenGPUMemory_format()"
+		-attachToRefresh
+		-allowOverlap true
+		HUDXGenGPUMemory;
+		
+		headsUpDisplay 
+		-section 7
+    	-block `headsUpDisplay -nextFreeBlock 7`
+    	-visible ($xgenHUDVisible && $groomingToolVisibility)
+		-label (uiRes("m_xgenHUD.kGroomingTool"))
+		-labelWidth 100
+		-dataWidth 65
+		-dataAlignment "right"
+		-allowOverlap true
+		-command "getXGenGroomingTool()"
+		-attachToRefresh
+    	HUDXGenGroomingTool;
+		
+		headsUpDisplay 
+		-section 7
+    	-block `headsUpDisplay -nextFreeBlock 7`
+    	-visible ($xgenHUDVisible && $groomingOnVisibility)
+		-label (uiRes("m_xgenHUD.kGroomingOn"))
+		-labelWidth 100
+		-dataWidth 65
+		-dataAlignment "right"
+		-command "getXGenGroomingOn()"
+		-attachToRefresh
+		-allowOverlap true
+    	HUDXGenGroomingOn;
+}
+
+global proc RemoveXGenHUD()
+{
+	if (`headsUpDisplay -exists HUDXGenSplinesCount`)
+	{
+		headsUpDisplay -remove HUDXGenSplinesCount;
+	}
+
+	if (`headsUpDisplay -exists HUDXGenGPUMemory`)
+	{
+		headsUpDisplay -remove HUDXGenGPUMemory;
+	}
+
+	if (`headsUpDisplay -exists HUDXGenGroomingTool`)
+	{
+		headsUpDisplay -remove HUDXGenGroomingTool;
+	}
+
+	if (`headsUpDisplay -exists HUDXGenGroomingOn`)
+	{
+		headsUpDisplay -remove HUDXGenGroomingOn;
+	}
+	
+}

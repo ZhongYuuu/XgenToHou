@@ -1,0 +1,203 @@
+//**************************************************************************/
+// Copyright 2015 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk
+// license agreement provided at the time of installation or download,
+// or which otherwise accompanies this software in either electronic
+// or hard copy form.
+//**************************************************************************/
+
+#include "SSAO_Common.cgh"
+
+#ifdef CLIPPING
+    #include "ClippingGL.cgh"
+#endif
+
+//
+// XGen wide spline NormalDepth pass shader
+//
+
+// Uniforms
+//
+uniform float4x4 gWorld                 : world;
+uniform float4x4 gWorldInverse          : worldinverse;
+uniform float4x4 gWorldViewProjection   : worldviewprojection;
+uniform float3   gViewDirection         : viewdirection;
+uniform float3   gWorldCameraPosition   : worldcameraposition;
+uniform float    gDepthPriority         : depthpriority;
+uniform bool     gIsOrthographic        : isorthographic;
+uniform float    gProjZSense            : ProjectionZSense;
+
+// Varyings
+//
+struct VS_INPUT
+{
+    float3 Pos              : POSITION;
+    float3 mayaBitangentIn  : TEXCOORD7;
+    float2 uvCoord          : TEXCOORD0;
+    float2 wCoord           : TEXCOORD1;
+    float  xgenCVWidth      : TEXCOORD2;
+};
+
+struct VS_TO_GS
+{
+    float3 mayaTangentIn    : TEXCOORD6;
+    float3 mayaBitangentIn  : TEXCOORD7;
+    float2 uvCoord          : TEXCOORD0;
+    float2 wCoord           : TEXCOORD1;
+    float  xgenCVWidth      : TEXCOORD2;
+    float4 NormalDepth      : TEXCOORD3;
+    float4 HPos             : POSITION;
+};
+
+struct GS_TO_PS
+{
+    float4 NormalDepth      : TEXCOORD3;
+#ifdef CLIPPING
+    float Clip0             : CLP0;
+    float Clip1             : CLP1;
+    float Clip2             : CLP2;
+    float Clip3             : CLP3;
+    float Clip4             : CLP4;
+    float Clip5             : CLP5;
+#endif
+    float4 HPos             : POSITION;
+};
+
+struct pixelOut2
+{
+    float4 Normal           : COLOR0;
+    float4 Depth            : COLOR1;
+};
+
+// Vertex Shader
+//
+float3 ixgenFacingCameraVSToGSTw(float3 Pm, float3 Bw, float4x4 worldInverse, float3 viewDirection, float3 worldCameraPosition, bool isOrthographic)
+{
+    // Get a view vector from camera to vertex
+    float3 viewVector = Pm - mul(worldInverse, float4(worldCameraPosition, 1.0f)).xyz;
+
+    // Orthographic camera is directional
+    if (isOrthographic)
+    {
+        float3 viewOrigin = mul(worldInverse, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
+        float3 viewTarget = mul(worldInverse, float4(viewDirection, 1.0f)).xyz;
+        viewVector = viewTarget - viewOrigin;
+    }
+
+    // Tangent is the cross product of view vector and bitangent
+    return normalize(cross(viewVector, Bw));
+}
+
+VS_TO_GS VS_NormalDepth(VS_INPUT vsIn)
+{
+    VS_TO_GS vsOut;
+
+    vsOut.mayaTangentIn   = ixgenFacingCameraVSToGSTw(vsIn.Pos, vsIn.mayaBitangentIn, gWorldInverse, gViewDirection, gWorldCameraPosition, gIsOrthographic);
+    vsOut.mayaBitangentIn = normalize(vsIn.mayaBitangentIn);
+    vsOut.uvCoord         = vsIn.uvCoord;
+    vsOut.wCoord          = vsIn.wCoord;
+    vsOut.xgenCVWidth     = vsIn.xgenCVWidth;
+    vsOut.HPos            = float4(vsIn.Pos, 1.0f);
+
+    float3 norm           = normalize(cross(vsOut.mayaTangentIn, vsOut.mayaBitangentIn));
+    vsOut.NormalDepth.xyz = mul(norm, float3x3(gWVITXf[0].xyz, gWVITXf[1].xyz, gWVITXf[2].xyz));
+    vsOut.NormalDepth.z   = gProjZSense * vsOut.NormalDepth.z;
+    vsOut.NormalDepth.w   = 0.0f;  // Fill in GS
+
+    return vsOut;
+}
+
+// Geometry Shader
+//
+LINE TRIANGLE_OUT void GS_NormalDepth(AttribArray<VS_TO_GS> gsIn)
+{
+    // Early Out
+    if( all(gsIn[0].HPos.xyz == gsIn[1].HPos.xyz) )
+    {
+        return;
+    }
+
+    GS_TO_PS gsOut;
+    float3 pm;
+
+    pm = gsIn[0].HPos.xyz - gsIn[0].mayaTangentIn * gsIn[0].xgenCVWidth * 0.5f;
+    gsOut.HPos = mul(gWorldViewProjection, float4(pm, 1.0f));
+    gsOut.HPos.z -= gsOut.HPos.w * 2.0f * gDepthPriority;
+    gsOut.NormalDepth.xyz = gsIn[0].NormalDepth.xyz;
+    gsOut.NormalDepth.w = gProjZSense * mul(float4(pm, 1.0f), gWVXf).z;
+#ifdef CLIPPING
+    {
+        float4 HPw = mul(float4(pm, 1.0f), gWXf);
+        ComputeClipDistances(HPw, gsOut.Clip0, gsOut.Clip1, gsOut.Clip2, gsOut.Clip3, gsOut.Clip4, gsOut.Clip5);
+    }
+#endif
+    emitVertex(gsOut);
+
+    pm = gsIn[0].HPos.xyz + gsIn[0].mayaTangentIn * gsIn[0].xgenCVWidth * 0.5f;
+    gsOut.HPos = mul(gWorldViewProjection, float4(pm, 1.0f));
+    gsOut.HPos.z -= gsOut.HPos.w * 2.0f * gDepthPriority;
+    gsOut.NormalDepth.xyz = gsIn[0].NormalDepth.xyz;
+    gsOut.NormalDepth.w = gProjZSense * mul(float4(pm, 1.0f), gWVXf).z;
+#ifdef CLIPPING
+    {
+        float4 HPw = mul(float4(pm, 1.0f), gWXf);
+        ComputeClipDistances(HPw, gsOut.Clip0, gsOut.Clip1, gsOut.Clip2, gsOut.Clip3, gsOut.Clip4, gsOut.Clip5);
+    }
+#endif
+    emitVertex(gsOut);
+
+    pm = gsIn[1].HPos.xyz - gsIn[1].mayaTangentIn * gsIn[1].xgenCVWidth * 0.5f;
+    gsOut.HPos = mul(gWorldViewProjection, float4(pm, 1.0f));
+    gsOut.HPos.z -= gsOut.HPos.w * 2.0f * gDepthPriority;
+    gsOut.NormalDepth.xyz = gsIn[1].NormalDepth.xyz;
+    gsOut.NormalDepth.w = gProjZSense * mul(float4(pm, 1.0f), gWVXf).z;
+#ifdef CLIPPING
+    {
+        float4 HPw = mul(float4(pm, 1.0f), gWXf);
+        ComputeClipDistances(HPw, gsOut.Clip0, gsOut.Clip1, gsOut.Clip2, gsOut.Clip3, gsOut.Clip4, gsOut.Clip5);
+    }
+#endif
+    emitVertex(gsOut);
+
+    pm = gsIn[1].HPos.xyz + gsIn[1].mayaTangentIn * gsIn[1].xgenCVWidth * 0.5f;
+    gsOut.HPos = mul(gWorldViewProjection, float4(pm, 1.0f));
+    gsOut.HPos.z -= gsOut.HPos.w * 2.0f * gDepthPriority;
+    gsOut.NormalDepth.xyz = gsIn[1].NormalDepth.xyz;
+    gsOut.NormalDepth.w = gProjZSense * mul(float4(pm, 1.0f), gWVXf).z;
+#ifdef CLIPPING
+    {
+        float4 HPw = mul(float4(pm, 1.0f), gWXf);
+        ComputeClipDistances(HPw, gsOut.Clip0, gsOut.Clip1, gsOut.Clip2, gsOut.Clip3, gsOut.Clip4, gsOut.Clip5);
+    }
+#endif
+    emitVertex(gsOut);
+
+    restartStrip();
+}
+
+// Pixel Shader
+//
+pixelOut2 PS_NormalDepth(GS_TO_PS psIn)
+{
+    pixelOut2 psOut;
+
+    psOut.Normal = float4((normalize(psIn.NormalDepth.xyz) + 1.0f) * 0.5f, 0.0f);
+    psOut.Depth  = psIn.NormalDepth.wwww;
+
+    return psOut;
+}
+
+// Techniques
+//
+technique main
+{
+    pass pNormalDepth
+    {
+        VertexProgram   = compile glslv VS_NormalDepth();
+        GeometryProgram = compile glslg GS_NormalDepth();
+        FragmentProgram = compile glslf PS_NormalDepth();
+    }
+}
+
+

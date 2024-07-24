@@ -1,0 +1,41 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+// =======================================================================
+// Copyright 2015 Autodesk, Inc. All rights reserved.
+//
+// This computer source code and related instructions and comments are the
+// unpublished confidential  and proprietary information of Autodesk, Inc.
+// and are protected under applicable copyright and trade secret law. They 
+// may not be disclosed to, copied  or used by any third party without the 
+// prior written consent of Autodesk, Inc.
+// =======================================================================
+
+global proc AExgmModifierSculptTemplate(string $nodeName)
+{
+    python("xgui.ae.AExgmModifierSculptTemplate('" + $nodeName + "')");
+}
+
+global proc AExgmModifierSculptLayersNew(string $nodeAttr)
+{
+    python("xgui.ae.AExgmModifierSculptLayersNew('" + $nodeAttr + "')");
+}
+
+global proc AExgmModifierSculptLayersReplace(string $nodeAttr)
+{
+    python("xgui.ae.AExgmModifierSculptLayersReplace('" + $nodeAttr + "')");
+}
+
+global proc AExgmModifierSculptLayerAttributesNew(string $nodeAttr)
+{
+    python("xgui.ae.AExgmModifierSculptLayerAttributesNew('" + $nodeAttr + "')");
+}
+
+global proc AExgmModifierSculptLayerAttributesReplace(string $nodeAttr)
+{
+    python("xgui.ae.AExgmModifierSculptLayerAttributesReplace('" + $nodeAttr + "')");
+}

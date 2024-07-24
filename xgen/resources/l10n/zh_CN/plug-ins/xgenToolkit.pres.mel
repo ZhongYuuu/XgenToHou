@@ -1,0 +1,859 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+// Resources for Plug-in: xgenToolkit
+// 
+// ----------------------------
+// Registered string resources:
+// ----------------------------
+setPluginResource( "xgenToolkit", "rAccept", "接受");
+setPluginResource( "xgenToolkit", "rAddGuidesToolAvailability", "“添加导向”工具只能用于使用导向的描述");
+setPluginResource( "xgenToolkit", "rAddMoveGuidesTool", "“添加/移动导向”工具");
+setPluginResource( "xgenToolkit", "rAddWidget", "添加构件");
+setPluginResource( "xgenToolkit", "rAlembicErrorBadAttribute", "Alembic 错误。文件中的属性 ^1s 错误: ^2s");
+setPluginResource( "xgenToolkit", "rAlembicErrorBadBoundingBox", "Alembic 错误。文件中的边界框数据错误: ^1s");
+setPluginResource( "xgenToolkit", "rAlembicErrorBadControl", "Alembic 错误。文件(帧)中的控制点错误: ^1s");
+setPluginResource( "xgenToolkit", "rAlembicErrorBadDegrees", "Alembic 错误。文件(帧)中的次数错误: ^1s");
+setPluginResource( "xgenToolkit", "rAlembicErrorBadKnot", "Alembic 错误。文件(帧)中的结向量错误: ^1s");
+setPluginResource( "xgenToolkit", "rAlembicErrorBadPosition", "Alembic 错误。文件中的位置数据错误: ^1s");
+setPluginResource( "xgenToolkit", "rAlembicErrorBadPositionFile", "Alembic 错误。文件中的位置数据错误: ^1s [^2s, ^3s]");
+setPluginResource( "xgenToolkit", "rAlembicErrorBadPositionFrame", "Alembic 错误。文件(帧)中的位置数据错误: ^1s");
+setPluginResource( "xgenToolkit", "rAlembicErrorBadWeights", "Alembic 错误。文件(帧)中的权重错误: ^1s");
+setPluginResource( "xgenToolkit", "rAlembicErrorGeoTypeMismatch", "Alembic 错误。“^1s”的几何体类型在 XGen (^2s) 和文件 ^3s 之间不匹配");
+setPluginResource( "xgenToolkit", "rAlembicErrorNoGeoFound", "Alembic 错误。文件(帧)中没有名为“^1s”的几何体: ^2s");
+setPluginResource( "xgenToolkit", "rApply", "应用");
+setPluginResource( "xgenToolkit", "rBack", "后退");
+setPluginResource( "xgenToolkit", "rCachePlayTypeBounce", "反弹");
+setPluginResource( "xgenToolkit", "rCachePlayTypeHold", "保持");
+setPluginResource( "xgenToolkit", "rCachePlayTypeLoop", "循环");
+setPluginResource( "xgenToolkit", "rCachePlayTypeReverse", "反向");
+setPluginResource( "xgenToolkit", "rCafErrorBadAttribute", "Caf 错误。文件(帧)中名为 ^1s 的属性错误: ^2s");
+setPluginResource( "xgenToolkit", "rCafErrorBadControl", "Caf 错误。文件(帧)中的控制点错误: ^1s");
+setPluginResource( "xgenToolkit", "rCafErrorBadDegree", "Caf 错误。文件(帧)中的次数错误: ^1s");
+setPluginResource( "xgenToolkit", "rCafErrorBadKnot", "Caf 错误。文件(帧)中的结向量错误: ^1s");
+setPluginResource( "xgenToolkit", "rCafErrorBadPointCount", "Caf 错误。文件(帧)中的点计数错误: ^1s");
+setPluginResource( "xgenToolkit", "rCafErrorBadPointId", "Caf 错误。文件(帧)中的点 ID 错误: ^1s");
+setPluginResource( "xgenToolkit", "rCafErrorBadPositionData", "Caf 错误。文件中的位置数据错误: ^1s");
+setPluginResource( "xgenToolkit", "rCafErrorBadPositionDataXgen", "Caf 错误。文件中的位置数据错误: ^1s [^2s, ^3s]");
+setPluginResource( "xgenToolkit", "rCafErrorCvAttributeNotSimple", "找到的 CV 属性不是简单浮点 xgen_cv_^1s。^2s [^3s, ^4s]");
+setPluginResource( "xgenToolkit", "rCafErrorFailedToOpenPtex", "无法打开 Ptex: ^1s -> ^2s");
+setPluginResource( "xgenToolkit", "rCafErrorFileDoesNotExist", "文件不存在: ^1s");
+setPluginResource( "xgenToolkit", "rCafErrorGeoTypeMismatch", "Caf 错误。“^1s”的几何体类型在 XGen (^2s)与 caf 文件之间不匹配: ^3s");
+setPluginResource( "xgenToolkit", "rCafErrorGuideIndexProblem", "读取导向索引时出现问题。^1s [^2s, ^3s]");
+setPluginResource( "xgenToolkit", "rCafErrorInvalidGuideIndex", "导向索引无效: ^1s。^2s [^3s, ^4s]");
+setPluginResource( "xgenToolkit", "rCafErrorNoGeoNamed", "Caf 错误。caf 文件(帧)中没有名为“^1s”的几何体: ^2s");
+setPluginResource( "xgenToolkit", "rCafErrorNoGuidesOverride", "没有要覆盖的导向 [^1s, ^2s]");
+setPluginResource( "xgenToolkit", "rCafErrorProblemReadingCv", "读取 CV 属性 xgen_cv_^1s 时出现问题。^2s [^3s, ^4s]");
+setPluginResource( "xgenToolkit", "rCafErrorRefPos", "Caf 错误。引用位置与文件(帧)中的网格不一致: ^1s");
+setPluginResource( "xgenToolkit", "rCafErrorUnableToLoadFile", "无法加载文件: ^1s");
+setPluginResource( "xgenToolkit", "rCafErrorUnableToLoadMulti", "无法加载: ^1s [^2s, ^3s]");
+setPluginResource( "xgenToolkit", "rCallToAttrExists", "调用 attrExists 失败。");
+setPluginResource( "xgenToolkit", "rCancel", "取消");
+setPluginResource( "xgenToolkit", "rCannotModifyPath", "无法修改 ^1s 节点的路径");
+setPluginResource( "xgenToolkit", "rClumpUseCustomControlMap", "自定义贴图");
+setPluginResource( "xgenToolkit", "rColorCurveWidget", "颜色曲线");
+setPluginResource( "xgenToolkit", "rColorWidget", "颜色");
+setPluginResource( "xgenToolkit", "rColorWidgetColor", "颜色");
+setPluginResource( "xgenToolkit", "rConvertXGenPrimToPoly", "将 XGen 基本体转化为多边形");
+setPluginResource( "xgenToolkit", "rCouldNotAddModifierType", "无法添加修改器 [^1s, ^2s, ^3s]");
+setPluginResource( "xgenToolkit", "rCouldNotDeleteCollection", "无法删除集合 [^1s]");
+setPluginResource( "xgenToolkit", "rCouldNotDeleteDescription", "无法删除描述 [^1s, ^2s]");
+setPluginResource( "xgenToolkit", "rCouldNotExportCollection", "无法导出集合。找不到集合: ^1s");
+setPluginResource( "xgenToolkit", "rCouldNotExportDesc", "无法导出描述 [^1s, ^2s]");
+setPluginResource( "xgenToolkit", "rCouldNotExportDescAsPreset", "无法导出描述 [^1s, ^2s] 作为预设");
+setPluginResource( "xgenToolkit", "rCouldNotFindActiveType", "找不到活动类型 [^1s, ^2s]");
+setPluginResource( "xgenToolkit", "rCouldNotFindCollection", "找不到集合 [^1s]");
+setPluginResource( "xgenToolkit", "rCouldNotFindFileInDataPath", "找不到 FileInXgDataPath [^1s, ^2s]");
+setPluginResource( "xgenToolkit", "rCouldNotFindFxModules", "找不到 fx 模块 [^1s, ^2s]");
+setPluginResource( "xgenToolkit", "rCouldNotFindModifier", "找不到修改器 [^1s, ^2s, ^3s]");
+setPluginResource( "xgenToolkit", "rCouldNotFindModifierForPreset", "找不到修改器 [^1s, ^2s, ^3s]");
+setPluginResource( "xgenToolkit", "rCouldNotFindModifierType", "找不到修改器类型 [^1s, ^2s, ^3s]");
+setPluginResource( "xgenToolkit", "rCouldNotGetObjects", "无法获取对象 [^1s, ^2s]");
+setPluginResource( "xgenToolkit", "rCouldNotImportDescAsPreset", "无法导入描述 [^1s, ^2s] 作为预设");
+setPluginResource( "xgenToolkit", "rCouldNotImportDescription", "无法导入描述 [^1s, ^2s]");
+setPluginResource( "xgenToolkit", "rCouldNotImportModifier", "无法导入修改器 [^1s, ^2s]");
+setPluginResource( "xgenToolkit", "rCouldNotImportModifierFile", "无法导入修改器 [^1s, ^2s, ^3s]");
+setPluginResource( "xgenToolkit", "rCouldNotInitInterpolation", "无法初始化插值 [^1s, ^2s]");
+setPluginResource( "xgenToolkit", "rCouldNotMoveModifierType", "无法移动修改器 [^1s, ^2s, ^3s]");
+setPluginResource( "xgenToolkit", "rCouldNotRemoveModifierType", "无法移除修改器 [^1s, ^2s, ^3s]");
+setPluginResource( "xgenToolkit", "rCouldNotReturnBoundFace", "无法返回边界面 [^1s, ^2s, ^3s]");
+setPluginResource( "xgenToolkit", "rCouldNotReturnBoundFaceNotFound", "无法返回边界面。找不到面片。[^1s, ^2s, ^3s]");
+setPluginResource( "xgenToolkit", "rCouldNotReturnBoundGeo", "无法返回绑定的几何体 [^1s, ^2s]");
+setPluginResource( "xgenToolkit", "rCouldNotReturnCulledPrims", "无法返回已消隐的基本体。[^1s, ^2s, ^3s]");
+setPluginResource( "xgenToolkit", "rCouldNotReturnPatchIds", "无法返回已消隐的面片面 ID [^1s, ^2s, ^3s]");
+setPluginResource( "xgenToolkit", "rCouldNotReturnPatchNotFound", "无法返回已消隐的面片。找不到面片 [^1s, ^2s, ^3s]");
+setPluginResource( "xgenToolkit", "rCouldNotReturnPatches", "无法返回已消隐的面片 [^1s, ^2s]");
+setPluginResource( "xgenToolkit", "rCouldNotSetActiveOfType", "无法设置给定类型的活动对象: [^1s, ^2s, ^3s]");
+setPluginResource( "xgenToolkit", "rCouldNotSetActiveType", "无法设置活动类型 [^1s, ^2s]");
+setPluginResource( "xgenToolkit", "rCreateDefaultSculptLayer", "未找到雕刻层。请创建一个新层。");
+setPluginResource( "xgenToolkit", "rCreatePtexUVAttachMesh", "createPtexUV 错误: 附加到网格失败。");
+setPluginResource( "xgenToolkit", "rCreatePtexUVCantGet", "createPtexUV 错误: 无法查询 UV 集");
+setPluginResource( "xgenToolkit", "rCreatePtexUVCommandFail", "createPtexUV 命令失败。");
+setPluginResource( "xgenToolkit", "rCreatePtexUVCommandSucceed", "createPtexUV 命令成功。");
+setPluginResource( "xgenToolkit", "rCreatePtexUVHasUVs", "createPtexUV: 网格已具有 UV，正在跳过。");
+setPluginResource( "xgenToolkit", "rCreatePtexUVNotAMesh", "createPtexUV 错误: ^1s 不是网格");
+setPluginResource( "xgenToolkit", "rCreatePtexUVNotFound", "createPtexUV 错误: 找不到 ^1s");
+setPluginResource( "xgenToolkit", "rCurveWidget", "曲线");
+setPluginResource( "xgenToolkit", "rCurveWidgetLookup", "查找");
+setPluginResource( "xgenToolkit", "rErr_AlembicCacheBigPreRollStartFrame", "预卷开始帧应小于开始帧。");
+setPluginResource( "xgenToolkit", "rErr_AlembicCacheExportCacheToFileInUse", "文件“^1s”正在使用。请指定另一个文件来导出缓存。");
+setPluginResource( "xgenToolkit", "rErr_AlembicCacheFileNotExists", "Alembic 文件“^1s”不存在。");
+setPluginResource( "xgenToolkit", "rErr_AlembicCacheIgnoreUnsupportedFlag", "忽略不受支持的标志: ^1s。");
+setPluginResource( "xgenToolkit", "rErr_AlembicCacheInvalidDataFormatFlag", "未正确指定数据格式。");
+setPluginResource( "xgenToolkit", "rErr_AlembicCacheInvalidFile", "Alembic 文件无效: ^1s。");
+setPluginResource( "xgenToolkit", "rErr_AlembicCacheInvalidFileFlag", "未正确指定文件。");
+setPluginResource( "xgenToolkit", "rErr_AlembicCacheInvalidFlag", "缓存标志无效。");
+setPluginResource( "xgenToolkit", "rErr_AlembicCacheInvalidFrameRangeFlag", "未正确指定帧范围。");
+setPluginResource( "xgenToolkit", "rErr_AlembicCacheInvalidFrameRelativeSampleFlag", "未正确指定帧相对采样。");
+setPluginResource( "xgenToolkit", "rErr_AlembicCacheInvalidObjectFlag", "未正确指定对象标志。");
+setPluginResource( "xgenToolkit", "rErr_AlembicCacheInvalidPreRollStartFrameFlag", "未正确指定预卷开始帧。");
+setPluginResource( "xgenToolkit", "rErr_AlembicCacheInvalidPreRollStepFlag", "未正确指定预卷步长。");
+setPluginResource( "xgenToolkit", "rErr_AlembicCacheInvalidStepFlag", "未正确指定步长。");
+setPluginResource( "xgenToolkit", "rErr_AlembicCacheNoCacheNodeSelected", "未选择任何缓存节点。");
+setPluginResource( "xgenToolkit", "rErr_AlembicCacheNoDescNodeSelected", "未选择任何描述节点。");
+setPluginResource( "xgenToolkit", "rErr_AlembicCacheNoDescNorCacheNodeSelected", "未选择任何描述节点或缓存节点。");
+setPluginResource( "xgenToolkit", "rErr_AlembicCacheNoFrameRangeFlag", "未指定帧范围。");
+setPluginResource( "xgenToolkit", "rErr_AlembicCacheNoXGenNodeSelected", "未指定有效的 XGen 节点。");
+setPluginResource( "xgenToolkit", "rErr_BrushContextFailToFindBase", "找不到基本节点。");
+setPluginResource( "xgenToolkit", "rErr_BrushContextFailToFindDesc", "找不到描述节点。");
+setPluginResource( "xgenToolkit", "rErr_BrushContextSpecifySculptNode", "需要指定有效的雕刻节点以对其进行梳理。");
+setPluginResource( "xgenToolkit", "rErr_BrushContextXgmCurveSplineNodeInBetween", "当前雕刻节点和描述节点之间存在一个“xgmCurveSpline”节点。");
+setPluginResource( "xgenToolkit", "rErr_BrushContextXgmSplineCacheNodeInBetween", "当前雕刻节点和描述节点之间存在“xgmSplineCache”节点。");
+setPluginResource( "xgenToolkit", "rErr_CreateSplineNameArgIsEmpty", "-name 参数不能为空。");
+setPluginResource( "xgenToolkit", "rErr_CreateSplineNameArgNotFound", "未指定或找不到 -name 参数。");
+setPluginResource( "xgenToolkit", "rErr_CreateSplineNoMeshSelected", "未选择要绑定的网格。");
+setPluginResource( "xgenToolkit", "rErr_CreateSplineSkipNonManifoldMesh", "网格 ^1s 包含非流形顶点(polyInfo -nmv ^2s)。跳过以在网格上创建描述。");
+setPluginResource( "xgenToolkit", "rErr_CreateSplineSplineCVCountTooBig", "CV 计数不应大于 ^1s。");
+setPluginResource( "xgenToolkit", "rErr_CreateSplineSplineCVCountTooSmall", "CV 计数不应小于 ^1s。");
+setPluginResource( "xgenToolkit", "rErr_CreateSplineSplineDensityTooBig", "样条线密度不应大于 ^1s。");
+setPluginResource( "xgenToolkit", "rErr_CreateSplineSplineLengthTooBig", "样条线长度不应大于 ^1s。");
+setPluginResource( "xgenToolkit", "rErr_CreateSplineSplineWidthScaleTooBig", "样条线宽度比例不应大于 ^1s。");
+setPluginResource( "xgenToolkit", "rErr_CreateSplineSplineWidthTooBig", "样条线宽度不应大于 ^1s。");
+setPluginResource( "xgenToolkit", "rErr_DensityBrushIllegalFloodMode", "笔刷泛洪模式“^1s”非法。");
+setPluginResource( "xgenToolkit", "rErr_DensityBrushIllegalOpMode", "笔刷操作模式“^1s”非法。");
+setPluginResource( "xgenToolkit", "rErr_DirectionBrushTurnOffFaceCamera", "禁用“朝向摄影机”以使用“扭曲笔刷”");
+setPluginResource( "xgenToolkit", "rErr_FailedToFindBaseNodeFromGuideNode", "从给定导向节点“^1s”中找不到基本节点。");
+setPluginResource( "xgenToolkit", "rErr_FailedToFindProperBaseNode", "找不到正确的 XGen 基本节点。");
+setPluginResource( "xgenToolkit", "rErr_GroomConvertMustSelDescOrPal", "必须选择调色板或描述。");
+setPluginResource( "xgenToolkit", "rErr_GroomConvertNoDesc", "没有为转换选择描述。");
+setPluginResource( "xgenToolkit", "rErr_GroomConvertPrefix", "前缀名称应以字母开头。");
+setPluginResource( "xgenToolkit", "rErr_GroomTransferFail", "传递失败。");
+setPluginResource( "xgenToolkit", "rErr_GroomTransferNoValidBase", "找不到有效的源基本节点。");
+setPluginResource( "xgenToolkit", "rErr_GroomTransferNoValidDesc", "未指定有效的描述节点。");
+setPluginResource( "xgenToolkit", "rErr_GroomTransferNoValidMesh", "未指定有效的网格节点。");
+setPluginResource( "xgenToolkit", "rErr_GroomTransferNoValidMeshForThisDesc", "找不到给定描述节点的有效网格。");
+setPluginResource( "xgenToolkit", "rErr_GroomTransferSelectMeshDesc", "请选择一个源描述节点和一个目标网格节点。");
+setPluginResource( "xgenToolkit", "rErr_GuideDensityShouldNotBiggerThan", "导向密度不应大于“^1s”。");
+setPluginResource( "xgenToolkit", "rErr_GuideInterpNoCandidateGuide", "尚未关联候选导向。 ");
+setPluginResource( "xgenToolkit", "rErr_GuideInterpNoRefMeshInGuide", "输入导向中找不到引用网格。");
+setPluginResource( "xgenToolkit", "rErr_GuideInterpNoRefMeshInSpline", "输入样条线数据中找不到引用网格。");
+setPluginResource( "xgenToolkit", "rErr_LinearWireBadWireNumber", "基本体 #^1s 的线条数量错误，请重新绑定节点 ^2s 的线条。");
+setPluginResource( "xgenToolkit", "rErr_LinearWireNoClosestPoint", "无法找到节点 ^2s 的线条 #^1s 的最近线条点。");
+setPluginResource( "xgenToolkit", "rErr_LinearWireNoRefMesh", "节点“^1s”的输入导向中找不到引用网格。跳过。");
+setPluginResource( "xgenToolkit", "rErr_LinearWireStaleRefState", "“^1s”的引用状态是通过先前版本的线性线条创建的，在此版本中可能无法正常显示。请更新其引用状态。");
+setPluginResource( "xgenToolkit", "rErr_LinearWireStaleRefStateInPreset", "“^1s”的引用状态是通过先前版本的线性线条创建的，在此版本中可能无法正常显示。请使用此版本打开原始场景、更新其引用状态并重新导出。");
+setPluginResource( "xgenToolkit", "rErr_LinearWireTooSmallWeights", "尖端/基础权重太小，无法归一化。 ");
+setPluginResource( "xgenToolkit", "rErr_MakeDynamicDisconnectGuideData", "请断开当前 inGuideData 后再执行此操作。");
+setPluginResource( "xgenToolkit", "rErr_MakeDynamicFailToFindMesh", "从给定导向节点“^1s”中找不到任何绑定网格。");
+setPluginResource( "xgenToolkit", "rErr_MakeDynamicFailToFindModifier", "找不到正确的修改器节点。");
+setPluginResource( "xgenToolkit", "rErr_MakeDynamicMeshHasNoUV", "网格“^1s”需要至少一个 UV 集以使曲线动力学化。");
+setPluginResource( "xgenToolkit", "rErr_MakeDynamicMultiModifierSelected", "选择了多个修改器节点。");
+setPluginResource( "xgenToolkit", "rErr_MakeDynamicNoCurve", "未指定用于生成导向的曲线。");
+setPluginResource( "xgenToolkit", "rErr_MakeDynamicNoGuideData", "没有要使导向动力学化的数据。");
+setPluginResource( "xgenToolkit", "rErr_MakeDynamicNoObject", "未指定或选择对象。");
+setPluginResource( "xgenToolkit", "rErr_MakeDynamicNoValidModifier", "未指定有效的修改器节点。");
+setPluginResource( "xgenToolkit", "rErr_MakeDynamicThisModNotValid", "指定的节点“^1s”不是有效的导向节点。");
+setPluginResource( "xgenToolkit", "rErr_MoreThanOneObjectSpecified", "指定或选择了多个对象。");
+setPluginResource( "xgenToolkit", "rErr_NoXgmModifierGuideObjectSpecified", "未指定或选择正确的 xgmModifierGuide 对象。");
+setPluginResource( "xgenToolkit", "rErr_NotAXgmModifierGuideOrXgmModifierLinearWire", "指定的节点“^1s”不是“xgmModifierGuide”或“xgmModifierLinearWire”节点。");
+setPluginResource( "xgenToolkit", "rErr_PlaceBrushIllegalOpMode", "笔刷操作模式“^1s”非法。");
+setPluginResource( "xgenToolkit", "rErr_RebuildCVCntTooSmall", "必须提供至少 ^1s 个 CV。");
+setPluginResource( "xgenToolkit", "rErr_RebuildCantCrossSecondaryBaseNode", "当前基本节点和描述节点之间存在“xgmCurveToSpline”或“xgmSplineCache”节点时，无法执行重建。");
+setPluginResource( "xgenToolkit", "rErr_RebuildFailToFindBase", "找不到正确的 XGen 基本节点。");
+setPluginResource( "xgenToolkit", "rErr_RebuildFailToFindBaseFromDesc", "从描述节点“^1s”中找不到 XGen 基本节点。");
+setPluginResource( "xgenToolkit", "rErr_RebuildFailToFindDesc", "从基本节点“^1s”中找不到描述节点。");
+setPluginResource( "xgenToolkit", "rErr_RebuildInValidMode", "模式“^1s”无效，请使用“^2s”或“^3s”。");
+setPluginResource( "xgenToolkit", "rErr_RebuildModeNotSupported", "尚不支持模式 [^1s]。");
+setPluginResource( "xgenToolkit", "rErr_RebuildMoreThanOneObj", "指定或选择了多个对象。");
+setPluginResource( "xgenToolkit", "rErr_RebuildNoObject", "未指定或选择正确的 XGen 对象。");
+setPluginResource( "xgenToolkit", "rErr_RebuildNotBaseOrDesc", "节点“^1s”既不是“xgmSplineBase”节点也不是“xgmSplineDescription”节点。");
+setPluginResource( "xgenToolkit", "rErr_RebuildUnrecognizedNode", "无法识别访问的节点: ID=“^1s”，名称=“^2s”。");
+setPluginResource( "xgenToolkit", "rErr_SculptFailToCreateAttrChangCallback", "无法创建属性更改回调。");
+setPluginResource( "xgenToolkit", "rErr_SculptFailToCreateCallback", "无法创建回调。");
+setPluginResource( "xgenToolkit", "rErr_SculptIllegalTweakIndex", "调整索引“^1s”非法，超出调整数量。");
+setPluginResource( "xgenToolkit", "rErr_UpdateRefMustOnXgmModifierLinearWire", "必须在“xgmModifierLinearWire”节点上更新引用状态。");
+setPluginResource( "xgenToolkit", "rErrorRegisteringPlugin", "注册 ^1s 时出错。");
+setPluginResource( "xgenToolkit", "rExpr", "表达式名称");
+setPluginResource( "xgenToolkit", "rFailedCanCreateDeltaCollectionNotFound", "无法检测是否可以创建增量。找不到集合: ^1s");
+setPluginResource( "xgenToolkit", "rFailedDeltaCollectionNotFound", "无法创建增量。找不到集合: ^1s");
+setPluginResource( "xgenToolkit", "rFailedDeltaSnapshotNotFound", "无法创建增量。找不到集合快照: ^1s");
+setPluginResource( "xgenToolkit", "rFailedSnapshotCollectionNotFound", "无法创建快照。找不到集合: ^1s");
+setPluginResource( "xgenToolkit", "rFailedToApplyDelta", "无法将增量应用到集合 ^1s。正在中止导入。 ");
+setPluginResource( "xgenToolkit", "rFailedToCreateSnapshot", "无法为集合 ^1s 创建快照。增量文件保存将不起作用。");
+setPluginResource( "xgenToolkit", "rFailedToImportCollectionFromFile", "无法从文件 ^1s 导入集合");
+setPluginResource( "xgenToolkit", "rFailedToImportDescAsPreset", "无法导入描述作为预设。找不到集合。[^1s]");
+setPluginResource( "xgenToolkit", "rFailedToImportDescription", "无法导入描述。找不到集合。[^1s]");
+setPluginResource( "xgenToolkit", "rFailedToRegisterPlugin", "无法注册 ^1s。");
+setPluginResource( "xgenToolkit", "rFileDoesNotExist", "文件不存在: ^1s");
+setPluginResource( "xgenToolkit", "rFileNameImportModifier", "必须指定文件名才能导入修改器。");
+setPluginResource( "xgenToolkit", "rFloatWidget", "浮点型");
+setPluginResource( "xgenToolkit", "rForward", "向前");
+setPluginResource( "xgenToolkit", "rFxModuleNotFound", "无法移除修改器。找不到修改器: [^1s, ^2s, ^3s]");
+setPluginResource( "xgenToolkit", "rFxModuleNotFoundMove", "无法移动修改器。找不到修改器: [^1s, ^2s, ^3s]");
+setPluginResource( "xgenToolkit", "rHelp", "帮助");
+setPluginResource( "xgenToolkit", "rInf_GroomTransferSucceeded", "传递成功。");
+setPluginResource( "xgenToolkit", "rIntWidget", "整型");
+setPluginResource( "xgenToolkit", "rInvalidGenerator", "指定用于创建描述的生成器无效。");
+setPluginResource( "xgenToolkit", "rInvalidInterpolation", "给定的插值方法无效。");
+setPluginResource( "xgenToolkit", "rInvalidModifierNode", "无效修改器节点: inMesh 和 outMesh 属性是必需的。");
+setPluginResource( "xgenToolkit", "rInvalidPreviewer", "指定用于创建描述的预览程序无效。");
+setPluginResource( "xgenToolkit", "rInvalidPrimitive", "指定用于创建描述的基本体无效。");
+setPluginResource( "xgenToolkit", "rInvalidRenderer", "指定用于创建描述的渲染器无效。");
+setPluginResource( "xgenToolkit", "rMax", "最大值:");
+setPluginResource( "xgenToolkit", "rMin", "最小值:");
+setPluginResource( "xgenToolkit", "rModifierExportFileName", "必须指定文件名才能导出修改器。");
+setPluginResource( "xgenToolkit", "rMsg_LinearWireNumIsZero", "线性修改器“^1s”上的引用或当前线条数量为零。");
+setPluginResource( "xgenToolkit", "rNeedInputMesh", "必须给定输入网格。");
+setPluginResource( "xgenToolkit", "rNoBoundGeometry", "没有 [^1s] 的绑定几何体");
+setPluginResource( "xgenToolkit", "rNoDescriptionFound", "未找到描述。");
+setPluginResource( "xgenToolkit", "rNoDescriptionName", "没有为创建描述指定描述名称。");
+setPluginResource( "xgenToolkit", "rNoPaletteName", "没有为创建描述指定集合名称。");
+setPluginResource( "xgenToolkit", "rNoPreviewVisibleBound", "无预览可见。描述未绑定到场景中的任何几何体。");
+setPluginResource( "xgenToolkit", "rNoPreviewVisibleGuidesTip", "无可见预览。描述已设置为使用导向，\\n但还没有创建导向。");
+setPluginResource( "xgenToolkit", "rNoPreviewVisibleLocationsTip", "无可见预览。描述已设置为使用位置，\\n但还没有创建位置。");
+setPluginResource( "xgenToolkit", "rNoVisibleBoundGeometry", "[^s1] 没有可见的绑定几何体");
+setPluginResource( "xgenToolkit", "rNumericWidgetDefault", "默认");
+setPluginResource( "xgenToolkit", "rNumericWidgetMax", "最大值");
+setPluginResource( "xgenToolkit", "rNumericWidgetMin", "最小值");
+setPluginResource( "xgenToolkit", "rPaletteDoesNotExist", "选项板 ^1s 不存在。中止应用增量。");
+setPluginResource( "xgenToolkit", "rPatchNoDescription", "编辑面片失败，没有描述。");
+setPluginResource( "xgenToolkit", "rPointHelpString", "单击鼠标左键可添加点，拖动可添加更多点。使用 Ctrl 键 + 鼠标左键可半径内删除点。按住 B 键并拖动可更改工具的半径。");
+setPluginResource( "xgenToolkit", "rPointsTool", "点");
+setPluginResource( "xgenToolkit", "rPreviewerMustBeGL", "该预览程序不能设置为非 GL 的预览程序。[^1s, ^2s, ^3s]");
+setPluginResource( "xgenToolkit", "rRampInterpLinear", "线性");
+setPluginResource( "xgenToolkit", "rRampInterpMSpline", "M样条线");
+setPluginResource( "xgenToolkit", "rRampInterpNone", "无");
+setPluginResource( "xgenToolkit", "rRampInterpSmooth", "平滑");
+setPluginResource( "xgenToolkit", "rRampInterpSpline", "样条线");
+setPluginResource( "xgenToolkit", "rRampPointInterp", "插值:");
+setPluginResource( "xgenToolkit", "rRampPointInterpShort", "插值:");
+setPluginResource( "xgenToolkit", "rRampPointPosition", "选定位置:  ");
+setPluginResource( "xgenToolkit", "rRampPointPositionShort", "位置:");
+setPluginResource( "xgenToolkit", "rRampPointValue", "选定值:  ");
+setPluginResource( "xgenToolkit", "rRampPointValueShort", "值:");
+setPluginResource( "xgenToolkit", "rRendererMustBeGL", "渲染器不能设置为预览程序 GL。 [^1s, ^2s, ^3s]");
+setPluginResource( "xgenToolkit", "rSave", "保存");
+setPluginResource( "xgenToolkit", "rSaveAs", "另存为");
+setPluginResource( "xgenToolkit", "rSaveChanges", "保存更改");
+setPluginResource( "xgenToolkit", "rSaveChangesToFile", "是否将更改保存到 ^1s?");
+setPluginResource( "xgenToolkit", "rSaveChangesToUntitledFile", "将更改保存到无标题文件？");
+setPluginResource( "xgenToolkit", "rSaveExpression", "保存表达式");
+setPluginResource( "xgenToolkit", "rSaveXGenLogFile", "保存 XGen 日志文件");
+setPluginResource( "xgenToolkit", "rSculptGuidesTool", "雕刻导向工具");
+setPluginResource( "xgenToolkit", "rSculptLockedLayerNotAllowed", "活动层被锁定。");
+setPluginResource( "xgenToolkit", "rSculptLockedNodeNotAllowed", "活动节点被锁定。");
+setPluginResource( "xgenToolkit", "rSculptReferencedNodeNotAllowed", "活动节点被参照。");
+setPluginResource( "xgenToolkit", "rSelectOneGroomSpline", "请选择一个交互式梳理样条线描述以使用此工具。");
+setPluginResource( "xgenToolkit", "rSelectPrimitivesTool", "选择基本体");
+setPluginResource( "xgenToolkit", "rSpecifyFileName", "必须指定文件名才能导入。");
+setPluginResource( "xgenToolkit", "rSpecifyFileNameError", "必须指定文件名才能导入描述。");
+setPluginResource( "xgenToolkit", "rSpecifyFileNameExportDesc", "必须指定文件名才能导出描述。");
+setPluginResource( "xgenToolkit", "rSpecifyFileNameExportDescAsPreset", "必须指定文件名才能导出描述作为预设。");
+setPluginResource( "xgenToolkit", "rTriedToImportDuplicate", "已尝试从文件 ^2s 导入重复的集合 ^1s。正在中止导入。");
+setPluginResource( "xgenToolkit", "rTypeToSearch", "要搜索的类型...");
+setPluginResource( "xgenToolkit", "rUnableToExecutePlugin", "无法执行 ^1s。");
+setPluginResource( "xgenToolkit", "rUnableToLoadFile", "无法加载文件: ^1s");
+setPluginResource( "xgenToolkit", "rUnknownTypeGiven", "找不到活动类型。给定类型未知: [^1s,^2s,^3s]");
+setPluginResource( "xgenToolkit", "rVariable", "变量");
+setPluginResource( "xgenToolkit", "rVectorWidget", "向量");
+setPluginResource( "xgenToolkit", "rWarn_BrushContextNoValidMeshForThisDesc", "找不到给定描述节点的有效网格。");
+setPluginResource( "xgenToolkit", "rWarn_GuideInterpCloseGuide", "面 ^1s 中有导向彼此太靠近。");
+setPluginResource( "xgenToolkit", "rWarn_GuideInterpCoincidentGuide", "面 ^1s 具有重合的导向 [^2s, ^3s]。");
+setPluginResource( "xgenToolkit", "rWarn_LinearWireFailComputeMaxRadius", "无法计算 maxRadius。所有导向变为活动状态。");
+setPluginResource( "xgenToolkit", "rWarn_LinearWireNoLegalWire", "找不到任何合法线条。");
+setPluginResource( "xgenToolkit", "rWarn_LinearWireNumChanged", "在 LinearModifier“^1s”上设置引用线条后当前线条数量发生了更改。请更新引用状态后继续。");
+setPluginResource( "xgenToolkit", "rWarn_LinearWireNumIsNonEqual", "LinearModifier“^1s”上的引用线条数量和当前线条数量不相等。请更新引用状态后继续。");
+setPluginResource( "xgenToolkit", "rWarn_SculptChangeActiveTweak", "剩余 ^1s 个调整。活动的调整索引大于当前调整数。将活动调整更改为:“^2s”。");
+setPluginResource( "xgenToolkit", "rXGCouldNotGetDagNode", "无法获取 DAG 节点的描述。");
+setPluginResource( "xgenToolkit", "rXGCouldNotGetXForm", "无法获取变换的描述。");
+setPluginResource( "xgenToolkit", "rXGDescUnableToCreateCB", "无法创建回调。");
+setPluginResource( "xgenToolkit", "rXGPatchMayaNodeDoesNotExist", "Maya 侧面片节点不存在。退出面片编辑。");
+setPluginResource( "xgenToolkit", "rXGPatchNoChanges", "没有对面片进行任何更改。");
+setPluginResource( "xgenToolkit", "rXgIgBaseNodeInterpCurrent", "当前描述");
+setPluginResource( "xgenToolkit", "rXgIgBaseNodeInterpSource", "插值源");
+setPluginResource( "xgenToolkit", "rXgIgBrushSize", "笔刷大小: ^1s ");
+setPluginResource( "xgenToolkit", "rXgIgBrushStrength", "笔刷强度: ^1s ");
+setPluginResource( "xgenToolkit", "rXgIgClumpBrushName", "成束笔刷工具");
+setPluginResource( "xgenToolkit", "rXgIgCombBrushName", "梳理笔刷工具");
+setPluginResource( "xgenToolkit", "rXgIgCutBrushName", "修剪笔刷工具");
+setPluginResource( "xgenToolkit", "rXgIgDensityBrushName", "密度笔刷工具");
+setPluginResource( "xgenToolkit", "rXgIgDirectionBrushName", "扭曲笔刷工具");
+setPluginResource( "xgenToolkit", "rXgIgFreezeBrushName", "冻结笔刷工具");
+setPluginResource( "xgenToolkit", "rXgIgGrabBrushName", "抓取笔刷工具");
+setPluginResource( "xgenToolkit", "rXgIgLengthBrushName", "长度笔刷工具");
+setPluginResource( "xgenToolkit", "rXgIgModifierCutAbsolute", "绝对");
+setPluginResource( "xgenToolkit", "rXgIgModifierCutRelative", "相对");
+setPluginResource( "xgenToolkit", "rXgIgModifierDisplaceCoordsysXYZ", "Maya (XYZ)");
+setPluginResource( "xgenToolkit", "rXgIgModifierDisplaceCoordsysXZY", "Mudbox (XZY)");
+setPluginResource( "xgenToolkit", "rXgIgModifierDisplaceModelGrayScale", "灰度");
+setPluginResource( "xgenToolkit", "rXgIgModifierDisplaceModelVector", "切线向量");
+setPluginResource( "xgenToolkit", "rXgIgNoInputHairForGuideModifier", "导向修改器的输入样条线数据中没有头发。输入导向也不会有样条线头发。");
+setPluginResource( "xgenToolkit", "rXgIgNoInputSplineDataForGuideModifier", "未找到导向修改器的输入样条线数据。输入导向也不会有样条线头发。");
+setPluginResource( "xgenToolkit", "rXgIgNoiseBrushName", "噪波笔刷工具");
+setPluginResource( "xgenToolkit", "rXgIgPartBrushName", "分隔笔刷工具");
+setPluginResource( "xgenToolkit", "rXgIgPlaceBrushName", "放置笔刷工具");
+setPluginResource( "xgenToolkit", "rXgIgRegionBrushName", "区域笔刷工具");
+setPluginResource( "xgenToolkit", "rXgIgSelectBrushName", "选择笔刷工具");
+setPluginResource( "xgenToolkit", "rXgIgSmoothBrushName", "平滑笔刷工具");
+setPluginResource( "xgenToolkit", "rXgIgTransferPositionBased", "基于位置");
+setPluginResource( "xgenToolkit", "rXgIgTransferUVBased", "基于 UV");
+setPluginResource( "xgenToolkit", "rXgIgWidthBrushName", "宽度笔刷工具");
+setPluginResource( "xgenToolkit", "rXgenError", "XGen: ^1s ^2s");
+setPluginResource( "xgenToolkit", "rXgenExprEditor", "XGen 表达式编辑器: ^1s");
+setPluginResource( "xgenToolkit", "rXgenTip", "XGen (尖端): ^1s ^2s");
+setPluginResource( "xgenToolkit", "rXgenWarning", "XGen (^1s): ^2s ^3s");
+setPluginResource( "xgenToolkit", "rYouMustSpecifyAFileName", "必须指定要导出的文件名。");
+// 
+// --------------------------
+// Registered node resources:
+// --------------------------
+// 
+// Node: xgmPalette
+// 
+setNodeNiceNameResource( "xgmPalette", "Xgm 调色板" );
+setAttrNiceNameResource( "xgmPalette", "xbf", "Xg 基础文件" );
+setAttrNiceNameResource( "xgmPalette", "xdf", "Xg 增量文件" );
+setAttrNiceNameResource( "xgmPalette", "xed", "Xg 导出为增量" );
+setAttrNiceNameResource( "xgmPalette", "xfn", "Xg 文件名" );
+// 
+// Node: xgmDescription
+// 
+setNodeNiceNameResource( "xgmDescription", "Xgm 描述" );
+// 
+// Node: xgmMakeGuide
+// 
+setNodeNiceNameResource( "xgmMakeGuide", "Xgm 生成导向" );
+setAttrNiceNameResource( "xgmMakeGuide", "fzn", "冻结" );
+setAttrNiceNameResource( "xgmMakeGuide", "cgm", "C 几何体" );
+setAttrNiceNameResource( "xgmMakeGuide", "mct", "最小计数" );
+setAttrNiceNameResource( "xgmMakeGuide", "frm", "帧" );
+setAttrNiceNameResource( "xgmMakeGuide", "ovr", "覆盖" );
+setAttrNiceNameResource( "xgmMakeGuide", "os", "输出网格" );
+setAttrNiceNameResource( "xgmMakeGuide", "gi", "几何体点击输入" );
+setAttrNiceNameResource( "xgmMakeGuide", "tg", "导向" );
+setAttrNiceNameResource( "xgmMakeGuide", "fza", "已冻结受影响对象" );
+// 
+// Node: xgmGuideManip
+// 
+setNodeNiceNameResource( "xgmGuideManip", "Xgm 导向操纵器" );
+// 
+// Node: xgmGuideSculptManip
+// 
+setNodeNiceNameResource( "xgmGuideSculptManip", "Xgm 导向雕刻操纵器" );
+// 
+// Node: xgmPointsManip
+// 
+setNodeNiceNameResource( "xgmPointsManip", "Xgm 点操纵器" );
+// 
+// Node: xgmConnectivity
+// 
+setNodeNiceNameResource( "xgmConnectivity", "Xgm 连接性" );
+setAttrNiceNameResource( "xgmConnectivity", "gi", "导向" );
+setAttrNiceNameResource( "xgmConnectivity", "de", "描述" );
+setAttrNiceNameResource( "xgmConnectivity", "rl", "重建列表" );
+// 
+// Node: xgmPointsViewer
+// 
+setNodeNiceNameResource( "xgmPointsViewer", "Xgm 点查看器" );
+setAttrNiceNameResource( "xgmPointsViewer", "len", "长度" );
+setAttrNiceNameResource( "xgmPointsViewer", "gen", "生成" );
+setAttrNiceNameResource( "xgmPointsViewer", "rdr", "重画" );
+// 
+// Node: xgmNurbsPatch
+// 
+setNodeNiceNameResource( "xgmNurbsPatch", "Xgm NURBS 面片" );
+setAttrNiceNameResource( "xgmNurbsPatch", "geo", "几何体" );
+// 
+// Node: xgmSubdPatch
+// 
+setNodeNiceNameResource( "xgmSubdPatch", "Xgm 细分面片" );
+setAttrNiceNameResource( "xgmSubdPatch", "geo", "几何体" );
+// 
+// Node: xgmArchiveGuide
+// 
+setNodeNiceNameResource( "xgmArchiveGuide", "Xgm 归档导向" );
+// 
+// Node: xgmCardGuide
+// 
+setNodeNiceNameResource( "xgmCardGuide", "Xgm 卡导向" );
+// 
+// Node: createPtexUV
+// 
+setNodeNiceNameResource( "createPtexUV", "创建 Ptex UV" );
+setAttrNiceNameResource( "createPtexUV", "fzn", "冻结" );
+setAttrNiceNameResource( "createPtexUV", "im", "输入网格" );
+setAttrNiceNameResource( "createPtexUV", "om", "输出网格" );
+setAttrNiceNameResource( "createPtexUV", "bl", "溢出" );
+setAttrNiceNameResource( "createPtexUV", "tc", "平铺计数" );
+setAttrNiceNameResource( "createPtexUV", "fza", "已冻结受影响对象" );
+// 
+// Node: xgmHairMapping
+// 
+setNodeNiceNameResource( "xgmHairMapping", "Xgm 头发映射" );
+setAttrNiceNameResource( "xgmHairMapping", "fzn", "冻结" );
+setAttrNiceNameResource( "xgmHairMapping", "uv", "UV 坐标" );
+setAttrNiceNameResource( "xgmHairMapping", "u", "U 坐标" );
+setAttrNiceNameResource( "xgmHairMapping", "v", "V 坐标" );
+setAttrNiceNameResource( "xgmHairMapping", "fs", "UV 过滤器大小" );
+setAttrNiceNameResource( "xgmHairMapping", "fsx", "UV 过滤器大小 X" );
+setAttrNiceNameResource( "xgmHairMapping", "fsy", "UV 过滤器大小 Y" );
+setAttrNiceNameResource( "xgmHairMapping", "c", "覆盖" );
+setAttrNiceNameResource( "xgmHairMapping", "cu", "U 向覆盖范围" );
+setAttrNiceNameResource( "xgmHairMapping", "cv", "V 向覆盖范围" );
+setAttrNiceNameResource( "xgmHairMapping", "tf", "平移帧" );
+setAttrNiceNameResource( "xgmHairMapping", "tfu", "平移 U 向帧" );
+setAttrNiceNameResource( "xgmHairMapping", "tfv", "平移 V 向帧" );
+setAttrNiceNameResource( "xgmHairMapping", "re", "UV 向重复" );
+setAttrNiceNameResource( "xgmHairMapping", "reu", "U 向重复" );
+setAttrNiceNameResource( "xgmHairMapping", "rev", "V 向重复" );
+setAttrNiceNameResource( "xgmHairMapping", "of", "偏移" );
+setAttrNiceNameResource( "xgmHairMapping", "ofu", "U 向偏移" );
+setAttrNiceNameResource( "xgmHairMapping", "ofv", "V 向偏移" );
+setAttrNiceNameResource( "xgmHairMapping", "o", "输出 UV" );
+setAttrNiceNameResource( "xgmHairMapping", "ou", "输出 U" );
+setAttrNiceNameResource( "xgmHairMapping", "ov", "输出 V" );
+setAttrNiceNameResource( "xgmHairMapping", "ofs", "输出 UV 过滤器大小" );
+setAttrNiceNameResource( "xgmHairMapping", "ofsx", "输出 UV 过滤器大小 X" );
+setAttrNiceNameResource( "xgmHairMapping", "ofsy", "输出 UV 过滤器大小 Y" );
+setAttrNiceNameResource( "xgmHairMapping", "fza", "已冻结受影响对象" );
+// 
+// Node: xgmSphereGuide
+// 
+setNodeNiceNameResource( "xgmSphereGuide", "Xgm 球体导向" );
+// 
+// Node: xgmSplineGuide
+// 
+setNodeNiceNameResource( "xgmSplineGuide", "Xgm 样条线导向" );
+setAttrNiceNameResource( "xgmSplineGuide", "tpr", "锥化" );
+setAttrNiceNameResource( "xgmSplineGuide", "wid", "宽度" );
+setAttrNiceNameResource( "xgmSplineGuide", "dwi", "显示宽度" );
+setAttrNiceNameResource( "xgmSplineGuide", "fcm", "朝向摄影机" );
+// 
+// Node: xgmSplineBase
+// 
+setNodeNiceNameResource( "xgmSplineBase", "基于 Xgm 样条线" );
+setAttrNiceNameResource( "xgmSplineBase", "fzn", "冻结" );
+setAttrNiceNameResource( "xgmSplineBase", "bm", "绑定网格" );
+setAttrNiceNameResource( "xgmSplineBase", "bid", "绑定信息数据" );
+setAttrNiceNameResource( "xgmSplineBase", "r", "分辨率" );
+setAttrNiceNameResource( "xgmSplineBase", "dm", "密度倍增" );
+setAttrNiceNameResource( "xgmSplineBase", "dmk", "密度遮罩" );
+setAttrNiceNameResource( "xgmSplineBase", "gs", "生成器种子" );
+setAttrNiceNameResource( "xgmSplineBase", "i", "插值" );
+setAttrNiceNameResource( "xgmSplineBase", "if", "插值源" );
+setAttrNiceNameResource( "xgmSplineBase", "is", "插值源" );
+setAttrNiceNameResource( "xgmSplineBase", "ism", "插值平滑度" );
+setAttrNiceNameResource( "xgmSplineBase", "l", "初始长度" );
+setAttrNiceNameResource( "xgmSplineBase", "w", "初始宽度" );
+setAttrNiceNameResource( "xgmSplineBase", "d", "初始方向" );
+setAttrNiceNameResource( "xgmSplineBase", "dx", "初始方向 X" );
+setAttrNiceNameResource( "xgmSplineBase", "dy", "初始方向 Y" );
+setAttrNiceNameResource( "xgmSplineBase", "dz", "初始方向 Z" );
+setAttrNiceNameResource( "xgmSplineBase", "csd", "已缓存的输入样条线数据" );
+setAttrNiceNameResource( "xgmSplineBase", "osd", "输出样条线数据" );
+setAttrNiceNameResource( "xgmSplineBase", "omd", "输出网格数据" );
+setAttrNiceNameResource( "xgmSplineBase", "cvc", "CV 计数" );
+setAttrNiceNameResource( "xgmSplineBase", "tmo", "传递模式" );
+setAttrNiceNameResource( "xgmSplineBase", "tan", "传递模式对齐到法线" );
+setAttrNiceNameResource( "xgmSplineBase", "tmt", "传递模式映射类型" );
+setAttrNiceNameResource( "xgmSplineBase", "tbi", "传递模式 BBInfo" );
+setAttrNiceNameResource( "xgmSplineBase", "fza", "已冻结受影响对象" );
+setAttrEnumResource( "xgmSplineBase", "if", 0, "当前描述" );
+setAttrEnumResource( "xgmSplineBase", "if", 1, "插值源" );
+setAttrEnumResource( "xgmSplineBase", "tmt", 0, "基于位置" );
+setAttrEnumResource( "xgmSplineBase", "tmt", 1, "基于 UV" );
+// 
+// Node: xgmModifierCut
+// 
+setNodeNiceNameResource( "xgmModifierCut", "Xgm 修改器切割" );
+setAttrNiceNameResource( "xgmModifierCut", "ctm", "修剪模式" );
+setAttrNiceNameResource( "xgmModifierCut", "mk", "遮罩" );
+setAttrNiceNameResource( "xgmModifierCut", "a", "数量" );
+setAttrNiceNameResource( "xgmModifierCut", "pt", "百分比" );
+setAttrNiceNameResource( "xgmModifierCut", "mrl", "最小剩余长度" );
+setAttrNiceNameResource( "xgmModifierCut", "rd", "重新分配 CV" );
+setAttrEnumResource( "xgmModifierCut", "ctm", 0, "绝对" );
+setAttrEnumResource( "xgmModifierCut", "ctm", 1, "相对" );
+// 
+// Node: xgmModifierCollision
+// 
+setNodeNiceNameResource( "xgmModifierCollision", "Xgm 修改器碰撞" );
+setAttrNiceNameResource( "xgmModifierCollision", "mk", "遮罩" );
+setAttrNiceNameResource( "xgmModifierCollision", "cd", "碰撞距离" );
+setAttrNiceNameResource( "xgmModifierCollision", "ac", "网格采样" );
+setAttrNiceNameResource( "xgmModifierCollision", "rt", "解决类型" );
+setAttrNiceNameResource( "xgmModifierCollision", "it", "迭代次数" );
+setAttrNiceNameResource( "xgmModifierCollision", "sg", "Sigma" );
+setAttrNiceNameResource( "xgmModifierCollision", "dp", "保留变形" );
+setAttrNiceNameResource( "xgmModifierCollision", "t", "调整" );
+setAttrNiceNameResource( "xgmModifierCollision", "cld", "碰撞对象" );
+setAttrNiceNameResource( "xgmModifierCollision", "cm", "碰撞对象网格" );
+setAttrNiceNameResource( "xgmModifierCollision", "cmx", "碰撞对象矩阵" );
+setAttrNiceNameResource( "xgmModifierCollision", "ce", "已启用碰撞对象" );
+setAttrNiceNameResource( "xgmModifierCollision", "cnf", "法线翻转碰撞对象" );
+// 
+// Node: xgmModifierSculpt
+// 
+setNodeNiceNameResource( "xgmModifierSculpt", "Xgm 修改器雕刻" );
+setAttrNiceNameResource( "xgmModifierSculpt", "ts", "调整" );
+setAttrNiceNameResource( "xgmModifierSculpt", "t", "调整" );
+setAttrNiceNameResource( "xgmModifierSculpt", "e", "启用" );
+setAttrNiceNameResource( "xgmModifierSculpt", "l", "锁定" );
+setAttrNiceNameResource( "xgmModifierSculpt", "s", "强度" );
+setAttrNiceNameResource( "xgmModifierSculpt", "oi", "所有者 ID" );
+setAttrNiceNameResource( "xgmModifierSculpt", "uin", "用户友好名称" );
+setAttrNiceNameResource( "xgmModifierSculpt", "uig", "UI 组" );
+setAttrNiceNameResource( "xgmModifierSculpt", "uio", "UI 顺序" );
+setAttrNiceNameResource( "xgmModifierSculpt", "gs", "组" );
+setAttrNiceNameResource( "xgmModifierSculpt", "tg", "调整组" );
+setAttrNiceNameResource( "xgmModifierSculpt", "tge", "启用调整组" );
+setAttrNiceNameResource( "xgmModifierSculpt", "tgi", "调整组所有者 ID" );
+setAttrNiceNameResource( "xgmModifierSculpt", "tgn", "调整组 UIName" );
+setAttrNiceNameResource( "xgmModifierSculpt", "tgo", "调整组 UIOrder" );
+setAttrNiceNameResource( "xgmModifierSculpt", "a", "活动调整" );
+setAttrNiceNameResource( "xgmModifierSculpt", "mk", "遮罩" );
+setAttrNiceNameResource( "xgmModifierSculpt", "tmo", "传递模式" );
+setAttrNiceNameResource( "xgmModifierSculpt", "tan", "传递模式对齐到法线" );
+setAttrNiceNameResource( "xgmModifierSculpt", "tmt", "传递模式映射类型" );
+setAttrEnumResource( "xgmModifierSculpt", "tmt", 0, "基于位置" );
+setAttrEnumResource( "xgmModifierSculpt", "tmt", 1, "基于 UV" );
+// 
+// Node: xgmModifierNoise
+// 
+setNodeNiceNameResource( "xgmModifierNoise", "Xgm 修改器噪波" );
+setAttrNiceNameResource( "xgmModifierNoise", "mk", "遮罩" );
+setAttrNiceNameResource( "xgmModifierNoise", "fy", "频率" );
+setAttrNiceNameResource( "xgmModifierNoise", "mg", "幅值" );
+setAttrNiceNameResource( "xgmModifierNoise", "ms", "幅值比例" );
+setAttrNiceNameResource( "xgmModifierNoise", "msp", "幅值比例位置" );
+setAttrNiceNameResource( "xgmModifierNoise", "msfv", "幅值比例浮点值" );
+setAttrNiceNameResource( "xgmModifierNoise", "msi", "幅值比例插值" );
+setAttrNiceNameResource( "xgmModifierNoise", "cl", "相关性" );
+setAttrNiceNameResource( "xgmModifierNoise", "pl", "保留长度" );
+setAttrNiceNameResource( "xgmModifierNoise", "t", "调整" );
+setAttrNiceNameResource( "xgmModifierNoise", "lv", "实时" );
+setAttrEnumResource( "xgmModifierNoise", "msi", 0, "无" );
+setAttrEnumResource( "xgmModifierNoise", "msi", 1, "线性" );
+setAttrEnumResource( "xgmModifierNoise", "msi", 2, "平滑" );
+setAttrEnumResource( "xgmModifierNoise", "msi", 3, "样条线" );
+// 
+// Node: xgmModifierDisplacement
+// 
+setNodeNiceNameResource( "xgmModifierDisplacement", "Xgm 修改器置换" );
+setAttrNiceNameResource( "xgmModifierDisplacement", "dis", "置换" );
+setAttrNiceNameResource( "xgmModifierDisplacement", "vdis", "向量置换" );
+setAttrNiceNameResource( "xgmModifierDisplacement", "vdis0", "向量置换 0" );
+setAttrNiceNameResource( "xgmModifierDisplacement", "vdis1", "向量置换 1" );
+setAttrNiceNameResource( "xgmModifierDisplacement", "vdis2", "向量置换 2" );
+setAttrNiceNameResource( "xgmModifierDisplacement", "cds", "坐标系" );
+setAttrNiceNameResource( "xgmModifierDisplacement", "scl", "缩放" );
+setAttrNiceNameResource( "xgmModifierDisplacement", "bs", "基础" );
+setAttrNiceNameResource( "xgmModifierDisplacement", "os", "偏移" );
+setAttrNiceNameResource( "xgmModifierDisplacement", "bp", "凹凸" );
+setAttrNiceNameResource( "xgmModifierDisplacement", "t", "调整" );
+setAttrEnumResource( "xgmModifierDisplacement", "cds", 0, "Mudbox (XZY)" );
+setAttrEnumResource( "xgmModifierDisplacement", "cds", 1, "Maya (XYZ)" );
+// 
+// Node: xgmModifierGuide
+// 
+setNodeNiceNameResource( "xgmModifierGuide", "Xgm 修改器导向" );
+setAttrNiceNameResource( "xgmModifierGuide", "igd", "输入导向数据" );
+setAttrNiceNameResource( "xgmModifierGuide", "mk", "遮罩" );
+setAttrNiceNameResource( "xgmModifierGuide", "mg", "幅值" );
+setAttrNiceNameResource( "xgmModifierGuide", "ms", "幅值比例" );
+setAttrNiceNameResource( "xgmModifierGuide", "msp", "幅值比例位置" );
+setAttrNiceNameResource( "xgmModifierGuide", "msfv", "幅值比例浮点值" );
+setAttrNiceNameResource( "xgmModifierGuide", "msi", "幅值比例插值" );
+setAttrNiceNameResource( "xgmModifierGuide", "bl", "融合" );
+setAttrNiceNameResource( "xgmModifierGuide", "urm", "使用区域贴图" );
+setAttrNiceNameResource( "xgmModifierGuide", "rm", "区域遮罩" );
+setAttrNiceNameResource( "xgmModifierGuide", "rmp", "区域贴图" );
+setAttrNiceNameResource( "xgmModifierGuide", "rmpr", "区域贴图 R" );
+setAttrNiceNameResource( "xgmModifierGuide", "rmpg", "区域贴图 G" );
+setAttrNiceNameResource( "xgmModifierGuide", "rmpb", "区域贴图 B" );
+setAttrNiceNameResource( "xgmModifierGuide", "pc", "预览颜色" );
+setAttrEnumResource( "xgmModifierGuide", "msi", 0, "无" );
+setAttrEnumResource( "xgmModifierGuide", "msi", 1, "线性" );
+setAttrEnumResource( "xgmModifierGuide", "msi", 2, "平滑" );
+setAttrEnumResource( "xgmModifierGuide", "msi", 3, "样条线" );
+// 
+// Node: xgmModifierLinearWire
+// 
+setNodeNiceNameResource( "xgmModifierLinearWire", "Xgm 修改器线性线条" );
+setAttrNiceNameResource( "xgmModifierLinearWire", "iwd", "输入线条数据" );
+setAttrNiceNameResource( "xgmModifierLinearWire", "mk", "遮罩" );
+setAttrNiceNameResource( "xgmModifierLinearWire", "mg", "幅值" );
+setAttrNiceNameResource( "xgmModifierLinearWire", "ms", "幅值比例" );
+setAttrNiceNameResource( "xgmModifierLinearWire", "msp", "幅值比例位置" );
+setAttrNiceNameResource( "xgmModifierLinearWire", "msfv", "幅值比例浮点值" );
+setAttrNiceNameResource( "xgmModifierLinearWire", "msi", "幅值比例插值" );
+setAttrNiceNameResource( "xgmModifierLinearWire", "s", "平滑度" );
+setAttrNiceNameResource( "xgmModifierLinearWire", "b", "破损" );
+setAttrNiceNameResource( "xgmModifierLinearWire", "rw", "引用线条" );
+setAttrNiceNameResource( "xgmModifierLinearWire", "tmo", "传递模式" );
+setAttrNiceNameResource( "xgmModifierLinearWire", "tan", "传递模式对齐到法线" );
+setAttrNiceNameResource( "xgmModifierLinearWire", "tmt", "传递模式映射类型" );
+setAttrEnumResource( "xgmModifierLinearWire", "msi", 0, "无" );
+setAttrEnumResource( "xgmModifierLinearWire", "msi", 1, "线性" );
+setAttrEnumResource( "xgmModifierLinearWire", "msi", 2, "平滑" );
+setAttrEnumResource( "xgmModifierLinearWire", "msi", 3, "样条线" );
+setAttrEnumResource( "xgmModifierLinearWire", "tmt", 0, "基于位置" );
+setAttrEnumResource( "xgmModifierLinearWire", "tmt", 1, "基于 UV" );
+// 
+// Node: xgmModifierScale
+// 
+setNodeNiceNameResource( "xgmModifierScale", "Xgm 修改器比例" );
+setAttrNiceNameResource( "xgmModifierScale", "mk", "遮罩" );
+setAttrNiceNameResource( "xgmModifierScale", "s", "缩放" );
+// 
+// Node: xgmModifierClump
+// 
+setNodeNiceNameResource( "xgmModifierClump", "Xgm 修改器成束" );
+setAttrNiceNameResource( "xgmModifierClump", "mk", "遮罩" );
+setAttrNiceNameResource( "xgmModifierClump", "cp", "束" );
+setAttrNiceNameResource( "xgmModifierClump", "cs", "束比例" );
+setAttrNiceNameResource( "xgmModifierClump", "csp", "束比例位置" );
+setAttrNiceNameResource( "xgmModifierClump", "csfv", "束比例浮点值" );
+setAttrNiceNameResource( "xgmModifierClump", "csi", "束比例插值" );
+setAttrNiceNameResource( "xgmModifierClump", "cvl", "束体积化" );
+setAttrNiceNameResource( "xgmModifierClump", "cvr", "束变化" );
+setAttrNiceNameResource( "xgmModifierClump", "pl", "保留长度" );
+setAttrNiceNameResource( "xgmModifierClump", "pd", "点密度" );
+setAttrNiceNameResource( "xgmModifierClump", "pdm", "点密度遮罩" );
+setAttrNiceNameResource( "xgmModifierClump", "pr", "点随机度" );
+setAttrNiceNameResource( "xgmModifierClump", "ps", "点种子" );
+setAttrNiceNameResource( "xgmModifierClump", "uip", "使用输入点" );
+setAttrNiceNameResource( "xgmModifierClump", "ips", "输入点" );
+setAttrNiceNameResource( "xgmModifierClump", "au", "自动更新" );
+setAttrNiceNameResource( "xgmModifierClump", "rv", "半径变化" );
+setAttrNiceNameResource( "xgmModifierClump", "ucm", "更新成束贴图" );
+setAttrNiceNameResource( "xgmModifierClump", "msl", "贴图细分级别" );
+setAttrNiceNameResource( "xgmModifierClump", "utm", "使用控制贴图" );
+setAttrNiceNameResource( "xgmModifierClump", "cmp", "控制贴图" );
+setAttrNiceNameResource( "xgmModifierClump", "acm", "活动控制贴图" );
+setAttrNiceNameResource( "xgmModifierClump", "ccm", "自定义控制贴图" );
+setAttrNiceNameResource( "xgmModifierClump", "ccmr", "自定义控制贴图 R" );
+setAttrNiceNameResource( "xgmModifierClump", "ccmg", "自定义控制贴图 G" );
+setAttrNiceNameResource( "xgmModifierClump", "ccmb", "自定义控制贴图 B" );
+setAttrNiceNameResource( "xgmModifierClump", "cms", "控制遮罩" );
+setAttrNiceNameResource( "xgmModifierClump", "cmsr", "控制遮罩 R" );
+setAttrNiceNameResource( "xgmModifierClump", "cmsg", "控制遮罩 G" );
+setAttrNiceNameResource( "xgmModifierClump", "cmsb", "控制遮罩 B" );
+setAttrNiceNameResource( "xgmModifierClump", "pc", "预览颜色" );
+setAttrNiceNameResource( "xgmModifierClump", "fl", "平坦度" );
+setAttrNiceNameResource( "xgmModifierClump", "fls", "平坦度比例" );
+setAttrNiceNameResource( "xgmModifierClump", "flsp", "平坦度比例位置" );
+setAttrNiceNameResource( "xgmModifierClump", "flsfv", "平坦度比例浮点值" );
+setAttrNiceNameResource( "xgmModifierClump", "flsi", "平坦度比例插值" );
+setAttrNiceNameResource( "xgmModifierClump", "of", "偏移" );
+setAttrNiceNameResource( "xgmModifierClump", "ofs", "偏移比例" );
+setAttrNiceNameResource( "xgmModifierClump", "ofsp", "偏移比例位置" );
+setAttrNiceNameResource( "xgmModifierClump", "ofsfv", "偏移比例浮点值" );
+setAttrNiceNameResource( "xgmModifierClump", "ofsi", "偏移比例插值" );
+setAttrNiceNameResource( "xgmModifierClump", "cu", "卷曲" );
+setAttrNiceNameResource( "xgmModifierClump", "cus", "卷曲比例" );
+setAttrNiceNameResource( "xgmModifierClump", "cusp", "卷曲比例位置" );
+setAttrNiceNameResource( "xgmModifierClump", "cusfv", "卷曲比例浮点值" );
+setAttrNiceNameResource( "xgmModifierClump", "cusi", "卷曲比例插值" );
+setAttrNiceNameResource( "xgmModifierClump", "or", "方向" );
+setAttrNiceNameResource( "xgmModifierClump", "co", "复制" );
+setAttrNiceNameResource( "xgmModifierClump", "cos", "复制比例" );
+setAttrNiceNameResource( "xgmModifierClump", "cosp", "复制比例位置" );
+setAttrNiceNameResource( "xgmModifierClump", "cosfv", "复制比例浮点值" );
+setAttrNiceNameResource( "xgmModifierClump", "cosi", "复制比例插值" );
+setAttrNiceNameResource( "xgmModifierClump", "cov", "复制变化" );
+setAttrNiceNameResource( "xgmModifierClump", "ct", "剪切" );
+setAttrNiceNameResource( "xgmModifierClump", "no", "噪波" );
+setAttrNiceNameResource( "xgmModifierClump", "nos", "噪波比例" );
+setAttrNiceNameResource( "xgmModifierClump", "nosp", "噪波比例位置" );
+setAttrNiceNameResource( "xgmModifierClump", "nosfv", "噪波比例浮点值" );
+setAttrNiceNameResource( "xgmModifierClump", "nosi", "噪波比例插值" );
+setAttrNiceNameResource( "xgmModifierClump", "nof", "噪波频率" );
+setAttrNiceNameResource( "xgmModifierClump", "noc", "噪波相关性" );
+setAttrNiceNameResource( "xgmModifierClump", "imd", "输入网格数据" );
+setAttrEnumResource( "xgmModifierClump", "csi", 0, "无" );
+setAttrEnumResource( "xgmModifierClump", "csi", 1, "线性" );
+setAttrEnumResource( "xgmModifierClump", "csi", 2, "平滑" );
+setAttrEnumResource( "xgmModifierClump", "csi", 3, "样条线" );
+setAttrEnumResource( "xgmModifierClump", "flsi", 0, "无" );
+setAttrEnumResource( "xgmModifierClump", "flsi", 1, "线性" );
+setAttrEnumResource( "xgmModifierClump", "flsi", 2, "平滑" );
+setAttrEnumResource( "xgmModifierClump", "flsi", 3, "样条线" );
+setAttrEnumResource( "xgmModifierClump", "ofsi", 0, "无" );
+setAttrEnumResource( "xgmModifierClump", "ofsi", 1, "线性" );
+setAttrEnumResource( "xgmModifierClump", "ofsi", 2, "平滑" );
+setAttrEnumResource( "xgmModifierClump", "ofsi", 3, "样条线" );
+setAttrEnumResource( "xgmModifierClump", "cusi", 0, "无" );
+setAttrEnumResource( "xgmModifierClump", "cusi", 1, "线性" );
+setAttrEnumResource( "xgmModifierClump", "cusi", 2, "平滑" );
+setAttrEnumResource( "xgmModifierClump", "cusi", 3, "样条线" );
+setAttrEnumResource( "xgmModifierClump", "cosi", 0, "无" );
+setAttrEnumResource( "xgmModifierClump", "cosi", 1, "线性" );
+setAttrEnumResource( "xgmModifierClump", "cosi", 2, "平滑" );
+setAttrEnumResource( "xgmModifierClump", "cosi", 3, "样条线" );
+setAttrEnumResource( "xgmModifierClump", "nosi", 0, "无" );
+setAttrEnumResource( "xgmModifierClump", "nosi", 1, "线性" );
+setAttrEnumResource( "xgmModifierClump", "nosi", 2, "平滑" );
+setAttrEnumResource( "xgmModifierClump", "nosi", 3, "样条线" );
+// 
+// Node: xgmCurveToSpline
+// 
+setNodeNiceNameResource( "xgmCurveToSpline", "Xgm 曲线到样条线" );
+setAttrNiceNameResource( "xgmCurveToSpline", "fzn", "冻结" );
+setAttrNiceNameResource( "xgmCurveToSpline", "isd", "输入样条线数据" );
+setAttrNiceNameResource( "xgmCurveToSpline", "umc", "使用 Maya 曲线" );
+setAttrNiceNameResource( "xgmCurveToSpline", "ics", "输入曲线" );
+setAttrNiceNameResource( "xgmCurveToSpline", "imd", "输入网格数据" );
+setAttrNiceNameResource( "xgmCurveToSpline", "csd", "已缓存的输入样条线数据" );
+setAttrNiceNameResource( "xgmCurveToSpline", "m", "禁用" );
+setAttrNiceNameResource( "xgmCurveToSpline", "osd", "输出样条线数据" );
+setAttrNiceNameResource( "xgmCurveToSpline", "uac", "使用 Alembic 曲线" );
+setAttrNiceNameResource( "xgmCurveToSpline", "fn", "文件名" );
+setAttrNiceNameResource( "xgmCurveToSpline", "ld", "已加载数据" );
+setAttrNiceNameResource( "xgmCurveToSpline", "ad", "活动数据" );
+setAttrNiceNameResource( "xgmCurveToSpline", "sf", "开始帧" );
+setAttrNiceNameResource( "xgmCurveToSpline", "ef", "结束帧" );
+setAttrNiceNameResource( "xgmCurveToSpline", "tm", "时间" );
+setAttrNiceNameResource( "xgmCurveToSpline", "sp", "速度" );
+setAttrNiceNameResource( "xgmCurveToSpline", "of", "偏移" );
+setAttrNiceNameResource( "xgmCurveToSpline", "ct", "循环类型" );
+setAttrNiceNameResource( "xgmCurveToSpline", "atn", "对齐到法线" );
+setAttrNiceNameResource( "xgmCurveToSpline", "fza", "已冻结受影响对象" );
+setAttrEnumResource( "xgmCurveToSpline", "ct", 0, "保持" );
+setAttrEnumResource( "xgmCurveToSpline", "ct", 1, "循环" );
+setAttrEnumResource( "xgmCurveToSpline", "ct", 2, "反向" );
+setAttrEnumResource( "xgmCurveToSpline", "ct", 3, "反弹" );
+// 
+// Node: xgmSeExpr
+// 
+setNodeNiceNameResource( "xgmSeExpr", "Xgm 抑制表达式" );
+setAttrNiceNameResource( "xgmSeExpr", "fzn", "冻结" );
+setAttrNiceNameResource( "xgmSeExpr", "expr", "表达式" );
+setAttrNiceNameResource( "xgmSeExpr", "oa", "输出 Alpha" );
+setAttrNiceNameResource( "xgmSeExpr", "oc", "输出颜色" );
+setAttrNiceNameResource( "xgmSeExpr", "ocr", "输出颜色 R" );
+setAttrNiceNameResource( "xgmSeExpr", "ocg", "输出颜色 G" );
+setAttrNiceNameResource( "xgmSeExpr", "ocb", "输出颜色 B" );
+setAttrNiceNameResource( "xgmSeExpr", "fza", "已冻结受影响对象" );
+// 
+// Node: xgmSplineCache
+// 
+setNodeNiceNameResource( "xgmSplineCache", "Xgm 样条线缓存" );
+setAttrNiceNameResource( "xgmSplineCache", "fn", "文件名" );
+setAttrNiceNameResource( "xgmSplineCache", "dc", "描述" );
+setAttrNiceNameResource( "xgmSplineCache", "ad", "活动描述" );
+setAttrNiceNameResource( "xgmSplineCache", "sf", "开始帧" );
+setAttrNiceNameResource( "xgmSplineCache", "ef", "结束帧" );
+setAttrNiceNameResource( "xgmSplineCache", "tm", "时间" );
+setAttrNiceNameResource( "xgmSplineCache", "sp", "速度" );
+setAttrNiceNameResource( "xgmSplineCache", "of", "偏移" );
+setAttrNiceNameResource( "xgmSplineCache", "ct", "循环类型" );
+setAttrNiceNameResource( "xgmSplineCache", "w", "宽度" );
+setAttrNiceNameResource( "xgmSplineCache", "wdt", "宽度锥化" );
+setAttrNiceNameResource( "xgmSplineCache", "wdts", "宽度锥形起点" );
+setAttrNiceNameResource( "xgmSplineCache", "wdr", "宽度渐变" );
+setAttrNiceNameResource( "xgmSplineCache", "wdrp", "宽度渐变位置" );
+setAttrNiceNameResource( "xgmSplineCache", "wdrfv", "宽度渐变浮点值" );
+setAttrNiceNameResource( "xgmSplineCache", "wdri", "宽度渐变插值" );
+setAttrEnumResource( "xgmSplineCache", "ct", 0, "保持" );
+setAttrEnumResource( "xgmSplineCache", "ct", 1, "循环" );
+setAttrEnumResource( "xgmSplineCache", "ct", 2, "反向" );
+setAttrEnumResource( "xgmSplineCache", "ct", 3, "反弹" );
+setAttrEnumResource( "xgmSplineCache", "wdri", 0, "无" );
+setAttrEnumResource( "xgmSplineCache", "wdri", 1, "线性" );
+setAttrEnumResource( "xgmSplineCache", "wdri", 2, "平滑" );
+setAttrEnumResource( "xgmSplineCache", "wdri", 3, "样条线" );
+// 
+// Node: xgmSplineDescription
+// 
+setNodeNiceNameResource( "xgmSplineDescription", "Xgm 样条线描述" );
+setAttrNiceNameResource( "xgmSplineDescription", "w", "宽度" );
+setAttrNiceNameResource( "xgmSplineDescription", "wdt", "宽度锥化" );
+setAttrNiceNameResource( "xgmSplineDescription", "wdts", "宽度锥形起点" );
+setAttrNiceNameResource( "xgmSplineDescription", "wdr", "宽度渐变" );
+setAttrNiceNameResource( "xgmSplineDescription", "wdrp", "宽度渐变位置" );
+setAttrNiceNameResource( "xgmSplineDescription", "wdrfv", "宽度渐变浮点值" );
+setAttrNiceNameResource( "xgmSplineDescription", "wdri", "宽度渐变插值" );
+setAttrNiceNameResource( "xgmSplineDescription", "ts", "管状体着色" );
+setAttrNiceNameResource( "xgmSplineDescription", "fca", "朝向摄影机" );
+setAttrNiceNameResource( "xgmSplineDescription", "oci", "总体颜色强度" );
+setAttrNiceNameResource( "xgmSplineDescription", "fc", "伪彩色" );
+setAttrNiceNameResource( "xgmSplineDescription", "fcc", "伪彩色曲线" );
+setAttrNiceNameResource( "xgmSplineDescription", "psh", "选择前亮显" );
+setAttrNiceNameResource( "xgmSplineDescription", "psc", "选择前亮显颜色" );
+setAttrNiceNameResource( "xgmSplineDescription", "pscr", "选择前亮显颜色 R" );
+setAttrNiceNameResource( "xgmSplineDescription", "pscg", "选择前亮显颜色 G" );
+setAttrNiceNameResource( "xgmSplineDescription", "pscb", "选择前亮显颜色 B" );
+setAttrNiceNameResource( "xgmSplineDescription", "slh", "选择亮显" );
+setAttrNiceNameResource( "xgmSplineDescription", "slc", "选择亮显颜色" );
+setAttrNiceNameResource( "xgmSplineDescription", "slcr", "选择亮显颜色 R" );
+setAttrNiceNameResource( "xgmSplineDescription", "slcg", "选择亮显颜色 G" );
+setAttrNiceNameResource( "xgmSplineDescription", "slcb", "选择亮显颜色 B" );
+setAttrNiceNameResource( "xgmSplineDescription", "sfz", "显示冻结对象" );
+setAttrNiceNameResource( "xgmSplineDescription", "sfc", "显示冻结颜色" );
+setAttrNiceNameResource( "xgmSplineDescription", "sfcr", "显示冻结颜色 R" );
+setAttrNiceNameResource( "xgmSplineDescription", "sfcg", "显示冻结颜色 G" );
+setAttrNiceNameResource( "xgmSplineDescription", "sfcb", "显示冻结颜色 B" );
+setAttrNiceNameResource( "xgmSplineDescription", "hp", "亮显放置" );
+setAttrNiceNameResource( "xgmSplineDescription", "hpc", "亮显放置的颜色" );
+setAttrNiceNameResource( "xgmSplineDescription", "hpcr", "亮显放置的颜色 R" );
+setAttrNiceNameResource( "xgmSplineDescription", "hpcg", "亮显放置的颜色 G" );
+setAttrNiceNameResource( "xgmSplineDescription", "hpcb", "亮显放置的颜色 B" );
+setAttrNiceNameResource( "xgmSplineDescription", "hpi", "亮显放置的强度" );
+setAttrNiceNameResource( "xgmSplineDescription", "scv", "显示 CV" );
+setAttrNiceNameResource( "xgmSplineDescription", "scvs", "显示 CV 大小" );
+setAttrNiceNameResource( "xgmSplineDescription", "scvo", "显示 CV 不透明度" );
+setAttrNiceNameResource( "xgmSplineDescription", "smv", "显示网格体素" );
+setAttrNiceNameResource( "xgmSplineDescription", "as", "活动雕刻" );
+setAttrNiceNameResource( "xgmSplineDescription", "rdm", "渲染密度倍增" );
+setAttrNiceNameResource( "xgmSplineDescription", "isd", "输入样条线数据" );
+setAttrNiceNameResource( "xgmSplineDescription", "ord", "输出渲染数据" );
+setAttrNiceNameResource( "xgmSplineDescription", "osd", "输出样条线数据" );
+setAttrEnumResource( "xgmSplineDescription", "wdri", 0, "无" );
+setAttrEnumResource( "xgmSplineDescription", "wdri", 1, "线性" );
+setAttrEnumResource( "xgmSplineDescription", "wdri", 2, "平滑" );
+setAttrEnumResource( "xgmSplineDescription", "wdri", 3, "样条线" );
+// 
+// Node: igBrushManip
+// 
+setNodeNiceNameResource( "igBrushManip", "Ig 笔刷操纵器" );
+// 
+// Node: igmDescription
+// 
+setNodeNiceNameResource( "igmDescription", "Igm 描述" );
+setAttrNiceNameResource( "igmDescription", "geo", "几何体" );
+setAttrNiceNameResource( "igmDescription", "fid", "面 ID" );
+setAttrNiceNameResource( "igmDescription", "den", "密度" );
+setAttrNiceNameResource( "igmDescription", "its", "插值样式" );
+setAttrNiceNameResource( "igmDescription", "msk", "遮罩" );
+setAttrNiceNameResource( "igmDescription", "xuv", "Xuv 目录" );
+setAttrNiceNameResource( "igmDescription", "bcl", "底端颜色" );
+setAttrNiceNameResource( "igmDescription", "bclr", "底端颜色 R" );
+setAttrNiceNameResource( "igmDescription", "bclg", "底端颜色 G" );
+setAttrNiceNameResource( "igmDescription", "bclb", "底端颜色 B" );
+setAttrNiceNameResource( "igmDescription", "tcl", "尖端颜色" );
+setAttrNiceNameResource( "igmDescription", "tclr", "尖端颜色 R" );
+setAttrNiceNameResource( "igmDescription", "tclg", "尖端颜色 G" );
+setAttrNiceNameResource( "igmDescription", "tclb", "尖端颜色 B" );
+setAttrNiceNameResource( "igmDescription", "dt", "显示类型" );
+setAttrNiceNameResource( "igmDescription", "pth", "路径" );
+setAttrNiceNameResource( "igmDescription", "tkl", "Tickle" );
+setAttrNiceNameResource( "igmDescription", "len", "长度" );
+setAttrNiceNameResource( "igmDescription", "wid", "宽度" );
+setAttrNiceNameResource( "igmDescription", "cdt", "缓存的数据" );
+setAttrNiceNameResource( "igmDescription", "loc", "加载缓存" );
+setAttrNiceNameResource( "igmDescription", "floc", "强制加载缓存" );

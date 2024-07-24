@@ -1,0 +1,59 @@
+<!--
+Copyright 2015 Autodesk, Inc. All rights reserved.
+
+Use of this software is subject to the terms of the Autodesk
+license agreement provided at the time of installation or download,
+or which otherwise accompanies this software in either electronic
+or hard copy form.
+-->
+<fragment uiName="xgenFacingCameraVw" name="xgenFacingCameraVw" type="plumbing" class="ShadeFragment" version="1.0" feature_level="0" >
+    <description>
+        <![CDATA[
+XGen spline view vector generator]]>
+    </description>
+    <properties>
+        <float3   name="Pw"                     semantic="Pw"         flags="varyingInputParam" />
+        <float3   name="worldCameraPosition"    semantic="worldcameraposition" />
+    </properties>
+    <values>
+    </values>
+    <outputs>
+        <float3 name="Vw" />
+    </outputs>
+    <implementation>
+        <implementation render="OGSRenderer" language="Cg" lang_version="2.100000" >
+            <function_name val="xgenFacingCameraVw" />
+            <source>
+                <![CDATA[
+float3 xgenFacingCameraVw(float3 Pw, float3 worldCameraPosition)
+{
+    return normalize(worldCameraPosition - Pw);
+}
+                ]]>
+            </source>
+        </implementation>
+        <implementation render="OGSRenderer" language="GLSL" lang_version="3.000000" >
+            <function_name val="xgenFacingCameraVw" />
+            <source>
+                <![CDATA[
+vec3 xgenFacingCameraVw(vec3 Pw, vec3 worldCameraPosition)
+{
+    return normalize(worldCameraPosition - Pw);
+}
+                ]]>
+            </source>
+        </implementation>
+        <implementation render="OGSRenderer" language="HLSL" lang_version="11.000000" >
+            <function_name val="xgenFacingCameraVw" />
+            <source>
+                <![CDATA[
+float3 xgenFacingCameraVw(float3 Pw, float3 worldCameraPosition)
+{
+    return normalize(worldCameraPosition - Pw);
+}
+                ]]>
+            </source>
+        </implementation>
+    </implementation>
+</fragment>
+

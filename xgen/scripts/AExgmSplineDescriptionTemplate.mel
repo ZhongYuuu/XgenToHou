@@ -1,0 +1,219 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+// =======================================================================
+// Copyright 2015 Autodesk, Inc. All rights reserved.
+//
+// This computer source code and related instructions and comments are the
+// unpublished confidential  and proprietary information of Autodesk, Inc.
+// and are protected under applicable copyright and trade secret law. They
+// may not be disclosed to, copied  or used by any third party without the
+// prior written consent of Autodesk, Inc.
+// =======================================================================
+
+// Local helper for naming the control
+proc string getControlName(string $attr, string $type)
+{
+    string $tokens[];
+    tokenize($attr, ".", $tokens);
+    string $attrName = $tokens[1];
+    return ("xgmSplineDesc_" + $attrName + "_" + $type + "_Control");
+}
+
+
+global proc AExgmSplineDescriptionPreviewSettingNew(
+        string $attr_showCVs)
+{
+    // Form UI names
+    string $showCVs_uiname          = getControlName($attr_showCVs, "checkBox");
+
+    setUITemplate -pst attributeEditorTemplate;
+    string $form = `formLayout -numberOfDivisions 100`;
+
+        // UI geometry
+        int $w_gap = 5;
+        int $h_gap = 3;
+        int $h = 20;
+        int $w_label = 138;
+        int $w_field = 100;
+
+        // "Draw" label
+        string $draw_uiname = `text -label (uiRes("m_AExgmSplineDescriptionTemplate.kPreviewSettingDrawLabel")) -align "right" -w $w_label -h $h`;
+
+        // "Control Vertices" check box
+        checkBox -align "left"
+            -label (uiRes("m_AExgmSplineDescriptionTemplate.kShowControlVertices"))
+            $showCVs_uiname;
+
+        // Form layout these UIs
+        formLayout -edit
+            // "Draw" label
+            -attachForm $draw_uiname "top"    $h_gap
+            -attachForm $draw_uiname "left"   $w_gap
+            -attachNone $draw_uiname "bottom"
+            -attachNone $draw_uiname "right"
+
+            // "Control Vertices" checkBox
+            -attachForm    $showCVs_uiname "top"    $h_gap
+            -attachControl $showCVs_uiname "left" $w_gap $draw_uiname
+            -attachNone    $showCVs_uiname "bottom"
+            -attachNone    $showCVs_uiname "right"
+
+        $form;
+
+    setParent ..;
+    setUITemplate -ppt;
+
+    AExgmSplineDescriptionPreviewSettingReplace($attr_showCVs);
+}
+
+global proc AExgmSplineDescriptionPreviewSettingReplaceShowCVs(string $attr_showCVs)
+{
+    // Form UI names
+    string $showCVs_uiname          = getControlName($attr_showCVs, "checkBox");
+
+    // Update checkbox status
+    int $enable = `getAttr $attr_showCVs`;
+    checkBox -e -value $enable $showCVs_uiname;
+
+    // Update enable status of CV Count and CV Opacity UI
+    string $nodeName = `plugNode $attr_showCVs`;
+    AExgmSplineDescription_updateCVSizeAndOpacity($nodeName);
+}
+
+global proc AExgmSplineDescriptionPreviewSettingReplace(
+        string $attr_showCVs)
+{
+    // Form UI names
+    string $showCVs_uiname          = getControlName($attr_showCVs, "checkBox");
+
+    // Get parent for script job use, support for multiple AE tabs
+    string $parent = `setParent -q`;
+    string $setParentCmd = ("setParent " + $parent + ";");
+
+    // show CVs
+    checkBox -e -value `getAttr $attr_showCVs` $showCVs_uiname;
+    checkBox -e
+             -onCommand ("setAttr " + $attr_showCVs + " 1")
+             -offCommand ("setAttr " + $attr_showCVs + " 0")
+             $showCVs_uiname;
+    scriptJob
+        -replacePrevious
+        -parent $showCVs_uiname
+        -attributeChange $attr_showCVs
+        ($setParentCmd + "AExgmSplineDescriptionPreviewSettingReplaceShowCVs " + $attr_showCVs);
+}
+
+// Update "CV Size" and "CV Opacity" UI enable/disable
+global proc AExgmSplineDescription_updateCVSizeAndOpacity(string $nodeName)
+{
+    // If show CVs
+    int $enable = `getAttr ($nodeName + ".showCVs")`;
+    editorTemplate -dimControl $nodeName "showCVsSize" (!$enable);
+    editorTemplate -dimControl $nodeName "showCVsOpacity" (!$enable);
+}
+
+global proc xgmPlacedHighlightColorChanged(string $attrName)
+{
+    float $color[] = `colorSliderGrp -q -rgb xgmBaseNodeHighlightColorCSG`;
+    setAttr $attrName $color[0] $color[1] $color[2];
+}
+
+global proc xgmPlacedHighlightColorAttrChanged(string $attrName)
+{
+    float $color[] = `getAttr $attrName`;
+    colorSliderGrp -e -rgb $color[0] $color[1] $color[2]
+                    -changeCommand ("xgmPlacedHighlightColorChanged " + $attrName)
+                    xgmBaseNodeHighlightColorCSG;
+}
+
+global proc AExgmSplineDescriptionHighlightColorNew(string $attrName)
+{
+    colorSliderGrp -label (uiRes("m_AExgmSplineDescriptionTemplate.kColor")) xgmBaseNodeHighlightColorCSG;
+
+    AExgmSplineDescriptionHighlightColorReplace($attrName);
+}
+
+global proc AExgmSplineDescriptionHighlightColorReplace(string $attrName)
+{
+    xgmPlacedHighlightColorAttrChanged($attrName);
+
+    // Get parent for script job use
+    string $parent = `setParent -q`;
+    string $setParentCmd = ("setParent " + $parent + ";");
+    scriptJob
+        -replacePrevious
+        -parent xgmBaseNodeHighlightColorCSG
+        -attributeChange $attrName
+        ($setParentCmd + "xgmPlacedHighlightColorAttrChanged " + $attrName);
+}
+
+global proc AExgmSplineDescriptionTemplate(string $nodeName)
+{
+    editorTemplate -beginScrollLayout;
+
+        // Primitive Attributes
+        editorTemplate -beginLayout (uiRes("m_AExgmSplineDescriptionTemplate.kPrimitiveAttributes")) -collapse 0;
+            xgmCreateAEUiForFloatAttr "width"           (uiRes("m_AExgmSplineDescriptionTemplate.kWidthScale"))           "xgmSplineDescription";
+            xgmCreateAEUiForFloatAttr "widthTaper"      (uiRes("m_AExgmSplineDescriptionTemplate.kWidthTaper"))                 "xgmSplineDescription";
+            xgmCreateAEUiForFloatAttr "widthTaperStart" (uiRes("m_AExgmSplineDescriptionTemplate.kWidthTaperStart"))      "xgmSplineDescription";
+
+            editorTemplate -addControl  -label (uiRes("m_AExgmSplineDescriptionTemplate.kShowAsTubeShade")) "tubeShade";
+			editorTemplate -addControl  -label (uiRes("m_AExgmSplineDescriptionTemplate.kFaceCamera")) "faceCamera";
+            AEaddRampControl ($nodeName+".widthRamp");
+        editorTemplate -endLayout;
+
+        // Preview Settings
+        editorTemplate -beginLayout (uiRes("m_AExgmSplineDescriptionTemplate.kPreviewSettings")) -collapse 0;
+            // "Spline Segments" - TODO : refer the mockup from MAYA-62383
+
+            editorTemplate -addControl -label (uiRes("m_AExgmSplineDescriptionTemplate.kHighlightPlacedSplines")) "highlightPlaced";
+            editorTemplate -callCustom "AExgmSplineDescriptionHighlightColorNew" "AExgmSplineDescriptionHighlightColorReplace" "highlightPlacedColor";
+            editorTemplate -addControl -label (uiRes("m_AExgmSplineDescriptionTemplate.kColorIntensity")) "highlightPlacedIntensity";
+
+            editorTemplate -addSeparator;
+
+            editorTemplate -callCustom "AExgmSplineDescriptionPreviewSettingNew" "AExgmSplineDescriptionPreviewSettingReplace" "showCVs";
+            editorTemplate -addControl -label (uiRes("m_AExgmSplineDescriptionTemplate.kShowCVsSize")) "showCVsSize" "AExgmSplineDescription_updateCVSizeAndOpacity";
+            editorTemplate -addControl -label (uiRes("m_AExgmSplineDescriptionTemplate.kShowCVsOpacity")) "showCVsOpacity" "AExgmSplineDescription_updateCVSizeAndOpacity";
+            editorTemplate -addSeparator;
+            editorTemplate -addControl -label (uiRes("m_AExgmSplineDescriptionTemplate.kShowMeshVoxels")) "showMeshVoxels";
+        editorTemplate -endLayout;
+
+        // Render Stats
+        editorTemplate -beginLayout (uiRes("m_AExgmSplineDescriptionTemplate.kRenderStats"));
+            editorTemplate -beginNoOptimize;
+            editorTemplate -addControl "castsShadows";
+            editorTemplate -addControl "receiveShadows";
+            editorTemplate -addControl "motionBlur";
+            editorTemplate -addControl "primaryVisibility";
+            editorTemplate -addControl "visibleInReflections";
+            editorTemplate -addControl "visibleInRefractions";
+            editorTemplate -endNoOptimize;
+        editorTemplate -endLayout;
+
+        // Render Settings
+        editorTemplate -beginLayout (uiRes("m_AExgmSplineDescriptionTemplate.kRenderSettings"));
+            editorTemplate -addControl "renderDensityMultiplier";
+        editorTemplate -endLayout;
+
+        // Derived Attributes
+        AEshapeTemplate $nodeName;
+
+        // Dynamic Attributes
+        editorTemplate -addExtraControls;
+
+    editorTemplate -endScrollLayout;
+
+    // Suppress attributes
+    AExgmSuppressShape;
+    editorTemplate -suppress "activeSculpt";
+    editorTemplate -suppress "inSplineData";
+    editorTemplate -suppress "outRenderData";
+    editorTemplate -suppress "outSplineData";
+}
+

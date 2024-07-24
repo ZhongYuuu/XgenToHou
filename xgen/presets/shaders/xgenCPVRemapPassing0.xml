@@ -1,0 +1,83 @@
+<!--
+Copyright 2015 Autodesk, Inc. All rights reserved.
+
+Use of this software is subject to the terms of the Autodesk
+license agreement provided at the time of installation or download,
+or which otherwise accompanies this software in either electronic
+or hard copy form.
+-->
+<fragment uiName="xgenCPVRemapPassing0" name="xgenCPVRemapPassing0" type="interpolant" class="ShadeFragment" version="1.0" feature_level="0" >
+    <description>
+        <![CDATA[
+XGen remap float to CPV color (interpolant)]]>
+    </description>
+    <properties>
+        <float name="remapValue0" semantic="TEXCOORD3" flags="varyingInputParam" />
+        <float name="remapValue1" semantic="TEXCOORD4" flags="varyingInputParam" />
+    </properties>
+    <values>
+    </values>
+    <outputs>
+        <float2 name="remapValueTuple" semantic="TEXTURE" />
+    </outputs>
+    <implementation>
+        <implementation render="OGSRenderer" language="Cg" lang_version="2.100000" >
+            <function_name val="xgenCPVRemapPassing0" />
+            <vertex_source>
+                <![CDATA[
+float2 ixgenCPVRemapPassing0(float remapValue0, float remapValue1)
+{
+    return float2(remapValue0, remapValue1);
+}
+                ]]>
+            </vertex_source>
+            <source>
+                <![CDATA[
+float2 xgenCPVRemapPassing0(float2 iRemapValueTuple)
+{
+    return iRemapValueTuple;
+}
+                ]]>
+            </source>
+        </implementation>
+        <implementation render="OGSRenderer" language="GLSL" lang_version="3.000000" >
+            <function_name val="xgenCPVRemapPassing0" />
+            <vertex_source>
+                <![CDATA[
+vec2 ixgenCPVRemapPassing0(float remapValue0, float remapValue1)
+{
+    return vec2(remapValue0, remapValue1);
+}
+                ]]>
+            </vertex_source>
+            <source>
+                <![CDATA[
+vec2 xgenCPVRemapPassing0(vec2 iRemapValueTuple)
+{
+    return iRemapValueTuple;
+}
+                ]]>
+            </source>
+        </implementation>
+        <implementation render="OGSRenderer" language="HLSL" lang_version="11.000000" >
+            <function_name val="xgenCPVRemapPassing0" />
+            <vertex_source>
+                <![CDATA[
+float2 ixgenCPVRemapPassing0(float remapValue0, float remapValue1)
+{
+    return float2(remapValue0, remapValue1);
+}
+                ]]>
+            </vertex_source>
+            <source>
+                <![CDATA[
+float2 xgenCPVRemapPassing0(float2 iRemapValueTuple)
+{
+    return iRemapValueTuple;
+}
+                ]]>
+            </source>
+        </implementation>
+    </implementation>
+</fragment>
+

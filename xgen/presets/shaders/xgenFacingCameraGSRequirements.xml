@@ -1,0 +1,64 @@
+<!--
+Copyright 2015 Autodesk, Inc. All rights reserved.
+
+Use of this software is subject to the terms of the Autodesk
+license agreement provided at the time of installation or download,
+or which otherwise accompanies this software in either electronic
+or hard copy form.
+-->
+<fragment uiName="xgenFacingCameraGSRequirements" name="xgenFacingCameraGSRequirements" type="plumbing" class="ShadeFragment" version="1.0" feature_level="0" >
+    <description>
+        <![CDATA[
+XGen wide spline stream requirements. We need a plumbing shader to require vertex streams.]]>
+    </description>
+    <properties>
+        <float3   name="Nw"                     semantic="NORMAL"     flags="varyingInputParam" />
+        <float3   name="Vw"                     semantic="TEXTURE"    flags="varyingInputParam" />
+        <float3   name="Pw"                     semantic="TEXTURE"    flags="varyingInputParam" />
+        <float3   name="mayaTangentIn"          semantic="TANGENT"    flags="varyingInputParam" />
+        <float2   name="uvCoord"                semantic="TEXCOORD0"  flags="varyingInputParam" />
+        <float2   name="wCoord"                 semantic="TEXCOORD1"  flags="varyingInputParam" />
+        <undefined name="GPUStage" semantic="GPUStage" />
+    </properties>
+    <values>
+    </values>
+    <outputs>
+        <float3 name="Nw" />
+    </outputs>
+    <implementation>
+        <implementation render="OGSRenderer" language="Cg" lang_version="2.100000" >
+            <function_name val="xgenFacingCameraGSRequirements" />
+            <source>
+                <![CDATA[
+float3 xgenFacingCameraGSRequirements(float3 Nw, float3 Vw, float3 Pw, float3 Tw, float2 uvCoord, float2 wCoord)
+{
+    return Nw;
+}
+                ]]>
+            </source>
+        </implementation>
+        <implementation render="OGSRenderer" language="GLSL" lang_version="3.000000" >
+            <function_name val="xgenFacingCameraGSRequirements" />
+            <source>
+                <![CDATA[
+vec3 xgenFacingCameraGSRequirements(vec3 Nw, vec3 Vw, vec3 Pw, vec3 Tw, vec2 uvCoord, vec2 wCoord)
+{
+    return Nw;
+}
+                ]]>
+            </source>
+        </implementation>
+        <implementation render="OGSRenderer" language="HLSL" lang_version="11.000000" >
+            <function_name val="xgenFacingCameraGSRequirements" />
+            <source>
+                <![CDATA[
+float3 xgenFacingCameraGSRequirements(float3 Nw, float3 Vw, float3 Pw, float3 Tw, float2 uvCoord, float2 wCoord)
+{
+    return Nw;
+}
+                ]]>
+            </source>
+        </implementation>
+    </implementation>
+</fragment>
+

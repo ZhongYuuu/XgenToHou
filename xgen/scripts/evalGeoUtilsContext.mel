@@ -1,0 +1,296 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+// Copyright (C) 1997-2014 Autodesk, Inc., and/or its licensors.
+// All rights reserved.
+//
+// The coded instructions, statements, computer programs, and/or related
+// material (collectively the "Data") in these files contain unpublished
+// information proprietary to Autodesk, Inc. ("Autodesk") and/or its licensors,
+// which is protected by U.S. and Canadian federal copyright law and by
+// international treaties.
+//
+// The Data is provided for use exclusively by You. You have the right to use,
+// modify, and incorporate this Data into other products for purposes authorized 
+// by the Autodesk software license agreement, without fee.
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND. AUTODESK
+// DOES NOT MAKE AND HEREBY DISCLAIMS ANY EXPRESS OR IMPLIED WARRANTIES
+// INCLUDING, BUT NOT LIMITED TO, THE WARRANTIES OF NON-INFRINGEMENT,
+// MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE, OR ARISING FROM A COURSE 
+// OF DEALING, USAGE, OR TRADE PRACTICE. IN NO EVENT WILL AUTODESK AND/OR ITS
+// LICENSORS BE LIABLE FOR ANY LOST REVENUES, DATA, OR PROFITS, OR SPECIAL,
+// DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES, EVEN IF AUTODESK AND/OR ITS
+// LICENSORS HAS BEEN ADVISED OF THE POSSIBILITY OR PROBABILITY OF SUCH DAMAGES.
+
+// ---------------------------------------------------------------------------
+//
+//  evalGeoUtils
+//
+//  Sample context to test the geoUtils command
+//
+//  Carlos Gonzalez-Ochoa
+//
+//  (c) Walt Disney Feature Animation
+//
+// ---------------------------------------------------------------------------
+//
+//
+// Usage:
+//
+// To use create some Nurbs, meshes and tile subdivision
+//
+// Load the objects into the context using the mel command
+//
+// mel> evalGeoUtilsLoadSelection
+//
+// This takes the annoying flickering
+//
+// Enter the context
+//
+// mel> setToolTo evalGeoUtilsCtx
+//
+// Start clicking
+//
+// To change some attributes, set the global variables:
+// 
+// $gGUObjectRadius  = <val>   radius of the cone
+//
+// $gMdGUUseLocator = <bool>   display a locator
+//
+//
+
+// Set tool to 
+// setToolTo evalGeoUtilsCtx;
+
+global proc evalGeoUtilsLoadSelection()
+{
+    global string $gMdGUOrigSelection[];
+    global string $gMdGUSelection[];
+    global int    $gMdGUUseLocator = 0;
+    global string $gMdGULocator;
+    global int    $gMdGUCLoadSelection;  // should we load selection
+
+    $gMdGUCLoadSelection = 0;// no need to load selection again
+
+    string $sl[] = `ls -sl`;
+    $gMdGUOrigSelection = $sl;
+
+    clear $gMdGUSelection;
+
+    int $n=0;
+    for ($obj in $sl) {
+
+	if (nodeType($obj) == "transform") {
+	    string $rel[] = `listRelatives -s $obj`;
+	    $obj = $rel[0];
+	} 
+	//print ("object: " + $obj + "\n");
+	if (nodeType($obj) == "nurbsSurface") {
+
+	    //print ("We have a nurbs\n");
+	    $gMdGUSelection[$n] = $obj;
+	    $n++;
+		
+	} else if (nodeType($obj) == "mesh") {
+
+	    //print ("We have a mesh " + $obj + "\n");
+	    // check for subdivs
+	    // If so, then add the tiles
+	    string $struct[] = MdGetSubdDAGStructure($obj);
+	    
+	    if (size($struct) == 0) {
+		// only a mesh
+		$gMdGUSelection[$n] = $obj;
+		$n++;
+	    } else {
+		// Tiles
+		// Get the name of the tiles
+		string $tiles[] = `listRelatives $struct[2]`;
+		int $nn = size($tiles);
+		appendStringArray($gMdGUSelection, $tiles, $nn);
+		// correct counter
+		$n = size($gMdGUSelection);
+	    }
+	}
+    }
+    select -cl;
+}
+
+global proc evalGeoUtilsCtxPress()
+{
+    global string $gMdGUOrigSelection[];
+    global string $gMdGUSelection[];
+    global int    $gMdGUUseLocator = 0;
+    global string $gMdGULocator;
+    global int    $gMdGUCLoadSelection;  // should we load selection
+
+    //    print ("Size of selection: " + size($gMdGUSelection) + "\n");
+
+    if ($gMdGUCLoadSelection == true || size($gMdGUSelection) == 0) {
+		print (uiRes("m_evalGeoUtilsContext.kLoadingSelection"));
+		evalGeoUtilsLoadSelection();
+    }
+	
+    if (size($gMdGUSelection) == 0) {
+		warning (uiRes("m_evalGeoUtilsContext.kNoObjectsSelected"));
+		setToolTo selectSuperContext;	
+    }
+	
+    // Create a locator
+    if ($gMdGUUseLocator) {
+		if (objExists($gMdGULocator) == false) {
+			$gMdGULocator = `createNode locator`;
+		}
+    }
+	
+    // callback function
+    // 0 - setup
+    global string $gMdGeoUtilsContextCB;
+
+
+
+    if ($gMdGeoUtilsContextCB != "") {
+		string $cmd = ($gMdGeoUtilsContextCB + "( 0, 0, 0, 0, 0, 0, 0)");
+		catch(eval($cmd));
+    }
+
+    //print "Context was correctly set\n";
+
+    select -cl;
+}
+
+global proc evalGeoUtilsCtxDrag()
+{
+    //    print "evalTileContexDrag\n"; 
+    global string $gMdGUSelection[];
+    global int    $gMdGUUseLocator;
+    global string $gMdGULocator;
+
+    draggerContext -e -sp screen evalGeoUtilsCtx;
+    draggerContext -e -pr sketchPlane evalGeoUtilsCtx;
+    float $ws[] = `draggerContext -query -dragPoint evalGeoUtilsCtx`;
+    
+    //print ("View plane:   " + $ws[0] + " " + $ws[1] + " " + $ws[2] + "\n");
+    
+//     print ("Selection\n");
+//     print $gMdGUSelection;
+//     print ("----\n");
+
+    float $wp[]=  `geoUtils -co -p -n -oi -sp $ws[0] $ws[1] $gMdGUSelection`;
+
+    if (size($wp) > 0) {
+
+
+	if ($gMdGUUseLocator) {
+	    if (objExists($gMdGULocator)) {
+		move -a $wp[0] $wp[1] $wp[2] $gMdGULocator;
+	    }
+	}
+
+	// callback function
+	// 1 - setup
+	
+	global string $gMdGeoUtilsContextCB;
+
+	if ($gMdGeoUtilsContextCB != "") {
+	    string $cmd = ($gMdGeoUtilsContextCB + "( 1, " 
+			   + $wp[0] + "," + $wp[1] + "," + $wp[2] + ","   
+			   + $wp[3] + "," + $wp[4] + "," + $wp[5] 
+			   + ")");
+	    catch(eval($cmd));
+	}
+	refresh();
+    }
+}
+
+global proc evalGeoUtilsCtxRelease()
+{
+    global string $gMdGUOrigSelection[];
+    global string $gMdGeoUtilsContextCB;
+
+    global int    $gMdGUUseLocator;
+    global string $gMdGULocator;
+
+    if ($gMdGUUseLocator) {
+	if (objExists($gMdGULocator)) {
+	    string $pr[] = `listRelatives -p $gMdGULocator`;
+	    delete $pr;
+	    $gMdGULocator = "";
+	}
+    }
+
+    //    select -r $gMdGUOrigSelection;
+
+    if ($gMdGeoUtilsContextCB != "") {
+	string $cmd = ($gMdGeoUtilsContextCB + "( 2, 0, 0, 0, 0, 0, 0)");
+	catch(eval($cmd));
+    }
+    refresh();
+}
+
+//
+//
+//
+global string $gMdGeoUtilsContextCB = "ETCCreateTestCurve2";
+
+global proc ETCCreateTestCurve2(int $what, 
+			      float $p0, float $p1, float $p2, 
+			      float $n0, float $n1, float $n2)
+{
+    global string $gGUObject;
+    global string $gGUAngleBetween;
+
+    global float $gGUObjectRadius=.1;
+
+    switch ($what) {
+    case 0:
+	string $objs[] = `cone -p 0 0 0 -ax 0 1 0 -ssw 0 -esw 360 
+	    -r $gGUObjectRadius -hr 6 -d 3 -ut 0 -tol 0.01 -s 8 -nsp 1 -ch 0`;
+	$gGUObject = $objs[0];
+	//	$gGUObject = `curve -d 3 -p 0 0 0 -p -0.0978641 0.631212 0 -p -0.125825 1.414126 0 -p 0.0978642 1.74966 0 -k 0 -k 0 -k 0 -k 1 -k 1 -k 1`;
+
+	$gGUAngleBetween = `createNode angleBetween`;
+	setAttr ($gGUAngleBetween + ".vector1") 0 1 0;
+	setAttr ($gGUAngleBetween + ".vector2") 0 1 0;
+	connectAttr -f ($gGUAngleBetween + ".euler") ($gGUObject + ".rotate");
+	break;
+    case 1:
+	if ($gGUObject != "" && $gGUAngleBetween != "") {
+	    move -a $p0 $p1 $p2 $gGUObject;
+	    setAttr ($gGUAngleBetween + ".vector2") $n0 $n1 $n2;
+	}
+	break;
+    case 2:
+	$gGUObject = "";
+	$gGUAngleBetween = "";
+	break;
+    }
+}
+
+global proc evalGeoUtilsContext()
+{
+    if (`draggerContext -q -ex evalGeoUtilsCtx`) {
+	deleteUI evalGeoUtilsCtx;
+    }
+    global string $gMdGUSelection[];
+    clear $gMdGUSelection;
+
+    eval("draggerContext " +
+	"-pressCommand    \"evalGeoUtilsCtxPress\"    " + 
+	"-dragCommand     \"evalGeoUtilsCtxDrag\"     " +
+	"-releaseCommand  \"evalGeoUtilsCtxRelease\"  " +
+	"-cursor          \"crossHair\"		      " +
+	"-image1          \"evalGeoUtilsContext.xpm\" " +
+	 "evalGeoUtilsCtx");
+
+    setToolTo evalGeoUtilsCtx;
+}
+
+global proc evalGeoUtilsSetCtx()
+{
+    setToolTo evalGeoUtilsCtx;
+}

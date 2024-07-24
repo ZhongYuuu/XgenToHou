@@ -1,0 +1,81 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+// ===========================================================================
+// Copyright 2015 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+
+
+//
+//    Description:    initializes the custom grab brush setting values
+//
+//    Input Arguments:
+//        parent    Parent layout of the custom grab brush settings layout.
+//                  Required so that UI object names can be successfully resolved
+//        tool      this is the name of the instance of the tool
+//                    that the property sheet is modifying.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmGrabBrushSettingsValues(string $parent, string $tool)
+{
+    global string $gXgmGrabBrushCmd;
+
+    setParent $parent;
+
+    int $preserveLen = eval( $gXgmGrabBrushCmd + " -q -preserveLength " + $tool );
+    checkBoxGrp -e -value1 $preserveLen xgmGrabBrushPreserveLengthGRP;
+}
+
+//
+//    Description:    initializes grabBrushContext tool property sheet values
+//
+//    Input Arguments:
+//        tool      this is the name of the instance of the tool
+//                    that the property sheet is modifying.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmGrabBrushValues(string $tool) 
+{
+    global string $gXgmGrabBrushLayout;
+    global string $gXgmGrabBrushCmd;
+    global string $gXgmGrabBrushSettingFrame;
+    global string $gXgmGrabBrushFalloffFrame;
+    global string $gXgmGrabRootToTipFalloffFrame;
+    global string $gXgmGrabBrushDisplaySettingFrame;
+    global string $gXgmGrabBrushSymmetrySettingFrame;
+
+    string $parent = `toolPropertyWindow -q -location`;
+    setParent $parent;
+
+    frameLayout -e -en true $gXgmGrabBrushSettingFrame;
+    frameLayout -e -en true $gXgmGrabBrushFalloffFrame;
+    frameLayout -e -en true $gXgmGrabRootToTipFalloffFrame;
+    frameLayout -e -en true $gXgmGrabBrushDisplaySettingFrame;
+
+    string $settingsCustom = "xgmGrabBrushSettingsValues( \"" + $gXgmGrabBrushLayout + "\", \"" + $tool + "\")";
+    xgmBrushSettingsValues( $gXgmGrabBrushSettingFrame, $gXgmGrabBrushCmd, $tool, $settingsCustom );
+    xgmBrushFalloffValues( $gXgmGrabBrushFalloffFrame, $gXgmGrabBrushCmd, $tool, "", "");
+    xgmRootToTipFalloffValues( $gXgmGrabRootToTipFalloffFrame, $gXgmGrabBrushCmd, $tool, "" );
+    xgmBrushDisplaySettingsValues( $gXgmGrabBrushDisplaySettingFrame, $gXgmGrabBrushCmd, $tool, "" );
+    xgmBrushSymmetrySettingsValues( $gXgmGrabBrushSymmetrySettingFrame, $gXgmGrabBrushCmd, $tool, "" );
+
+    string $help = "GrabBrushTool";
+    toolPropertySetCommon $tool "xgmGrabBrushTool.xpm" $help;
+
+    toolPropertySelect $gXgmGrabBrushLayout;
+
+    string $nameField = `toolPropertyWindow -query -field`;
+    text -edit -label (uiRes("m_xgmGrabBrushValues.kGrabBrushToolName")) $nameField;
+}

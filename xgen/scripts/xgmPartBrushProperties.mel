@@ -1,0 +1,175 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+// ===========================================================================
+// Copyright 2015 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+
+
+//  Description:    defines behaviour and layout of xgmPartBrushContext
+//                    tool property sheet
+//
+
+global string $gXgmPartBrushLayout = "xgmPartBrush";
+global string $gXgmPartBrushCmd = "xgmPartBrushContext";
+global string $gXgmPartBrushToolName = "xgmPartBrushTool";
+
+global string $gXgmPartBrushSettingFrame = "xgmPartBrushSettingFrame";
+global string $gXgmPartBrushFalloffFrame = "xgmPartBrushFalloffFrame";
+global string $gXgmPartRootToTipFalloffFrame = "xgmPartRootToTipFalloffFrame";
+global string $gXgmPartDisplaySettingFrame = "xgmPartBrushDisplaySettingFrame";
+global string $gXgmPartSymmetrySettingFrame = "xgmPartBrushSymmetrySettingFrame";
+
+global string $gXgmPartBrushFalloffTypes;
+global string $gXgmPartBrushFalloffTypesL10N[];
+global int $gXgmPartSurfaceFalloffIndex;
+
+//
+//    Description:
+//        Initializes the Part brush falloff types
+//
+//    Input Arguments:
+//        None.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmInitPartBrushFalloffTypes()
+{
+    global string $gXgmPartBrushFalloffTypes;
+    global string $gXgmPartBrushFalloffTypesL10N[];
+    global int $gXgmPartSurfaceFalloffIndex;
+
+    if( $gXgmPartBrushFalloffTypes == "" || size($gXgmPartBrushFalloffTypesL10N) == 0 ) {
+        $gXgmPartBrushFalloffTypes = "surface";
+        $gXgmPartBrushFalloffTypesL10N  = { (uiRes("m_xgmPartBrushProperties.kXgmPartBrushFalloffTypeSurface"))};
+        $gXgmPartSurfaceFalloffIndex = size($gXgmPartBrushFalloffTypesL10N) - 1 ;
+    }
+}
+
+
+//
+//    Description:
+//        Creates the UI of the custom brush settings for the Part brush
+//
+//    Input Arguments:
+//        None.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmPartBrushSettingsCustom()
+{
+    global string $gXgmPartBrushCmd;
+
+    string $curctx = `currentCtx`;
+
+    radioButtonGrp -label (uiRes("m_xgmPartBrushProperties.kXgmPartBrushSelectionMode"))
+                -numberOfRadioButtons 2
+                -label1 (uiRes("m_xgmPartBrushProperties.kXgmPartBrushAlongStroke"))
+                -label2 (uiRes("m_xgmPartBrushProperties.kXgmPartBrushAwayFromCenter"))
+                -on1 ( $gXgmPartBrushCmd + " -e -alongStroke 1 " + $curctx )
+                -on2 ( $gXgmPartBrushCmd + " -e -alongStroke 0 " + $curctx )
+                xgmPartBrushAxisModeRBG;
+}
+
+//
+//    Description:
+//    Hide "Volume Search Radius", "Volume Center offset", "Offset Hotkey Interval" 
+//    since no Volume mode so far
+//
+//    Input Arguments:
+//        None.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmPartBrushFalloffCustom()
+{
+    floatSliderGrp -e -visible 0 xgmBrushVolumeSearchRadiusFSG;
+    floatSliderGrp -e -visible 0 xgmBrushVolumeCenterOffsetFSG;
+    floatSliderGrp -e -visible 0 xgmBrushOffsetHotkeyIntervalFSG;
+}
+
+//
+//    Description:
+//        layout of Part brush tool property sheet
+//
+//    Input Arguments:
+//        None.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmPartBrushProperties ()
+{
+    global string $gXgmPartBrushLayout;
+    global string $gXgmPartBrushCmd;
+    global string $gXgmPartBrushToolName;
+    global string $gXgmPartBrushSettingFrame;
+    global string $gXgmPartBrushFalloffFrame;
+    global string $gXgmPartRootToTipFalloffFrame;
+    global string $gXgmPartDisplaySettingFrame;
+    global string $gXgmPartSymmetrySettingFrame;
+    global string $gXgmPartBrushFalloffTypes;
+    global string $gXgmPartBrushFalloffTypesL10N[];
+
+    xgmInitPartBrushFalloffTypes();
+
+    string $parent = `toolPropertyWindow -q -location`;
+    setParent $parent;
+
+    setUITemplate -pushTemplate OptionsTemplate;
+
+    columnLayout $gXgmPartBrushLayout;
+
+    xgmBrushSettingsProperties( $gXgmPartBrushLayout, 
+                            $gXgmPartBrushSettingFrame, 
+                            $gXgmPartBrushCmd, 
+                            $gXgmPartBrushToolName, 
+                            "xgmPartBrushSettingsCustom" );
+    //xgmPartBrushFalloffCustom will hide "Volume Search Radius", "Volume Center offset", "Offset Hotkey Interval" 
+    //since no Volume mode so far
+    //TO DO: remove the custom callback if we add volume mode in the future.
+    xgmBrushFalloffProperties( $gXgmPartBrushLayout, 
+                            $gXgmPartBrushFalloffFrame, 
+                            $gXgmPartBrushCmd, 
+                            $gXgmPartBrushToolName,
+                            "xgmPartBrushFalloffCustom",
+                            $gXgmPartBrushFalloffTypes,
+                            $gXgmPartBrushFalloffTypesL10N ); 
+
+    string $temp[];
+    xgmRootToTipFalloffProperties( $gXgmPartBrushLayout, 
+                            $gXgmPartRootToTipFalloffFrame, 
+                            $gXgmPartBrushCmd, 
+                            $gXgmPartBrushToolName,
+                            $temp,
+                            "" ); 
+
+    // The "Root to Tip" falloff only applies to the Part.
+    frameLayout -e -l (uiRes("m_xgmPartBrushProperties.kXgmRootToTipMagnitudeControl")) $gXgmPartRootToTipFalloffFrame;
+
+    xgmBrushDisplaySettingsProperties( $gXgmPartBrushLayout, 
+                            $gXgmPartDisplaySettingFrame,
+                            $gXgmPartBrushCmd, 
+                            $gXgmPartBrushToolName,
+                            "" );
+
+    xgmBrushSymmetrySettingsProperties( $gXgmPartBrushLayout, 
+                            $gXgmPartSymmetrySettingFrame,
+                            $gXgmPartBrushCmd, 
+                            $gXgmPartBrushToolName,
+                            "" );
+
+    setUITemplate -popTemplate;
+}
+

@@ -1,0 +1,69 @@
+<!--
+Copyright 2015 Autodesk, Inc. All rights reserved.
+
+Use of this software is subject to the terms of the Autodesk
+license agreement provided at the time of installation or download,
+or which otherwise accompanies this software in either electronic
+or hard copy form.
+-->
+<fragment_graph name="xgenFacingCameraVSToGS" ref="xgenFacingCameraVSToGS" class="FragmentGraph" version="1.0" feature_level="0" >
+    <fragments>
+        <fragment_ref name="xgenFacingCameraVSToGSNw"     ref="xgenFacingCameraVSToGSNw" />
+        <fragment_ref name="xgenFacingCameraVSToGSVw"     ref="xgenFacingCameraVSToGSVw" />
+        <fragment_ref name="xgenFacingCameraVSToGSPw"     ref="xgenFacingCameraVSToGSPw" />
+        <fragment_ref name="xgenFacingCameraVSToGSTw"     ref="xgenFacingCameraVSToGSTw" />
+        <fragment_ref name="xgenFacingCameraVSToGSBw"     ref="xgenFacingCameraVSToGSBw" />
+        <fragment_ref name="xgenFacingCameraVSToGSPc"     ref="xgenFacingCameraVSToGSPc" />
+        <fragment_ref name="xgenFacingCameraVSToGSRoot"   ref="xgenFacingCameraVSToGSRoot" />
+    </fragments>
+    <connections>
+        <connect from="xgenFacingCameraVSToGSTw.Tw" to="xgenFacingCameraVSToGSNw.mayaTangentIn" />
+        <connect from="xgenFacingCameraVSToGSBw.Bw" to="xgenFacingCameraVSToGSNw.mayaBitangentIn" />
+
+        <connect from="xgenFacingCameraVSToGSNw.Nw" to="xgenFacingCameraVSToGSRoot.Nw" />
+        <connect from="xgenFacingCameraVSToGSVw.Vw" to="xgenFacingCameraVSToGSRoot.Vw" />
+        <connect from="xgenFacingCameraVSToGSPw.Pw" to="xgenFacingCameraVSToGSRoot.Pw" />
+        <connect from="xgenFacingCameraVSToGSTw.Tw" to="xgenFacingCameraVSToGSRoot.mayaTangentIn" />
+        <connect from="xgenFacingCameraVSToGSBw.Bw" to="xgenFacingCameraVSToGSRoot.mayaBitangentIn" />
+        <connect from="xgenFacingCameraVSToGSPc.positionShader" to="xgenFacingCameraVSToGSRoot.GPUStage" />
+     </connections>
+    <properties>
+
+        <float4x4 name="worldInverseTranspose"  ref="xgenFacingCameraVSToGSNw.worldInverseTranspose"  semantic="worldinversetranspose" />
+
+        <float3   name="Pm"                     ref="xgenFacingCameraVSToGSVw.Pm"                         semantic="Pm"         flags="varyingInputParam" />
+        <float4x4 name="world"                  ref="xgenFacingCameraVSToGSVw.world"                      semantic="world" />
+        <float3   name="worldCameraPosition"    ref="xgenFacingCameraVSToGSVw.worldCameraPosition"        semantic="worldcameraposition" />
+
+        <float3   name="Pm"                     ref="xgenFacingCameraVSToGSPw.Pm"                         semantic="Pm"         flags="varyingInputParam" />
+        <float4x4 name="world"                  ref="xgenFacingCameraVSToGSPw.world"                      semantic="world" />
+
+        <float3   name="Pm"                     ref="xgenFacingCameraVSToGSTw.Pm"                         semantic="Pm"         flags="varyingInputParam" />
+        <float3   name="mayaBitangentIn"        ref="xgenFacingCameraVSToGSTw.mayaBitangentIn"            semantic="BITANGENT"  flags="varyingInputParam"/>
+        <float3   name="xgenCVDirection"        ref="xgenFacingCameraVSToGSTw.xgenCVDirection"            semantic="TANGENT"    flags="varyingInputParam"/>
+        <float    name="xgenCVWidth"            ref="xgenFacingCameraVSToGSTw.xgenCVWidth"                semantic="TEXCOORD2"  flags="varyingInputParam"/>
+		<bool     name="bFaceCamera" 			ref="xgenFacingCameraVSToGSTw.bFaceCamera" />
+        <float4x4 name="worldInverse"           ref="xgenFacingCameraVSToGSTw.worldInverse"               semantic="worldinverse" />
+        <float3   name="viewDirection"          ref="xgenFacingCameraVSToGSTw.viewDirection"              semantic="viewdirection" />
+        <float3   name="worldCameraPosition"    ref="xgenFacingCameraVSToGSTw.worldCameraPosition"        semantic="worldcameraposition" />
+        <bool     name="isOrthographic"         ref="xgenFacingCameraVSToGSTw.isOrthographic"             semantic="isorthographic" />
+
+        <float3   name="mayaBitangentIn"        ref="xgenFacingCameraVSToGSBw.mayaBitangentIn"            semantic="BITANGENT"  flags="varyingInputParam"/>
+
+        <float3   name="Pm"                     ref="xgenFacingCameraVSToGSPc.Pm"                         semantic="Pm"         flags="varyingInputParam" />
+        <float4x4 name="worldViewProjection"    ref="xgenFacingCameraVSToGSPc.worldViewProjection"        semantic="worldviewprojection" />
+        <float    name="depthPriority"          ref="xgenFacingCameraVSToGSPc.depthPriority"              semantic="depthpriority" />
+    </properties>
+    <values>
+        <bool name="isOrthographic" value="false" />
+		<bool name="bFaceCamera" value="true"    />
+    </values>
+    <outputs>
+        <float3 name="Nw"               ref="xgenFacingCameraVSToGSRoot.Nw"               />
+        <float3 name="Vw"               ref="xgenFacingCameraVSToGSRoot.Vw"               />
+        <float3 name="Pw"               ref="xgenFacingCameraVSToGSRoot.Pw"               />
+        <float3 name="mayaTangentIn"    ref="xgenFacingCameraVSToGSRoot.mayaTangentIn"    />
+        <float3 name="mayaBitangentIn"  ref="xgenFacingCameraVSToGSRoot.mayaBitangentIn"  />
+        <undefined name="vertexShader"  ref="xgenFacingCameraVSToGSRoot.vertexShader"     />
+    </outputs>
+</fragment_graph>

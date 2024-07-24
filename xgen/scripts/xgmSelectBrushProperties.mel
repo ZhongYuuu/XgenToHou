@@ -1,0 +1,243 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+// ===========================================================================
+// Copyright 2015 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+
+
+//  Description:    defines behaviour and layout of xgmSelectBrushContext
+//                    tool property sheet
+//
+
+global string $gXgmSelectBrushLayout = "xgmSelectBrush";
+global string $gXgmSelectBrushCmd = "xgmSelectBrushContext";
+global string $gXgmSelectBrushToolName = "xgmSelectBrushTool";
+
+global string $gXgmSelectBrushSettingFrame = "xgmSelectBrushSettingFrame";
+global string $gXgmSelectBrushDisplaySettingFrame = "xgmSelectBrushDisplaySettingFrame";
+global string $gXgmSelectBrushSymmetrySettingFrame = "xgmSelectBrushSymmetrySettingFrame";
+
+global string $gXgmSelectBrushSelectTypes;
+global string $gXgmSelectBrushSelectTypesL10N[];
+
+//
+//    Description:
+//        Initializes the select brush select types
+//
+//    Input Arguments:
+//        None.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmInitSelectBrushSelectTypes()
+{
+    global string $gXgmSelectBrushSelectTypes;
+    global string $gXgmSelectBrushSelectTypesL10N[];
+
+    if( $gXgmSelectBrushSelectTypes == "" || size($gXgmSelectBrushSelectTypesL10N) == 0 ) {
+        $gXgmSelectBrushSelectTypes = "screen,volume,surface";
+        $gXgmSelectBrushSelectTypesL10N  = { (uiRes("m_xgmSelectBrushProperties.kXgmSelectBrushSelectTypeScreen")),
+                                              (uiRes("m_xgmSelectBrushProperties.kXgmSelectBrushSelectTypeVolume")),
+                                              (uiRes("m_xgmSelectBrushProperties.kXgmSelectBrushSelectTypeSurface"))};
+    }
+}
+
+//
+//    Description:
+//        layout of common brush settings
+//
+//    Input Arguments:
+//        parent         Parent layout of the common brush settings layout.
+//                       Required so that UI object names can be successfully resolved.
+//        frameLayout    Name of the frame layout to be created for the common brush settings
+//        brushCmd       Brush command to be used by the UI objects
+//        tool           Name of the instance of the tool that the command is applied on
+//
+//    Return Value:
+//        None.
+//
+global proc xgmSelectBrushSettingsProperties( string $parent, string $frameLayout, string $brushCmd, string $tool )
+{
+    global string $gXgmSelectBrushSelectTypes;
+    global string $gXgmSelectBrushSelectTypesL10N[];
+    xgmInitSelectBrushSelectTypes();
+
+    setParent $parent;
+
+    frameLayout -collapsable true -collapse false -mh 5 -l (uiRes("m_xgmSelectBrushProperties.kXgmBrushSettings")) $frameLayout;
+        string $brushSettingColumnLayout = `columnLayout -adj true -rs 5 xgmBrushSettingsColumnLayout`;
+
+            // Base Properties
+            rowLayout -numberOfColumns 2 -columnWidth 1 50 -columnWidth 2 20 -adjustableColumn 1 -rowAttach 2 "top" 0 xgmBrushSettingsSizeLayout;
+                floatSliderGrp -field true -pre 3
+                    -min 0
+                    -max 1000
+                    -fieldMaxValue 10000000
+                    -label (uiRes("m_xgmSelectBrushProperties.kXgmBrushSize"))
+                    -annotation (uiRes("m_xgmSelectBrushProperties.kXgmBrushSizeAnnotation"))
+                    -cc ( $brushCmd + " -e -radius #1 " + $tool )
+                xgmBrushSizeFSG;
+
+                iconTextCheckBox -width 22 -height 22 -style "iconOnly" -image "nodeGrapherUnpinnedLarge.png" -selectionImage "nodeGrapherPinnedLarge.png" 
+                    -annotation (uiRes("m_xgmSelectBrushProperties.kUseGlobalBrushSizeAnnotation"))
+                    -onCommand  ( $brushCmd + " -e -useGlobalRadius false " + $tool )
+                    -offCommand ( $brushCmd + " -e -useGlobalRadius true " + $tool )
+                xgmBrushPinITCB;
+
+            setParent ..;
+
+            separator -style "none";
+
+            checkBoxGrp -label (uiRes("m_xgmSelectBrushProperties.kXgmSelectBrushInvert"))
+                -numberOfCheckBoxes 1
+                -on1 ( $brushCmd + " -e -invert 1 " + $tool )
+                -of1 ( $brushCmd + " -e -invert 0 " + $tool )
+                xgmSelectBrushInvertCBG;
+
+            optionMenuGrp -label (uiRes("m_xgmSelectBrushProperties.kXgmSelectBrushSelectionType"))
+                -cc ( "xgmBrushFalloffSetFalloffType( \"" + $brushSettingColumnLayout + "\", \"" + $brushCmd + "\", \"" +  $tool + "\", \"" + $gXgmSelectBrushSelectTypes + "\")" )
+                xgmBrushFalloffTypeOMG;
+
+                for($item in $gXgmSelectBrushSelectTypesL10N) {
+                    menuItem -label $item;
+                }
+
+            floatSliderGrp -field true -pre 3
+                -en 0
+                -min 0.01
+                -max 1
+                -label (uiRes("m_xgmSelectBrushProperties.kXgmSelectBrushVolumeSearchRadius"))
+                -cc ( $brushCmd + " -e -volumeSearchRadius #1 " + $tool )
+                xgmSelectBrushVolumeSearchRadiusFSG;
+
+            floatSliderGrp -field true -pre 2
+                -en 0
+                -min -10
+                -max 10
+                -fieldMaxValue 10000000
+                -fieldMinValue -10000000
+                -label (uiRes("m_xgmSelectBrushProperties.kXgmSelectBrushVolumeCenterOffset"))
+                -cc ( $brushCmd + " -e -volumeCenterOffset #1 " + $tool )
+                xgmSelectBrushVolumeCenterOffsetFSG;
+            
+            floatSliderGrp -field true -pre 2
+                -en 0
+                -label (uiRes("m_xgmSelectBrushProperties.kXgmSelectBrushOffsetHotkeyInterval"))
+                -cc ( $brushCmd + " -e -offsetHotkeyInterval #1 " + $tool )
+                xgmSelectBrushOffsetHotkeyIntervalFSG;
+
+            separator -style "none";
+            checkBoxGrp -label (uiRes("m_xgmSelectBrushProperties.kXgmSelectBrushFilterBackface"))
+                -numberOfCheckBoxes 1
+                -on1 ( $brushCmd + " -e -filterBackface 1 " + $tool )
+                -of1 ( $brushCmd + " -e -filterBackface 0 " + $tool )
+                xgmBrushFilterBackfaceGRP;
+
+            floatSliderGrp -field true -pre 3
+                -min 0
+                -max 180
+                -label (uiRes("m_xgmSelectBrushProperties.kXgmSelectBrushFilterBackfaceCutoffAngle"))
+                -cc ( $brushCmd + " -e -fea #1 " + $tool )
+                xgmBrushFilterBackfaceEndAngleFSG;
+
+            separator -style "none";
+
+            string $buttonForm = `formLayout xgmSelectBrushButtonsForm`;
+
+                string $buttonColumn = `columnLayout -rowSpacing 5 xgmSelectBrushButtonsColumn`;
+
+                    rowLayout -numberOfColumns 2 -columnWidth2 90 90 -columnAttach2 "both" "both" -columnOffset2 0 0;
+                        button -label (uiRes("m_xgmSelectBrushProperties.kXgmSelectBrushDeselectAll"))
+                            -command ($brushCmd + " -e -deselectAll " + $tool )
+                            xgmSelectBrushDeselectAllButton;
+                        button -label (uiRes("m_xgmSelectBrushProperties.kXgmSelectBrushInvertSelection"))
+                            -command ($brushCmd + " -e -invertSelection " + $tool )
+                            xgmSelectBrushInvertSelectionButton;
+                    setParent ..;
+
+                    rowLayout -numberOfColumns 2 -columnWidth2 90 90 -columnAttach2 "both" "both" -columnOffset2 0 0;
+                        button -label (uiRes("m_xgmSelectBrushProperties.kXgmSelectBrushHideSelected"))
+                            -command ($brushCmd + " -e -hideSelected " + $tool )
+                            xgmSelectBrushHideSelectedButton;
+                        button -label (uiRes("m_xgmSelectBrushProperties.kXgmSelectBrushShowAll"))
+                            -command ($brushCmd + " -e -unhideAll " + $tool )
+                            xgmSelectBrushShowAllButton;
+                    setParent ..;
+
+                    button -label (uiRes("m_xgmSelectBrushProperties.kXgmSelectBrushShowSelectedOnly"))
+                            -command ($brushCmd + " -e -hideUnselected " + $tool )
+                            xgmSelectBrushShowSelectedOnlyButton;
+
+                    button -label (uiRes("m_xgmSelectBrushProperties.kXgmSelectBrushInvertHidden"))
+                            -command ($brushCmd + " -e -invertHidden " + $tool )
+                            xgmSelectBrushInvertHiddenButton;
+
+                setParent ..;
+
+            formLayout -e
+                -attachForm     $buttonColumn "left"   130
+                $buttonForm;
+
+            setParent ..;
+
+        setParent ..;
+    setParent ..;
+}
+
+
+//
+//    Description:
+//        layout of select brush tool property sheet
+//
+//    Input Arguments:
+//        None.
+//
+//    Return Value:
+//        None.
+//
+global proc xgmSelectBrushProperties ()
+{
+    global string $gXgmSelectBrushLayout;
+    global string $gXgmSelectBrushCmd;
+    global string $gXgmSelectBrushToolName;
+    global string $gXgmSelectBrushSettingFrame;
+    global string $gXgmSelectBrushDisplaySettingFrame;
+    global string $gXgmSelectBrushSymmetrySettingFrame;
+
+    string $parent = `toolPropertyWindow -q -location`;
+    setParent $parent;
+
+    setUITemplate -pushTemplate OptionsTemplate;
+
+    columnLayout $gXgmSelectBrushLayout;
+
+    xgmSelectBrushSettingsProperties( $gXgmSelectBrushLayout, 
+                            $gXgmSelectBrushSettingFrame, 
+                            $gXgmSelectBrushCmd, 
+                            $gXgmSelectBrushToolName );
+
+    xgmBrushDisplaySettingsProperties( $gXgmSelectBrushLayout, 
+                            $gXgmSelectBrushDisplaySettingFrame,
+                            $gXgmSelectBrushCmd, 
+                            $gXgmSelectBrushToolName,
+                            "" );  
+
+    xgmBrushSymmetrySettingsProperties( $gXgmSelectBrushLayout, 
+                            $gXgmSelectBrushSymmetrySettingFrame,
+                            $gXgmSelectBrushCmd, 
+                            $gXgmSelectBrushToolName,
+                            "" );  
+
+    setUITemplate -popTemplate;
+}
+

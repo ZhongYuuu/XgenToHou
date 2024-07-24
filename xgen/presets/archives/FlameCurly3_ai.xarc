@@ -1,0 +1,8 @@
+#ArchiveGroup 0 name="FlameCurly3_ai" description="No description." thumbnail="archives/FlameCurly3.png" materials="archives/materials/FlameCurly3_ai.ma" color=[1,0,0]
+0 "archives/abc/FlameCurly3_ai.abc" material=FlameCurly3_ai:paintfx_archives:flameCurly3ShaderSG objects=|paintfx_archives:flameCurly3MeshGroup|paintfx_archives:flameCurly3Main
+3 "archives/ass/FlameCurly3_ai_Main.ass.gz" material=FlameCurly3_ai:paintfx_archives:flameCurly3ShaderSG objects=|paintfx_archives:flameCurly3MeshGroup|paintfx_archives:flameCurly3Main
+1 "archives/abc/FlameCurly3_ai_med.abc" material=FlameCurly3_ai:paintfx_archives:flameCurly3ShaderSG objects=|paintfx_archives:flameCurly3MeshGroup|paintfx_archives:flameCurly3Main
+4 "archives/ass/FlameCurly3_ai_Main_med.ass.gz" material=FlameCurly3_ai:paintfx_archives:flameCurly3ShaderSG objects=|paintfx_archives:flameCurly3MeshGroup|paintfx_archives:flameCurly3Main
+2 "archives/abc/FlameCurly3_ai_lo.abc" material=FlameCurly3_ai:paintfx_archives:flameCurly3ShaderSG objects=|paintfx_archives:flameCurly3MeshGroup|paintfx_archives:flameCurly3Main
+5 "archives/ass/FlameCurly3_ai_Main_lo.ass.gz" material=FlameCurly3_ai:paintfx_archives:flameCurly3ShaderSG objects=|paintfx_archives:flameCurly3MeshGroup|paintfx_archives:flameCurly3Main
+

@@ -1,0 +1,52 @@
+import maya
+
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.k2x2'] = u'2x2'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.k3x3'] = u'3x3'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.k4x4'] = u'4x4'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kAutoBindSkin'] = u'自动绑定蒙皮'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kAutoBindSkinAnn'] = u'将转化的多边形自动绑定到条带关节'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kCombineMesh'] = u'组合网格'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kCombineMeshAnn'] = u'将所有几何体合并到一个网格。'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kConvertSelected'] = u'仅转化选定的基本体'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kConvertSelectedAnn'] = u'仅将选定的基本体转化为多边形。'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kCreateGeo'] = u'创建几何体'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kCreateGeoAnn'] = u'将当前描述输出到几何体。'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kCreateGuideJoints'] = u'在导向上创建关节'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kCreateGuideJointsAnn'] = u'在导向上创建关节。'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kCreateStripJoints'] = u'在条带上创建关节'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kCreateStripJointsAnn'] = u'在条带上创建关节。'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kCurvature'] = u'曲率:'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kCurvatureAnno'] = u'从 -90 到 90 次数之间的曲率。'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kFrameRangeRenderNotYetSupported'] = u'尚不支持帧范围渲染。'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kGeoProgressInfo'] = u'将基本体转化为几何体。'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kGuideJointNum'] = u'每个导向的关节数:'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kGuideJointNumAnn'] = u'每个导向的关节数。'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kGuideJointPlacementAnn'] = u'导向上关节的放置类型。'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kInsertWidthSpan'] = u'沿宽度插入跨度'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kInsertWidthSpanAnn'] = u'沿宽度插入跨度。'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kJointPerCV'] = u'每个 CV 一个关节'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kJointPerSpan'] = u'每个跨度一个关节'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kJointPlacement'] = u'关节放置:'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kMaxInfluences'] = u'最大影响物:'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kMaxInfluencesAnn'] = u'最大影响物'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kSpanNum'] = u'跨度数:'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kSpanNumAnn'] = u'沿宽度的跨度数。'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kSpecifyJointNum'] = u'指定关节数'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kStripJointNum'] = u'每个条带的关节数:'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kStripJointNumAnn'] = u'每个条带的关节数。'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kStripJointPlacementAnn'] = u'条带上关节的放置类型。'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kTileSeparation'] = u'平铺分隔:'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kTileSeparationAnn'] = u'UV 平铺之间的分隔间隔。'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kUVInTiles'] = u'在平铺中放置 UV'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kUVInTilesAnn'] = u'在平铺中放置多边形 UV。'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kUVLayoutType'] = u'UV 布局类型:'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kUVLayoutTypeAnn'] = u'UV 平铺的细分数量。'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kUseWidthRamp'] = u'使用宽度渐变'
+maya.stringTable['y_xgenm_ui_tabs_xgGeometryRendererTab.kUseWidthRampAnn'] = u'将宽度渐变应用到样条线基本体。'
+# ===========================================================================
+# Copyright 2021 Autodesk, Inc. All rights reserved.
+#
+# Use of this software is subject to the terms of the Autodesk license
+# agreement provided at the time of installation or download, or which
+# otherwise accompanies this software in either electronic or hard copy form.
+# ===========================================================================

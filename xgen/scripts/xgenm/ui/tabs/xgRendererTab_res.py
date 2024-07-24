@@ -1,0 +1,15 @@
+import maya
+
+maya.stringTable['y_xgenm_ui_tabs_xgRendererTab.kFile'] = u'Create XPD File'
+maya.stringTable['y_xgenm_ui_tabs_xgRendererTab.kGeometry'] = u'Create Geometry'
+maya.stringTable['y_xgenm_ui_tabs_xgRendererTab.kGuide'] = u'Create Guides'
+maya.stringTable['y_xgenm_ui_tabs_xgRendererTab.kMel'] = u'Create MEL File'
+maya.stringTable['y_xgenm_ui_tabs_xgRendererTab.kNoExtraAttributesForRenderer'] = u'No extra attributes for %s renderer.'
+maya.stringTable['y_xgenm_ui_tabs_xgRendererTab.kParticle'] = u'Create Particle File'
+maya.stringTable['y_xgenm_ui_tabs_xgRendererTab.kPercent'] = u'Percent'
+maya.stringTable['y_xgenm_ui_tabs_xgRendererTab.kPercentAnn'] = u'Control the percentage of generated primitives that appear in the preview.'
+maya.stringTable['y_xgenm_ui_tabs_xgRendererTab.kPoint'] = u'Create Point File'
+maya.stringTable['y_xgenm_ui_tabs_xgRendererTab.kRender'] = u'Render'
+maya.stringTable['y_xgenm_ui_tabs_xgRendererTab.kRendererTabUnknownType'] = u'Unknown type %s'
+maya.stringTable['y_xgenm_ui_tabs_xgRendererTab.kRendererType'] = u'Operation'
+maya.stringTable['y_xgenm_ui_tabs_xgRendererTab.kRendererTypeAnn'] = u'Specify what XGen does with generated primitives'

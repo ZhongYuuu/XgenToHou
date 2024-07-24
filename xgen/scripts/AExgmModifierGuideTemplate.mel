@@ -1,0 +1,197 @@
+// ===========================================================================
+// Copyright 2021 Autodesk, Inc. All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.
+// ===========================================================================
+
+global proc xgmModifierGuideOpCB(int $mode, string $nodeName)
+{
+    if ($mode == 0)
+    {
+        xgmModifierGuideOp -createGuide $nodeName;
+    }
+    else    // destroy
+    {
+        xgmModifierGuideOp -removeGuide $nodeName;
+    }
+}
+
+global proc onXgmModifierOpenGuideDescriptionClickedCB(string $nodeName)
+{
+    // find input guide description, select it,
+    // then XGen UI panel will jump into the input guide description
+    string $inAttr = $nodeName + ".inGuideData";
+    while (1)
+    {
+        string $nodes[] = `listConnections -d off -s on -sh on $inAttr`;
+        if (size($nodes) == 0)
+        {
+            break;
+        }
+        if (`nodeType $nodes[0]` == "xgmSplineDescription")
+        {
+            select $nodes[0];
+            return;
+        }
+        
+        if ( `attributeExists "inSplineData" $nodes[0]`)
+            $inAttr = $nodes[0] + ".inSplineData";
+        else
+            break;    
+    }
+
+    warning (uiRes("m_AExgmModifierGuideTemplate.kNoInGuideDescFound"));
+}
+
+global proc xgmGuideModifierUpdateCreateBtn(string $nodeName)
+{
+    // the button maybe not exist if current UI is not the modifier node tab
+    // when new scene, the callback may be called after the node is deleted
+    if (`button -ex xgmGuideModifierCreateGuideButton` && `objExists $nodeName`)
+    {
+        string $attrName = $nodeName + ".inGuideData";
+        int $mode = `connectionInfo -isDestination $attrName`;
+        if ($mode == 0)
+        {
+            button -e -label (uiRes("m_AExgmModifierGuideTemplate.kCreate"))
+                    -c ("xgmModifierGuideOpCB 0 " + $nodeName) xgmGuideModifierCreateGuideButton;
+            symbolButton -e -enable 0 xgmGuideModifierOpenGuideDescButton;
+        }
+        else
+        {
+            button -e -label (uiRes("m_AExgmModifierGuideTemplate.kDelete"))
+                    -c ("xgmModifierGuideOpCB 1 " + $nodeName) xgmGuideModifierCreateGuideButton;
+            symbolButton -e -enable 1 xgmGuideModifierOpenGuideDescButton;
+        }
+    }
+}
+
+global proc AExgmModifierGuideInputGuideNew(string $attrName)
+{
+    setUITemplate -pst attributeEditorTemplate;
+        rowLayout -numberOfColumns 3 inputGuideLayout;
+            text -label (uiRes("m_AExgmModifierGuideTemplate.kInputGuide2"));
+            button -label "" xgmGuideModifierCreateGuideButton;
+            symbolButton -image "inArrow.png" xgmGuideModifierOpenGuideDescButton;
+        setParent ..;
+        rowLayout -numberOfColumns 2;
+            text -label "";
+            button -label ((uiRes("m_AExgmModifierGuideTemplate.kCreateGuideFromCurve"))) xgmGuideModifierCreateGuideFromCurveButton;
+        setParent ..;
+    setUITemplate -ppt;
+
+    AExgmModifierGuideInputGuideReplace($attrName);
+}
+
+
+global proc AExgmModifierGuideInputGuideReplace(string $attrName)
+{
+    string $nodeName = `plugNode $attrName`;
+    string $parent = `setParent -q`;
+    string $setParentCmd = ("setParent " + $parent + ";");
+
+    xgmGuideModifierUpdateCreateBtn($nodeName);
+
+    // create a script job when inGuideData connection changed,
+    // then the button label is up-to-date
+    scriptJob -p `button -q -p xgmGuideModifierCreateGuideButton` -rp
+                -con ($nodeName + ".inGuideData") ("xgmGuideModifierUpdateCreateBtn " + $nodeName);
+
+    symbolButton -e -command ("onXgmModifierOpenGuideDescriptionClickedCB " + $nodeName) xgmGuideModifierOpenGuideDescButton;
+
+    button -e -c ($setParentCmd + "AExgmModifierGuideCreateGuideFromCurvesOnClick " + $nodeName) xgmGuideModifierCreateGuideFromCurveButton;
+}
+
+global proc AExgmModifierGuideRegionMapNew(string $attrName)
+{
+    attrNavigationControlGrp -columnAttach 1 "right" 5 -l (uiRes("m_AExgmModifierGuideTemplate.kRegionMap")) -eb true -ebi "xg3dPaint.png" -nkm true -nim true -at $attrName xgmGuideModifierRegionMapNCG;
+
+    AExgmModifierGuideRegionMapReplace($attrName);
+}
+
+global proc AExgmModifierGuideRegionMapReplace(string $attrName)
+{
+    attrNavigationControlGrp -e -at $attrName -ebc ("xgmAEFloatAttrPaintBtnClicked " + $attrName + " 1") xgmGuideModifierRegionMapNCG;
+}
+
+global proc AExgmModifierGuideMakeGuideDynamicOnClick(string $nodeName)
+{
+    if (0 == `xgmMakeGuideDynamic -q -hg $nodeName`){
+        error (uiRes("m_AExgmModifierGuideTemplate.kNoGuideData"));
+        return;
+    }
+
+    // Launch setting dialog
+    python("xgui.createXgIgNHairGuideWindow('"+$nodeName+"'"+")");
+}
+
+global proc AExgmModifierGuideMakeGuideDynamicNew(string $attrName)
+{
+    setUITemplate -pst attributeEditorTemplate;
+            rowLayout -numberOfColumns 2;
+                text -label "";
+                button -label ((uiRes("m_AExgmModifierGuideTemplate.kMakeGuidesDynamic"))) xgmGuideModifierMakeDynamicButton;
+            setParent ..;
+    setUITemplate -ppt;
+
+    AExgmModifierGuideMakeGuideDynamicReplace($attrName);
+}
+
+global proc AExgmModifierGuideCreateGuideFromCurvesOnClick(string $nodeName)
+{
+    select -add $nodeName;
+
+    python("xgui.createXgIgCurveToGuideWindow('"+$nodeName+"', 1)");
+}
+
+global proc AExgmModifierGuideMakeGuideDynamicReplace(string $attrName)
+{
+    string $nodeName = `plugNode $attrName`;
+
+    button -e -c ("AExgmModifierGuideMakeGuideDynamicOnClick " + $nodeName) xgmGuideModifierMakeDynamicButton;
+}
+
+global proc AExgmModifierGuideTemplate(string $nodeName)
+{
+    editorTemplate -beginScrollLayout;
+        // Common Attributes
+        AExgmModifierBaseTemplate $nodeName;
+
+        editorTemplate -beginLayout (uiRes("m_AExgmModifierGuideTemplate.kGuideModifier")) -collapse 0;
+            xgmCreateAEUiForFloatAttr "mask" (uiRes("m_AExgmModifierGuideTemplate.kMask")) "xgmModifierGuide";
+            xgmCreateAEUiForFloatAttr "magnitude" (uiRes("m_AExgmModifierGuideTemplate.kMagnitude")) "xgmModifierGuide";
+
+            AEaddRampControl ($nodeName+".magnitudeScale");
+
+            editorTemplate -addSeparator;
+
+            xgmCreateAEUiForFloatAttr "blend" (uiRes("m_AExgmModifierGuideTemplate.kBlend")) "xgmModifierGuide";
+        editorTemplate -endLayout;
+
+        // "Input Guide"
+        editorTemplate -beginLayout (uiRes("m_AExgmModifierGuideTemplate.kInputGuide")) -collapse 0;
+            editorTemplate -callCustom "AExgmModifierGuideInputGuideNew"
+                "AExgmModifierGuideInputGuideReplace" "inGuideData";
+
+            editorTemplate -callCustom "AExgmModifierGuideMakeGuideDynamicNew"
+                "AExgmModifierGuideMakeGuideDynamicReplace" "inSplineData";
+        editorTemplate -endLayout;
+
+        editorTemplate -beginLayout (uiRes("m_AExgmModifierGuideTemplate.kRegionControl")) -collapse 0;
+            editorTemplate -addControl -label (uiRes("m_AExgmModifierGuideTemplate.kUseRegionMap")) "useRegionMap";
+            xgmCreateAEUiForFloatAttr "regionMask" (uiRes("m_AExgmModifierGuideTemplate.kRegionMask")) "xgmModifierGuide";
+
+            editorTemplate -callCustom "AExgmModifierGuideRegionMapNew"
+                "AExgmModifierGuideRegionMapReplace" "regionMap";
+            editorTemplate -addControl -label (uiRes("m_AExgmModifierGuideTemplate.kPreviewColorOnSplines")) "previewColor";
+        editorTemplate -endLayout;
+
+        AEdependNodeTemplate $nodeName ;
+
+        // Dynamic Attributes
+        editorTemplate -addExtraControls;
+
+    editorTemplate -endScrollLayout;
+}
