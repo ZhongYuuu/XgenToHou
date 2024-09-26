@@ -79,4 +79,4 @@ https://www.autodesk.com.cn/support/technical/article/caas/sfdcarticles/sfdcarti
 Xgen毛发渲染抖动可能原因
 https://www.shangyexinzhi.com/article/3942036.html
 ```
-
+* [使用py调用maya里xgen面板](maya-xgen.py)
